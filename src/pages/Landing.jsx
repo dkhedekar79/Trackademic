@@ -259,13 +259,13 @@ const Landing = () => {
 
         {/* Comparison Table Section */}
         <section className="w-full flex flex-col items-center justify-center py-16 bg-gradient-to-b from-white to-blue-50 px-4">
-          <h3 className="text-2xl md:text-3xl font-bold mb-8 text-center">Trackviso vs Other Apps</h3>
+          <h3 className="text-2xl md:text-3xl font-bold mb-8 text-center">Trackademic vs Other Apps</h3>
           <div className="w-full max-w-2xl p-0 rounded-2xl shadow-2xl bg-white overflow-hidden">
             <table className="w-full border-collapse">
               <thead className="bg-blue-100 sticky top-0">
                 <tr>
                   <th className="py-3 px-6 text-left font-bold text-lg break-words">Feature</th>
-                  <th className="py-3 px-6 text-center font-bold text-lg break-words">Trackviso</th>
+                  <th className="py-3 px-6 text-center font-bold text-lg break-words">Trackademic</th>
                   <th className="py-3 px-6 text-center font-bold text-lg break-words">Other Apps</th>
                 </tr>
               </thead>
@@ -328,7 +328,7 @@ const Landing = () => {
                     <button className="p-2 ml-2 rounded-md bg-blue-500 text-white">Subscribe</button>
                 </div>
             </div>
-            <p className="text-center mt-8 text-sm">© 2025 Trackviso. All rights reserved.</p>
+            <p className="text-center mt-8 text-sm">© 2025 Trackademic. All rights reserved.</p>
         </section>
       </div>
     </div>
