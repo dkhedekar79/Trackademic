@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
 import { Pencil, Trash2 } from "lucide-react";
-import { jsonrepair } from "jsonrepair";
-
 
 const priorities = [
   { label: "Low", color: "border-blue-500" },
@@ -10,16 +8,12 @@ const priorities = [
   { label: "High", color: "border-red-500" },
 ];
 
-const subjects = ["Math", "English", "Biology", "History"];
-
 export default function Tasks() {
   const [tasks, setTasks] = useState([]);
+  const [subjects, setSubjects] = useState([]);
   const [form, setForm] = useState({ name: "", subject: "", time: "", priority: "Low", scheduledDate: "" });
   const [formError, setFormError] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const [showAIModal, setShowAIModal] = useState(false);
-  const [aiInstructions, setAiInstructions] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false);
   const [tab, setTab] = useState("todo");
   const [popTaskId, setPopTaskId] = useState(null);
   const [sortBy, setSortBy] = useState("subject");
@@ -29,6 +23,24 @@ export default function Tasks() {
   useEffect(() => {
     const saved = localStorage.getItem("tasks");
     if (saved) setTasks(JSON.parse(saved));
+  }, []);
+
+  // Load subjects from localStorage on mount
+  useEffect(() => {
+    const savedSubjects = localStorage.getItem("subjects");
+    if (savedSubjects) {
+      setSubjects(JSON.parse(savedSubjects));
+    } else {
+      // If no subjects exist, set default subjects
+      const defaultSubjects = [
+        { id: 1, name: "Math", color: "#6C5DD3", goalHours: 5 },
+        { id: 2, name: "English", color: "#B6E4CF", goalHours: 4 },
+        { id: 3, name: "Biology", color: "#FEC260", goalHours: 6 },
+        { id: 4, name: "History", color: "#FF6B6B", goalHours: 3 }
+      ];
+      setSubjects(defaultSubjects);
+      localStorage.setItem("subjects", JSON.stringify(defaultSubjects));
+    }
   }, []);
 
   // Save tasks to localStorage whenever they change
@@ -143,106 +155,6 @@ export default function Tasks() {
     setTasks(tasks.filter(t => t.id !== id));
   };
 
-  // Example topics for AI generation
-  const subjectTopics = {
-    Math: ["Algebra", "Geometry", "Calculus", "Statistics", "Trigonometry", "Probability", "Graphs", "Equations", "Word Problems", "Functions"],
-    English: ["Essay Writing", "Poetry Analysis", "Reading Comprehension", "Grammar", "Literature Review", "Creative Writing", "Vocabulary", "Book Report", "Speech Prep", "Drama"],
-    Biology: ["Cell Structure", "Genetics", "Photosynthesis", "Human Body", "Ecology", "Evolution", "Enzymes", "Respiration", "Osmosis", "Plant Biology"],
-    History: ["World War I", "World War II", "Cold War", "Industrial Revolution", "Ancient Rome", "Civil Rights", "French Revolution", "Medieval Europe", "Renaissance", "Exploration"],
-  };
-
-  // AI Generate Tasks with Hugging Face
-  const handleAIGenerate = async () => {
-    if (!aiInstructions.trim()) return;
-  
-    setIsGenerating(true);
-  
-    try {
-      console.log("Using Groq Key:", import.meta.env.VITE_GROQ_API_KEY); // TEMP: for debugging
-  
-      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${import.meta.env.VITE_GROQ_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "llama3-70b-8192",
-          messages: [
-            {
-                role: "system",
-                content: `
-              You are a helpful assistant that generates detailed study tasks based on user instructions. 
-              Always respond with a valid JSON object containing an array of at least 3 task objects under the key "tasks".
-              
-              Each task object must include:
-              - "name" (string)
-              - "subject" (string)
-              - "time" (string, in minutes)
-              - "priority" ("High", "Medium", or "Low")
-              
-              DO NOT include explanations, markdown, or anything outside the JSON object.
-              Respond ONLY with the JSON object.`
-              },
-            
-            {
-              role: "user",
-              content: aiInstructions,
-            },
-          ],
-          temperature: 0.7,
-          max_tokens: 1024,
-        }),
-      });
-  
-      if (!response.ok) {
-        const errText = await response.text();
-        console.error("Groq API Error:", response.status, errText);
-        throw new Error(`API returned ${response.status}: ${errText}`);
-      }
-  
-      const result = await response.json();
-      const message = result.choices?.[0]?.message?.content;
-  
-      console.log("Groq response:", message);
-  
-      const jsonMatch = message.match(/\{[\s\S]*?\}/);
-      let parsed = null;
-      try {
-        const jsonText = jsonMatch?.[0];
-        if (jsonText) {
-          parsed = JSON.parse(jsonrepair(jsonText));
-        }
-      } catch (e) {
-        console.error("JSON parse/repair failed:", e);
-        throw new Error("AI returned malformed data. Could not fix.");
-      }
-  
-      if (!parsed || !Array.isArray(parsed.tasks)) throw new Error("Invalid JSON format");
-  
-      const newTasks = parsed.tasks.map(task => ({
-        ...task,
-        id: Date.now() + Math.random(),
-        done: false,
-      }));
-  
-      setTasks(prev => [...prev, ...newTasks]);
-  
-    } catch (error) {
-      console.error("Error generating tasks from Groq:", error);
-      alert("Failed to generate tasks. Please check your API key and try again.");
-    } finally {
-      setIsGenerating(false);
-      setShowAIModal(false);
-      setAiInstructions('');
-    }
-  };
-  
-     
-
-
-
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1a1a2e] to-[#16213e] mt-20 flex">
       <Sidebar />
@@ -257,12 +169,6 @@ export default function Tasks() {
                   onClick={() => setShowModal(true)}
                 >
                   + Add Task
-                </button>
-                <button
-                  className="rounded-2xl bg-[#B6E4CF] text-[#23234a] px-4 py-2 font-semibold shadow hover:bg-[#A0D9C2] transition"
-                  onClick={() => setShowAIModal(true)}
-                >
-                  🤖 AI Generate Tasks
                 </button>
               </div>
             </div>
@@ -315,7 +221,7 @@ export default function Tasks() {
                   >
                     <option value="">Select Subject</option>
                     {subjects.map((subject) => (
-                      <option key={subject} value={subject}>{subject}</option>
+                      <option key={subject.id} value={subject.name}>{subject.name}</option>
                     ))}
                   </select>
                   <label className="block text-white mb-1">Duration (minutes)</label>
@@ -349,32 +255,6 @@ export default function Tasks() {
                     onClick={addTask}
                   >
                     Save Task
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* AI Generate Tasks Modal */}
-            {showAIModal && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-                <div className="bg-[#23234a] p-6 rounded-2xl shadow-xl w-full max-w-md space-y-4">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-lg font-bold text-white">AI Generate Tasks</span>
-                    <button className="text-white text-xl" onClick={() => setShowAIModal(false)}>&times;</button>
-                  </div>
-                  <label className="block text-white mb-1">Instructions</label>
-                  <textarea
-                    className="w-full p-2 rounded bg-[#1a1a2e] text-white border border-[#6C5DD3] mb-4"
-                    value={aiInstructions}
-                    onChange={e => setAiInstructions(e.target.value)}
-                    placeholder="e.g., 'Generate 3 tasks for my upcoming biology test on cell division.'"
-                  />
-                  <button
-                    className="w-full rounded-2xl bg-[#6C5DD3] text-white px-4 py-2 font-semibold shadow hover:bg-[#7A6AD9] transition disabled:opacity-50"
-                    onClick={handleAIGenerate}
-                    disabled={isGenerating}
-                  >
-                    {isGenerating ? 'Generating...' : 'Generate Tasks'}
                   </button>
                 </div>
               </div>

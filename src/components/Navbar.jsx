@@ -10,9 +10,7 @@ const Navbar = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      // Fade out as user scrolls down, fade in as user scrolls up
       const scrollY = window.scrollY;
-      // Fade out between 0 and 60px, clamp between 1 and 0
       const newOpacity = Math.max(0, 1 - scrollY / 60);
       setOpacity(newOpacity);
     };
@@ -36,11 +34,12 @@ const Navbar = () => {
           Trackademic
         </Link>
       </div>
-      {/* Center: DASHBOARD if on dashboard */}
-      <div className="flex-1 flex justify-center min-w-0">
+      
+      {/* Center: Page Title & Date */}
+      <div className="flex flex-col items-center flex-1 min-w-0">
         {(["/dashboard","/tasks","/schedule","/subjects","/study","/settings"].includes(location.pathname)) && (
-          <div className="flex flex-col items-center">
-            <span className="text-3xl font-extrabold tracking-widest bg-[linear-gradient(135deg,_#E0BBE4,_white)] text-transparent bg-clip-text">
+          <>
+            <span className="text-2xl font-extrabold tracking-widest bg-[linear-gradient(135deg,_#E0BBE4,_white)] text-transparent bg-clip-text">
               {location.pathname === "/dashboard" && "DASHBOARD"}
               {location.pathname === "/tasks" && "TASKS"}
               {location.pathname === "/schedule" && "SCHEDULE"}
@@ -51,15 +50,16 @@ const Navbar = () => {
             <span className="text-sm font-medium text-[#EDE9FE] mt-1">
               {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
             </span>
-          </div>
+          </>
         )}
       </div>
+      
       {/* Right: Auth links/buttons */}
       <div className="flex-1 flex justify-end gap-4 min-w-0">
         {!user && (
           <>
             <Link to="/login" className="px-4 py-2 rounded-lg text-[#6C5DD3] font-semibold hover:bg-[#EDE9FE] transition">Login</Link>
-            <Link to="/signup" className="px-4 py-2 rounded-lg text-[#6C5DD3] font-semibold hover:bg-[#EDE9FE] transition">Sign Up</Link>
+            <Link to="/signup" className="px-4 py-2 rounded-lg text-[#6C5DD3] font-semibold hover:bg-[#7A6AD9] transition">Sign Up</Link>
           </>
         )}
         {user && (
