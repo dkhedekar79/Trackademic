@@ -681,59 +681,69 @@ const Study = () => {
                       {studySessions
                         .filter(session => session.subjectName === subject)
                         .slice(0, 5)
-                        .map((session, index) => (
-                          <div key={index} className="p-3 rounded-lg bg-white/5 border border-white/10">
-                            <div className="flex items-center justify-between mb-2">
-                              <div className="flex items-center gap-2">
-                                <Clock className="w-4 h-4 text-[#6C5DD3]" />
-                                <span className="text-sm font-medium text-white">
-                                  {session.durationMinutes.toFixed(1)} min
+                        .map((session, index) => {
+                          const moodEmoji = {
+                            'great': '😄',
+                            'good': '🙂',
+                            'okay': '😐',
+                            'struggled': '😫'
+                          }[session.mood] || '';
+                          
+                          return (
+                            <div key={index} className="p-3 rounded-lg bg-white/5 border border-white/10">
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center gap-2">
+                                  <Clock className="w-4 h-4 text-[#6C5DD3]" />
+                                  <span className="text-sm font-medium text-white">
+                                    {session.durationMinutes.toFixed(1)} min
+                                  </span>
+                                </div>
+                                <span className="text-xs text-gray-400">
+                                  {new Date(session.timestamp).toLocaleDateString("en-US", { 
+                                    month: "short", 
+                                    day: "numeric",
+                                    hour: "2-digit",
+                                    minute: "2-digit"
+                                  })}
                                 </span>
                               </div>
-                              <span className="text-xs text-gray-400">
-                                {new Date(session.timestamp).toLocaleDateString("en-US", { 
-                                  month: "short", 
-                                  day: "numeric",
-                                  hour: "2-digit",
-                                  minute: "2-digit"
-                                })}
-                              </span>
-                            </div>
-                            
-                            {session.task && (
-                              <div className="text-xs text-gray-300 mb-1">
-                                Task: {session.task}
-                              </div>
-                            )}
-                            
-                            {session.reflection && (
-                              <div className="text-xs text-gray-300 mb-2">
-                                "{session.reflection}"
-                              </div>
-                            )}
-                            
-                            <div className="flex items-center gap-3 text-xs">
-                              {session.mood && (
-                                <span className="text-gray-400">
-                                  Mood: {session.mood}
-                                </span>
+                              
+                              {session.task && (
+                                <div className="text-xs text-gray-300 mb-1">
+                                  <span className="font-medium">Task:</span> {session.task}
+                                </div>
                               )}
-                              {session.difficulty && (
-                                <span className="text-gray-400">
-                                  Difficulty: {session.difficulty}/4
-                                </span>
+                              
+                              {session.reflection && (
+                                <div className="text-xs text-gray-300 mb-2 italic">
+                                  "{session.reflection}"
+                                </div>
                               )}
+                              
+                              <div className="flex items-center gap-3 text-xs">
+                                {session.mood && (
+                                  <span className="text-gray-400 flex items-center gap-1">
+                                    <span>{moodEmoji}</span>
+                                    <span className="capitalize">{session.mood}</span>
+                                  </span>
+                                )}
+                                {session.difficulty && (
+                                  <span className="text-gray-400">
+                                    Difficulty: {session.difficulty}/4
+                                  </span>
+                                )}
+                              </div>
+                              
+                              <button
+                                onClick={() => deleteStudySession(studySessions.indexOf(session))}
+                                className="mt-2 p-1 rounded hover:bg-red-600/20 transition text-red-400 hover:text-red-300"
+                                title="Delete session"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </button>
                             </div>
-                            
-                            <button
-                              onClick={() => deleteStudySession(studySessions.indexOf(session))}
-                              className="mt-2 p-1 rounded hover:bg-red-600/20 transition text-red-400 hover:text-red-300"
-                              title="Delete session"
-                            >
-                              <Trash2 className="w-3 h-3" />
-                            </button>
-                          </div>
-                        ))}
+                          );
+                        })}
                     </div>
                   ) : (
                     <div className="text-center py-8">
