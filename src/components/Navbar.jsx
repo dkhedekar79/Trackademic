@@ -31,7 +31,7 @@ const Navbar = () => {
       {/* Left: Logo */}
       <div className="flex-1 min-w-0">
         <Link to="/dashboard" className="text-2xl font-extrabold text-white whitespace-nowrap">
-          Trackademic
+          Trackviso
         </Link>
       </div>
       
