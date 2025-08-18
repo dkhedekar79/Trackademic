@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useGamification } from "../context/GamificationContext";
+import { Bell, User, LogOut, Menu, X, Star, Trophy, Flame } from 'lucide-react';
 
 const Navbar = () => {
   const [opacity, setOpacity] = useState(1);
   const { user, logout } = useAuth();
+  const { userStats, showRewards, recentRewards } = useGamification();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -37,7 +40,7 @@ const Navbar = () => {
       
       {/* Center: Page Title & Date */}
       <div className="flex flex-col items-center flex-1 min-w-0">
-        {(["/dashboard","/tasks","/schedule","/subjects","/study","/settings"].includes(location.pathname)) && (
+        {(["/dashboard","/tasks","/schedule","/subjects","/study","/settings","/insights"].includes(location.pathname)) && (
           <>
             <span className="text-2xl font-extrabold tracking-widest bg-[linear-gradient(135deg,_#E0BBE4,_white)] text-transparent bg-clip-text">
               {location.pathname === "/dashboard" && "DASHBOARD"}
@@ -46,6 +49,7 @@ const Navbar = () => {
               {location.pathname === "/subjects" && "SUBJECTS"}
               {location.pathname === "/study" && "STUDY"}
               {location.pathname === "/settings" && "SETTINGS"}
+              {location.pathname === "/insights" && "INSIGHTS"}
             </span>
             <span className="text-sm font-medium text-[#EDE9FE] mt-1">
               {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
@@ -63,14 +67,40 @@ const Navbar = () => {
           </>
         )}
         {user && (
-          <button
-            onClick={handleLogout}
-            className="px-4 py-2 rounded-lg text-white bg-[#6C5DD3] font-semibold hover:bg-[#7A6AD9] transition"
-          >
-            Log Out
-          </button>
+          <>
+            {/* Gamification Status */}
+            <div className="flex items-center gap-3 text-white">
+              <div className="flex items-center gap-2 bg-white/20 px-3 py-1 rounded-full">
+                <Star className="w-4 h-4 text-yellow-300" />
+                <span className="text-sm font-medium">{userStats?.level || 1}</span>
+              </div>
+              <div className="flex items-center gap-2 bg-white/20 px-3 py-1 rounded-full">
+                <Flame className="w-4 h-4 text-orange-300" />
+                <span className="text-sm font-medium">{userStats?.currentStreak || 0}</span>
+              </div>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="px-4 py-2 rounded-lg text-white bg-[#6C5DD3] font-semibold hover:bg-[#7A6AD9] transition"
+            >
+              Log Out
+            </button>
+          </>
         )}
       </div>
+
+      {/* Gamification Notifications */}
+      {showRewards && recentRewards.length > 0 && (
+        <div className="fixed top-24 right-6 bg-gradient-to-r from-green-500 to-emerald-600 text-white p-4 rounded-2xl shadow-2xl z-50 max-w-sm">
+          <div className="flex items-center gap-3">
+            <div className="text-2xl">🎉</div>
+            <div>
+              <h4 className="font-bold text-lg">Session Complete!</h4>
+              <p className="text-sm opacity-90">{recentRewards[recentRewards.length - 1]?.message}</p>
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };

@@ -1,344 +1,362 @@
-import React, { useState, useEffect } from "react";
-import Sidebar from "../components/Sidebar";
-import { Plus, Edit, Trash2, Clock, Play } from "lucide-react";
-import { useTimer } from "../context/TimerContext";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { 
+  Plus, 
+  Edit, 
+  Trash2, 
+  Play, 
+  BookOpen,
+  Star,
+  Trophy,
+  Award,
+  Target
+} from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useTimer } from '../context/TimerContext';
+import { useGamification } from '../context/GamificationContext';
 
-const defaultColors = [
-  "#6C5DD3", "#B6E4CF", "#FEC260", "#FF6B6B", 
-  "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEAA7",
-  "#DDA0DD", "#98D8C8", "#F7DC6F", "#BB8FCE"
-];
-
-function getTextColor(backgroundColor) {
-  const hex = backgroundColor.replace('#', '');
-  const r = parseInt(hex.substr(0, 2), 16);
-  const g = parseInt(hex.substr(2, 2), 16);
-  const b = parseInt(hex.substr(4, 2), 16);
-  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-  return luminance > 0.5 ? '#000000' : '#ffffff';
-}
-
-function getStartOfWeek(date) {
-  const d = new Date(date);
-  const day = d.getDay();
-  const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Monday as first day
-  return new Date(d.setDate(diff));
-}
-
-function formatLastStudied(ts) {
-  if (!ts) return "Never";
-  const now = new Date();
-  const last = new Date(ts);
-  const diffMs = now - last;
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  if (diffDays === 0) return "Today";
-  if (diffDays === 1) return "Yesterday";
-  if (diffDays < 7) return `${diffDays} days ago`;
-  return last.toLocaleDateString();
-}
-
-export default function Subjects() {
+const Subjects = () => {
   const [subjects, setSubjects] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [form, setForm] = useState({
-    name: "",
-    color: "#6C5DD3",
-    goalHours: ""
-  });
-  const [formError, setFormError] = useState("");
-  const [editId, setEditId] = useState(null);
-  const [studySessions, setStudySessions] = useState([]);
-  const { setTimerSubject, startTimer } = useTimer();
+  const [editingSubject, setEditingSubject] = useState(null);
+  const [newSubject, setNewSubject] = useState({ name: '', color: '#6C5DD3', goalHours: 0 });
   const navigate = useNavigate();
+  const { setTimerSubject } = useTimer();
+  const { userStats } = useGamification();
 
   useEffect(() => {
-    const saved = localStorage.getItem("subjects");
-    if (saved) {
-      setSubjects(JSON.parse(saved));
-    } else {
-      const defaultSubjects = [
-        { id: 1, name: "Math", color: "#6C5DD3", goalHours: 5 },
-        { id: 2, name: "English", color: "#B6E4CF", goalHours: 4 },
-        { id: 3, name: "Biology", color: "#FEC260", goalHours: 6 },
-        { id: 4, name: "History", color: "#FF6B6B", goalHours: 3 }
-      ];
-      setSubjects(defaultSubjects);
-      localStorage.setItem("subjects", JSON.stringify(defaultSubjects));
-    }
-    // Load study sessions
-    const sessions = localStorage.getItem("studySessions");
-    if (sessions) setStudySessions(JSON.parse(sessions));
+    const savedSubjects = JSON.parse(localStorage.getItem('subjects') || '[]');
+    setSubjects(savedSubjects);
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem("subjects", JSON.stringify(subjects));
-  }, [subjects]);
-
-  const addSubject = () => {
-    if (!form.name.trim()) {
-      setFormError("Please enter a subject name.");
-      return;
-    }
-    if (!form.goalHours || form.goalHours <= 0) {
-      setFormError("Please enter a valid goal hours per week.");
-      return;
-    }
-    if (editId) {
-      setSubjects(subjects.map(s => s.id === editId ? { ...s, ...form, goalHours: Number(form.goalHours) } : s));
-    } else {
-      setSubjects([...subjects, { 
-        ...form, 
-        id: Date.now(), 
-        goalHours: Number(form.goalHours) 
-      }]);
-    }
-    setForm({ name: "", color: "#6C5DD3", goalHours: "" });
-    setFormError("");
-    setShowModal(false);
-    setEditId(null);
-  };
-
-  const handleEdit = (subject) => {
-    setForm({
-      name: subject.name,
-      color: subject.color,
-      goalHours: subject.goalHours.toString()
-    });
-    setEditId(subject.id);
-    setShowModal(true);
-  };
-
-  const handleDelete = (id) => {
-    setSubjects(subjects.filter(s => s.id !== id));
-  };
-
-  const resetForm = () => {
-    setForm({ name: "", color: "#6C5DD3", goalHours: "" });
-    setFormError("");
-    setEditId(null);
-  };
-
-  const handleAddTask = (subjectName) => {
-    // Navigate to tasks page with subject pre-selected
-    // Store the subject name in localStorage for the tasks page to pick up
-    localStorage.setItem("preSelectedSubject", subjectName);
-    window.location.href = "/tasks";
-  };
-
   const handleStartTimer = (subjectName) => {
-    // Set the subject in the timer context
     setTimerSubject(subjectName);
-    // Navigate to study page with subject as URL parameter
     navigate(`/study?subject=${encodeURIComponent(subjectName)}`);
   };
 
-  // --- Calculate study stats for each subject ---
-  const now = new Date();
-  const weekStart = getStartOfWeek(now);
+  const handleAddSubject = () => {
+    if (newSubject.name.trim()) {
+      const updatedSubjects = [...subjects, { ...newSubject, id: Date.now() }];
+      setSubjects(updatedSubjects);
+      localStorage.setItem('subjects', JSON.stringify(updatedSubjects));
+      setNewSubject({ name: '', color: '#6C5DD3', goalHours: 0 });
+      setShowModal(false);
+    }
+  };
 
-  function getSubjectStats(subjectName) {
-    const sessions = studySessions.filter(s => s.subjectName === subjectName);
-    const weekSessions = sessions.filter(s => new Date(s.timestamp) >= weekStart);
-    const minutesThisWeek = weekSessions.reduce((sum, s) => sum + (s.durationMinutes || 0), 0);
-    const hoursThisWeek = minutesThisWeek / 60;
-    const lastSession = sessions.length > 0 ? Math.max(...sessions.map(s => s.timestamp)) : null;
-    return {
-      hoursThisWeek,
-      minutesThisWeek,
-      lastSession
-    };
-  }
+  const handleEditSubject = () => {
+    if (editingSubject && editingSubject.name.trim()) {
+      const updatedSubjects = subjects.map(subject =>
+        subject.id === editingSubject.id ? editingSubject : subject
+      );
+      setSubjects(updatedSubjects);
+      localStorage.setItem('subjects', JSON.stringify(updatedSubjects));
+      setEditingSubject(null);
+      setShowModal(false);
+    }
+  };
+
+  const handleDeleteSubject = (subjectId) => {
+    const updatedSubjects = subjects.filter(subject => subject.id !== subjectId);
+    setSubjects(updatedSubjects);
+    localStorage.setItem('subjects', JSON.stringify(updatedSubjects));
+  };
+
+  const getSubjectStudyTime = (subjectName) => {
+    const studySessions = JSON.parse(localStorage.getItem('studySessions') || '[]');
+    return studySessions
+      .filter(session => session.subjectName === subjectName)
+      .reduce((total, session) => total + session.durationMinutes, 0);
+  };
+
+  const getLastStudied = (subjectName) => {
+    const studySessions = JSON.parse(localStorage.getItem('studySessions') || '[]');
+    const subjectSessions = studySessions
+      .filter(session => session.subjectName === subjectName)
+      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    
+    return subjectSessions.length > 0 ? subjectSessions[0].timestamp : null;
+  };
+
+  const getSubjectLevel = (studyTime) => {
+    // Calculate level based on study time (1 level per 2 hours)
+    return Math.floor(studyTime / 120) + 1;
+  };
+
+  const getSubjectProgress = (studyTime, goalHours) => {
+    const goalMinutes = goalHours * 60;
+    return goalMinutes > 0 ? Math.min(100, (studyTime / goalMinutes) * 100) : 0;
+  };
+
+  const getSubjectBadge = (studyTime) => {
+    if (studyTime >= 600) return { icon: '🏆', name: 'Master', color: 'text-yellow-500' };
+    if (studyTime >= 300) return { icon: '⭐', name: 'Expert', color: 'text-purple-500' };
+    if (studyTime >= 120) return { icon: '🎯', name: 'Intermediate', color: 'text-blue-500' };
+    if (studyTime >= 60) return { icon: '📚', name: 'Beginner', color: 'text-green-500' };
+    return { icon: '🌱', name: 'New', color: 'text-gray-500' };
+  };
+
+  const calculateLuminance = (hex) => {
+    const rgb = hex.match(/[A-Za-z0-9]{2}/g).map(v => parseInt(v, 16));
+    return (0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]) / 255;
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1a1a2e] to-[#16213e] mt-20 flex">
-      <Sidebar />
-      <div className="flex-1 ml-16 transition-all duration-300 ease-in-out [body>div>aside:hover_+_div&]:ml-64">
-        <div className="p-8">
-          <div className="p-6 space-y-6">
-            <div className="flex items-center justify-between mb-6">
-              <h1 className="text-3xl font-bold text-white">Your Subjects</h1>
-              <button
-                className="rounded-2xl bg-[#6C5DD3] text-white px-4 py-2 font-semibold shadow hover:bg-[#7A6AD9] transition flex items-center gap-2"
-                onClick={() => {
-                  resetForm();
-                  setShowModal(true);
-                }}
-              >
-                <Plus className="w-4 h-4" />
-                Add Subject
-              </button>
-            </div>
+    <div className="p-6 space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-800">Subjects</h1>
+          <p className="text-gray-600">Manage your study subjects and track progress</p>
+        </div>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setShowModal(true)}
+          className="flex items-center space-x-2 px-6 py-3 bg-[#6C5DD3] text-white rounded-xl font-semibold shadow-lg hover:bg-[#7A6AD9] transition-colors"
+        >
+          <Plus className="w-5 h-5" />
+          <span>Add Subject</span>
+        </motion.button>
+      </div>
 
-            {/* Subjects Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {subjects.map((subject) => {
-                const textColor = getTextColor(subject.color);
-                const stats = getSubjectStats(subject.name);
-                const percent = Math.min(100, (stats.hoursThisWeek / subject.goalHours) * 100);
-                return (
-                  <div
-                    key={subject.id}
-                    className="rounded-xl p-6 transition-transform duration-200 hover:scale-105 shadow-lg flex flex-col"
-                    style={{ 
-                      backgroundColor: subject.color,
-                      color: textColor
-                    }}
-                  >
-                    <div className="flex items-start justify-between mb-4">
-                      <h3 className="text-xl font-bold" style={{ color: textColor }}>
-                        {subject.name}
-                      </h3>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleEdit(subject)}
-                          className="p-1 rounded hover:bg-black/10 transition"
-                          title="Edit"
-                          style={{ color: textColor }}
-                        >
-                          <Edit className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(subject.id)}
-                          className="p-1 rounded hover:bg-red-600/20 transition"
-                          title="Delete"
-                          style={{ color: textColor }}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+      {/* Subjects Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {subjects.map((subject) => {
+          const studyTime = getSubjectStudyTime(subject.name);
+          const lastStudied = getLastStudied(subject.name);
+          const level = getSubjectLevel(studyTime);
+          const progress = getSubjectProgress(studyTime, subject.goalHours);
+          const badge = getSubjectBadge(studyTime);
+          const textColor = calculateLuminance(subject.color) > 0.5 ? 'text-gray-800' : 'text-white';
+
+          return (
+            <motion.div
+              key={subject.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              whileHover={{ scale: 1.02 }}
+              className="relative overflow-hidden rounded-2xl shadow-lg"
+              style={{ backgroundColor: subject.color }}
+            >
+              {/* Subject Badge */}
+              <div className="absolute top-3 right-3">
+                <div className={`${badge.color} text-2xl`}>{badge.icon}</div>
+              </div>
+
+              <div className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex-1">
+                    <h3 className={`text-xl font-bold ${textColor} mb-1`}>{subject.name}</h3>
+                    <p className={`text-sm ${textColor} opacity-80`}>{badge.name} Level {level}</p>
+                  </div>
+                  <div className="flex space-x-2">
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => {
+                        setEditingSubject(subject);
+                        setShowModal(true);
+                      }}
+                      className={`p-2 rounded-lg ${textColor} opacity-70 hover:opacity-100 transition-opacity`}
+                    >
+                      <Edit className="w-4 h-4" />
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => handleDeleteSubject(subject.id)}
+                      className={`p-2 rounded-lg ${textColor} opacity-70 hover:opacity-100 transition-opacity`}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </motion.button>
+                  </div>
+                </div>
+
+                {/* Study Stats */}
+                <div className="space-y-3 mb-4">
+                  <div className="flex justify-between items-center">
+                    <span className={`text-sm ${textColor} opacity-80`}>Total Studied</span>
+                    <span className={`font-semibold ${textColor}`}>
+                      {Math.round(studyTime / 60)}h {Math.round(studyTime % 60)}m
+                    </span>
+                  </div>
+                  
+                  {subject.goalHours > 0 && (
+                    <div>
+                      <div className="flex justify-between items-center mb-1">
+                        <span className={`text-sm ${textColor} opacity-80`}>Weekly Goal</span>
+                        <span className={`text-sm ${textColor} opacity-80`}>{Math.round(progress)}%</span>
+                      </div>
+                      <div className="w-full bg-black bg-opacity-20 rounded-full h-2">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${progress}%` }}
+                          transition={{ duration: 1, ease: "easeOut" }}
+                          className="bg-white bg-opacity-80 h-2 rounded-full"
+                        ></motion.div>
                       </div>
                     </div>
-                    
-                    {/* Progress Bar */}
-                    <div className="w-full h-3 bg-white/30 rounded-full mb-3">
-                      <div
-                        className="h-3 rounded-full transition-all duration-300"
-                        style={{
-                          width: `${percent}%`,
-                          background: textColor === '#000000' ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.85)'
-                        }}
-                      ></div>
-                    </div>
-                    
-                    <div className="text-sm font-semibold mb-1" style={{ color: textColor }}>
-                      {stats.hoursThisWeek.toFixed(2)} hours studied this week
-                    </div>
-                    <div className="text-xs opacity-80 mb-1" style={{ color: textColor }}>
-                      Goal: {subject.goalHours} hours/week
-                    </div>
-                    <div className="text-xs opacity-80 mb-4" style={{ color: textColor }}>
-                      Last studied: {formatLastStudied(stats.lastSession)}
-                    </div>
+                  )}
 
-                    {/* Action Buttons */}
-                    <div className="flex gap-2 mt-auto">
-                      <button
-                        onClick={() => handleAddTask(subject.name)}
-                        className="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-semibold transition-all duration-200 hover:scale-105"
-                        style={{
-                          backgroundColor: textColor === '#000000' ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.2)',
-                          color: textColor
-                        }}
-                      >
-                        <Plus className="w-3 h-3" />
-                        Add Task
-                      </button>
-                      <button
-                        onClick={() => handleStartTimer(subject.name)}
-                        className="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-semibold transition-all duration-200 hover:scale-105"
-                        style={{
-                          backgroundColor: textColor === '#000000' ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.2)',
-                          color: textColor
-                        }}
-                      >
-                        <Play className="w-3 h-3" />
-                        Start Timer
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {subjects.length === 0 && (
-              <div className="text-center text-white/60 py-12">
-                <p className="text-lg mb-2">No subjects yet!</p>
-                <p className="text-sm">Click "Add Subject" to get started.</p>
-              </div>
-            )}
-
-            {/* Add/Edit Subject Modal */}
-            {showModal && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-                <div className="bg-[#23234a] p-6 rounded-2xl shadow-xl w-full max-w-md space-y-4">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-lg font-bold text-white">
-                      {editId ? "Edit Subject" : "Add New Subject"}
-                    </span>
-                    <button 
-                      className="text-white text-xl" 
-                      onClick={() => {
-                        setShowModal(false);
-                        resetForm();
-                      }}
-                    >
-                      &times;
-                    </button>
-                  </div>
-                  {formError && (
-                    <div className="bg-red-500/80 text-white text-sm rounded px-3 py-2 mb-2">
-                      {formError}
+                  {lastStudied && (
+                    <div className="flex justify-between items-center">
+                      <span className={`text-sm ${textColor} opacity-80`}>Last Studied</span>
+                      <span className={`text-sm ${textColor} opacity-80`}>
+                        {new Date(lastStudied).toLocaleDateString()}
+                      </span>
                     </div>
                   )}
-                  <div>
-                    <label className="block text-white mb-1">Subject Name</label>
-                    <input
-                      className="w-full p-2 rounded bg-[#1a1a2e] text-white border border-[#6C5DD3] mb-4"
-                      value={form.name}
-                      onChange={(e) => setForm({ ...form, name: e.target.value })}
-                      placeholder="e.g., Physics"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-white mb-1">Goal Hours per Week</label>
-                    <input
-                      type="number"
-                      min="0.5"
-                      step="0.5"
-                      className="w-full p-2 rounded bg-[#1a1a2e] text-white border border-[#6C5DD3] mb-4"
-                      value={form.goalHours}
-                      onChange={(e) => setForm({ ...form, goalHours: e.target.value })}
-                      placeholder="e.g., 5"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-white mb-1">Color</label>
-                    <div className="grid grid-cols-6 gap-2 mb-4">
-                      {defaultColors.map((color) => (
-                        <button
-                          key={color}
-                          type="button"
-                          className={`w-8 h-8 rounded-full border-2 transition ${
-                            form.color === color ? "border-white" : "border-white/20"
-                          }`}
-                          style={{ backgroundColor: color }}
-                          onClick={() => setForm({ ...form, color })}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                  <button
-                    className="w-full rounded-2xl bg-[#6C5DD3] text-white px-4 py-2 font-semibold shadow hover:bg-[#7A6AD9] transition"
-                    onClick={addSubject}
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex space-x-2">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => handleStartTimer(subject.name)}
+                    className={`flex-1 flex items-center justify-center space-x-2 py-2 px-4 rounded-lg font-semibold transition-colors ${
+                      textColor === 'text-white' 
+                        ? 'bg-white bg-opacity-20 text-white hover:bg-opacity-30' 
+                        : 'bg-black bg-opacity-10 text-gray-800 hover:bg-opacity-20'
+                    }`}
                   >
-                    {editId ? "Update Subject" : "Add Subject"}
-                  </button>
+                    <Play className="w-4 h-4" />
+                    <span>Start Timer</span>
+                  </motion.button>
+                  
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className={`flex items-center justify-center p-2 rounded-lg transition-colors ${
+                      textColor === 'text-white' 
+                        ? 'bg-white bg-opacity-20 text-white hover:bg-opacity-30' 
+                        : 'bg-black bg-opacity-10 text-gray-800 hover:bg-opacity-20'
+                    }`}
+                  >
+                    <BookOpen className="w-4 h-4" />
+                  </motion.button>
                 </div>
               </div>
-            )}
-          </div>
-        </div>
+            </motion.div>
+          );
+        })}
       </div>
+
+      {/* Empty State */}
+      {subjects.length === 0 && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-center py-12"
+        >
+          <BookOpen className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-xl font-semibold text-gray-600 mb-2">No subjects yet</h3>
+          <p className="text-gray-500 mb-6">Add your first subject to start tracking your study progress</p>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setShowModal(true)}
+            className="px-6 py-3 bg-[#6C5DD3] text-white rounded-xl font-semibold shadow-lg hover:bg-[#7A6AD9] transition-colors"
+          >
+            Add Your First Subject
+          </motion.button>
+        </motion.div>
+      )}
+
+      {/* Add/Edit Subject Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-2xl p-6 w-full max-w-md mx-4"
+          >
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">
+              {editingSubject ? 'Edit Subject' : 'Add New Subject'}
+            </h2>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Subject Name</label>
+                <input
+                  type="text"
+                  value={editingSubject ? editingSubject.name : newSubject.name}
+                  onChange={(e) => {
+                    if (editingSubject) {
+                      setEditingSubject({ ...editingSubject, name: e.target.value });
+                    } else {
+                      setNewSubject({ ...newSubject, name: e.target.value });
+                    }
+                  }}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6C5DD3] focus:border-transparent"
+                  placeholder="Enter subject name"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Color</label>
+                <input
+                  type="color"
+                  value={editingSubject ? editingSubject.color : newSubject.color}
+                  onChange={(e) => {
+                    if (editingSubject) {
+                      setEditingSubject({ ...editingSubject, color: e.target.value });
+                    } else {
+                      setNewSubject({ ...newSubject, color: e.target.value });
+                    }
+                  }}
+                  className="w-full h-12 border border-gray-300 rounded-lg cursor-pointer"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Weekly Goal (hours)</label>
+                <input
+                  type="number"
+                  value={editingSubject ? editingSubject.goalHours : newSubject.goalHours}
+                  onChange={(e) => {
+                    if (editingSubject) {
+                      setEditingSubject({ ...editingSubject, goalHours: parseFloat(e.target.value) || 0 });
+                    } else {
+                      setNewSubject({ ...newSubject, goalHours: parseFloat(e.target.value) || 0 });
+                    }
+                  }}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6C5DD3] focus:border-transparent"
+                  placeholder="0"
+                  min="0"
+                  step="0.5"
+                />
+              </div>
+            </div>
+            
+            <div className="flex space-x-3 mt-6">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => {
+                  setShowModal(false);
+                  setEditingSubject(null);
+                  setNewSubject({ name: '', color: '#6C5DD3', goalHours: 0 });
+                }}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={editingSubject ? handleEditSubject : handleAddSubject}
+                className="flex-1 px-4 py-2 bg-[#6C5DD3] text-white rounded-lg font-semibold hover:bg-[#7A6AD9] transition-colors"
+              >
+                {editingSubject ? 'Save Changes' : 'Add Subject'}
+              </motion.button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
-} 
+};
+
+export default Subjects; 

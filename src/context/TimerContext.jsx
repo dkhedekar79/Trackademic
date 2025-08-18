@@ -12,231 +12,173 @@ export const useTimer = () => {
 
 export const TimerProvider = ({ children }) => {
   const [timerState, setTimerState] = useState({
-    secondsLeft: 25 * 60, // 25 minutes default
     isRunning: false,
-    subject: 'No Subject',
     mode: 'pomodoro', // pomodoro, custom, stopwatch
-    customDuration: 25 * 60,
+    secondsLeft: 25 * 60, // For countdown modes
     stopwatchSeconds: 0, // For stopwatch mode
-    isPomodoroBreak: false, // Track if we're in break mode
-    pomodoroCount: 0 // Count completed pomodoros
+    isPomodoroBreak: false,
+    pomodoroCount: 0,
+    subjectName: '',
+    // Custom duration (minutes) for custom mode
+    customMinutes: 25,
+    startTime: null, // Store when timer started (ms)
+    pausedTime: null, // Accumulated time when paused (seconds)
+    lastUpdateTime: null // Track last update for accuracy (ms)
   });
 
-  const [intervalId, setIntervalId] = useState(null);
+  const { isRunning, mode, secondsLeft, stopwatchSeconds, isPomodoroBreak, pomodoroCount, subjectName, startTime, pausedTime, lastUpdateTime, customMinutes } = timerState;
 
-  // Load timer state from localStorage on mount
-  useEffect(() => {
-    const savedState = localStorage.getItem('timerState');
-    if (savedState) {
-      setTimerState(JSON.parse(savedState));
+  // Calculate actual elapsed time based on real timestamps
+  const getActualElapsedTime = () => {
+    if (!startTime) return 0;
+    if (isRunning) {
+      return Math.floor((Date.now() - startTime) / 1000);
+    } else if (pausedTime !== null) {
+      return pausedTime;
     }
-  }, []);
+    return 0;
+  };
 
-  // Save timer state to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem('timerState', JSON.stringify(timerState));
-  }, [timerState]);
-
-  // Timer countdown effect
-  useEffect(() => {
-    if (timerState.isRunning && timerState.mode !== 'stopwatch') {
-      if (timerState.secondsLeft > 0) {
-        const id = setInterval(() => {
-          setTimerState(prev => ({
-            ...prev,
-            secondsLeft: prev.secondsLeft > 0 ? prev.secondsLeft - 1 : 0
-          }));
-        }, 1000);
-        setIntervalId(id);
-        return () => clearInterval(id);
-      } else if (intervalId) {
-        clearInterval(intervalId);
-        setIntervalId(null);
-      }
-    } else if (timerState.isRunning && timerState.mode === 'stopwatch') {
-      const id = setInterval(() => {
-        setTimerState(prev => ({
-          ...prev,
-          stopwatchSeconds: prev.stopwatchSeconds + 1
-        }));
-      }, 1000);
-      setIntervalId(id);
-      return () => clearInterval(id);
-    } else if (intervalId) {
-      clearInterval(intervalId);
-      setIntervalId(null);
-    }
-    // eslint-disable-next-line
-  }, [timerState.isRunning, timerState.secondsLeft, timerState.mode, timerState.stopwatchSeconds]);
-
-  // Handle timer completion and pomodoro cycles
-  useEffect(() => {
-    if (timerState.secondsLeft === 0 && timerState.isRunning && timerState.mode === 'pomodoro') {
-      setTimerState(prev => {
-        // Don't save study session here - let the Study page handle it with reflection data
-        // if (!prev.isPomodoroBreak && prev.subject !== 'No Subject') {
-        //   saveStudySession();
-        // }
-
-        // Handle pomodoro cycle
-        if (!prev.isPomodoroBreak) {
-          // Work session completed, start break
-          const newState = {
-            ...prev,
-            isRunning: false,
-            isPomodoroBreak: true,
-            secondsLeft: 5 * 60, // 5 minute break
-            pomodoroCount: prev.pomodoroCount + 1
-          };
-          
-          // Auto-start break timer after a short delay
-          setTimeout(() => {
-            setTimerState(current => ({ ...current, isRunning: true }));
-          }, 1000);
-          
-          return newState;
-        } else {
-          // Break completed, start next work session
-          const newState = {
-            ...prev,
-            isRunning: false,
-            isPomodoroBreak: false,
-            secondsLeft: 25 * 60 // 25 minute work session
-          };
-          
-          // Auto-start work timer after a short delay
-          setTimeout(() => {
-            setTimerState(current => ({ ...current, isRunning: true }));
-          }, 1000);
-          
-          return newState;
-        }
-      });
-    } else if (timerState.secondsLeft === 0 && timerState.isRunning && timerState.mode === 'custom') {
-      setTimerState(prev => {
-        // Don't save study session here - let the Study page handle it with reflection data
-        // if (prev.subject !== 'No Subject') {
-        //   saveStudySession();
-        // }
-        return { ...prev, isRunning: false };
-      });
-    }
-  }, [timerState.secondsLeft, timerState.isRunning, timerState.mode, timerState.isPomodoroBreak]);
-
-  const saveStudySession = (isPartial = false, customState = null) => {
-    const stateToUse = customState || timerState;
-    let actualDuration;
-    
-    if (stateToUse.mode === 'stopwatch') {
-      actualDuration = stateToUse.stopwatchSeconds;
+  // Update timer display based on actual elapsed time
+  const updateTimerDisplay = () => {
+    if (mode === 'stopwatch') {
+      const elapsed = getActualElapsedTime();
+      setTimerState(prev => ({ ...prev, stopwatchSeconds: elapsed }));
     } else {
-      const totalDuration = getModeDuration(stateToUse.mode);
-      actualDuration = isPartial ? (totalDuration - stateToUse.secondsLeft) : totalDuration;
+      const elapsed = getActualElapsedTime();
+      const totalDuration = getModeDuration(mode);
+      const remaining = Math.max(0, totalDuration - elapsed);
+      setTimerState(prev => ({ ...prev, secondsLeft: remaining }));
     }
-    
-    // Only save if there's actual study time
-    if (actualDuration <= 0) return;
+  };
 
-    const session = {
-      subjectName: stateToUse.subject,
-      durationMinutes: actualDuration / 60, // Convert seconds to minutes
-      timestamp: new Date().toISOString()
+  // Main timer update loop - runs every 100ms for smooth display
+  useEffect(() => {
+    if (!isRunning) return;
+    const interval = setInterval(() => {
+      updateTimerDisplay();
+      if (mode !== 'stopwatch') {
+        const elapsed = getActualElapsedTime();
+        const totalDuration = getModeDuration(mode);
+        if (elapsed >= totalDuration) handleTimerComplete();
+      }
+    }, 100);
+    return () => clearInterval(interval);
+  }, [isRunning, mode, startTime, pausedTime, customMinutes, isPomodoroBreak]);
+
+  // Handle page visibility changes to maintain timer accuracy
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        if (isRunning) {
+          const elapsed = getActualElapsedTime();
+          setTimerState(prev => ({ ...prev, pausedTime: elapsed, lastUpdateTime: Date.now() }));
+        }
+      } else {
+        if (isRunning && pausedTime !== null) {
+          const now = Date.now();
+          const hiddenDuration = now - (lastUpdateTime || now);
+          // Shift startTime forward by the hidden duration so elapsed includes background time
+          setTimerState(prev => ({ ...prev, startTime: prev.startTime ? prev.startTime + hiddenDuration : now, pausedTime: null }));
+        }
+      }
     };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [isRunning, pausedTime, lastUpdateTime]);
 
-    // Get existing sessions
-    const existingSessions = localStorage.getItem('studySessions');
-    const sessions = existingSessions ? JSON.parse(existingSessions) : [];
-    
-    // Add new session
-    sessions.push(session);
-    
-    // Save back to localStorage
-    localStorage.setItem('studySessions', JSON.stringify(sessions));
-  };
-
-  const getModeDuration = (mode) => {
-    switch (mode) {
-      case 'pomodoro': return timerState.isPomodoroBreak ? 5 * 60 : 25 * 60;
-      case 'custom': return timerState.customDuration;
-      case 'stopwatch': return 0; // Stopwatch doesn't have a duration
-      default: return 25 * 60;
+  const getModeDuration = (timerMode) => {
+    switch (timerMode) {
+      case 'pomodoro':
+        return isPomodoroBreak ? 5 * 60 : 25 * 60;
+      case 'custom':
+        return (customMinutes || 25) * 60;
+      case 'stopwatch':
+        return 0;
+      default:
+        return 25 * 60;
     }
   };
 
+  // Start or resume timer
   const startTimer = () => {
-    setTimerState(prev => ({ ...prev, isRunning: true }));
-  };
-
-  const stopTimer = () => {
-    // Don't save study session here - let the Study page handle it with reflection data
-    // if (timerState.subject !== 'No Subject') {
-    //   if (timerState.mode === 'stopwatch') {
-    //     if (timerState.stopwatchSeconds > 0) {
-    //       saveStudySession(false);
-    //     }
-    //   } else if (timerState.mode === 'pomodoro' && !timerState.isPomodoroBreak) {
-    //     if (timerState.secondsLeft < getModeDuration(timerState.mode)) {
-    //       saveStudySession(true);
-    //     }
-    //   } else if (timerState.mode === 'custom') {
-    //     if (timerState.secondsLeft < getModeDuration(timerState.mode)) {
-    //       saveStudySession(true);
-    //     }
-    //   }
-    // }
-    
-    setTimerState(prev => ({ ...prev, isRunning: false }));
-  };
-
-  const resetTimer = () => {
-    const duration = getModeDuration(timerState.mode);
-    setTimerState(prev => ({ 
-      ...prev, 
-      isRunning: false,
-      secondsLeft: duration,
-      stopwatchSeconds: 0,
-      isPomodoroBreak: false
+    const now = Date.now();
+    setTimerState(prev => ({
+      ...prev,
+      isRunning: true,
+      // If we have pausedTime, resume from that elapsed
+      startTime: prev.pausedTime !== null ? now - prev.pausedTime * 1000 : now,
+      pausedTime: null,
+      lastUpdateTime: now
     }));
   };
 
-  const setTimerDuration = (seconds) => {
-    setTimerState(prev => ({ 
-      ...prev, 
-      secondsLeft: seconds,
-      customDuration: seconds,
-      mode: 'custom',
-      isPomodoroBreak: false
+  const stopTimer = () => {
+    const elapsed = getActualElapsedTime();
+    setTimerState(prev => ({ ...prev, isRunning: false, pausedTime: elapsed, lastUpdateTime: Date.now() }));
+  };
+
+  const resetTimer = () => {
+    const totalDuration = getModeDuration(mode);
+    setTimerState(prev => ({
+      ...prev,
+      isRunning: false,
+      secondsLeft: mode === 'stopwatch' ? 0 : totalDuration,
+      stopwatchSeconds: 0,
+      startTime: null,
+      pausedTime: null,
+      lastUpdateTime: null
+    }));
+  };
+
+  // When custom minutes change, reflect it in secondsLeft if not running and in custom mode
+  const setCustomMinutes = (minutes) => {
+    setTimerState(prev => {
+      const next = { ...prev, customMinutes: minutes };
+      if (!prev.isRunning && prev.mode === 'custom') {
+        next.secondsLeft = (minutes || 25) * 60;
+      }
+      return next;
+    });
+  };
+
+  const setTimerMode = (newMode) => {
+    const totalDuration = getModeDuration(newMode);
+    setTimerState(prev => ({
+      ...prev,
+      mode: newMode,
+      secondsLeft: newMode === 'stopwatch' ? 0 : totalDuration,
+      stopwatchSeconds: 0,
+      isPomodoroBreak: false,
+      pomodoroCount: 0,
+      startTime: null,
+      pausedTime: null,
+      lastUpdateTime: null
     }));
   };
 
   const setTimerSubject = (subject) => {
-    setTimerState(prev => ({ ...prev, subject }));
+    setTimerState(prev => ({ ...prev, subjectName: subject }));
   };
 
-  const setTimerMode = (mode) => {
-    const duration = getModeDuration(mode);
-    setTimerState(prev => ({ 
-      ...prev, 
-      mode,
-      secondsLeft: duration,
-      isRunning: false,
-      stopwatchSeconds: 0,
-      isPomodoroBreak: false
-    }));
-  };
-
-  const formatTime = (seconds) => {
-    const mins = String(Math.floor(seconds / 60)).padStart(2, '0');
-    const secs = String(seconds % 60).padStart(2, '0');
-    return `${mins}:${secs}`;
-  };
-
-  const getProgress = () => {
-    if (timerState.mode === 'stopwatch') {
-      return 0; // Stopwatch doesn't have progress
+  const handleTimerComplete = () => {
+    if (mode === 'pomodoro') {
+      if (isPomodoroBreak) {
+        setTimerState(prev => ({ ...prev, isPomodoroBreak: false, pomodoroCount: prev.pomodoroCount + 1, startTime: Date.now(), pausedTime: null }));
+      } else {
+        setTimerState(prev => ({ ...prev, isPomodoroBreak: true, startTime: Date.now(), pausedTime: null }));
+      }
+    } else {
+      stopTimer();
     }
-    const total = getModeDuration(timerState.mode);
-    return total > 0 ? ((total - timerState.secondsLeft) / total) * 100 : 0;
+  };
+
+  const saveStudySession = (sessionData) => {
+    const actualDuration = mode === 'stopwatch' ? stopwatchSeconds : getModeDuration(mode) - secondsLeft;
+    const session = { ...sessionData, durationMinutes: Math.round((actualDuration / 60) * 100) / 100, timestamp: new Date().toISOString(), subjectName: subjectName || sessionData.subjectName };
+    const existingSessions = JSON.parse(localStorage.getItem('studySessions') || '[]');
+    const updatedSessions = [...existingSessions, session];
+    localStorage.setItem('studySessions', JSON.stringify(updatedSessions));
   };
 
   const value = {
@@ -244,12 +186,11 @@ export const TimerProvider = ({ children }) => {
     startTimer,
     stopTimer,
     resetTimer,
-    setTimerDuration,
-    setTimerSubject,
+    setCustomMinutes,
     setTimerMode,
-    formatTime,
-    getProgress,
-    getModeDuration
+    setTimerSubject,
+    saveStudySession,
+    getActualElapsedTime
   };
 
   return (
