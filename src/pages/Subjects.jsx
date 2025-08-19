@@ -102,7 +102,7 @@ const Subjects = () => {
   };
 
   return (
-    <div className="p-6 space-y-6 mt-20 pl-[80px] bg-gradient-to-br from-[#1a1a2e] to-[#16213e] flex ">
+    <div className="p-6 space-y-6 mt-20 pl-[80px] bg-gradient-to-br from-[#1a1a2e] to-[#16213e] ">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
