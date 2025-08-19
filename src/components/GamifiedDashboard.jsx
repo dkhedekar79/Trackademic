@@ -157,7 +157,7 @@ const GamifiedDashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="bg-white/10 rounded-2xl p-4 backdrop-blur">
               <div className="flex items-center gap-3 mb-2">
-                <Fire className="w-6 h-6 text-orange-300" />
+                <Flame className="w-6 h-6 text-orange-300" />
                 <span className="font-semibold">Current Streak</span>
               </div>
               <div className="text-2xl font-bold">
