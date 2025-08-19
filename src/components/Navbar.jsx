@@ -7,7 +7,7 @@ import { Bell, User, LogOut, Menu, X, Star, Trophy, Flame } from 'lucide-react';
 const Navbar = () => {
   const [opacity, setOpacity] = useState(1);
   const { user, logout } = useAuth();
-  const { userStats, showRewards, recentRewards } = useGamification();
+  const { userStats, showRewards, rewardQueue } = useGamification();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -105,4 +105,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar; 
+export default Navbar;
