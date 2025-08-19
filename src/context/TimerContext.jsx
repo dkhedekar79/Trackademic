@@ -118,7 +118,7 @@ export const TimerProvider = ({ children }) => {
     setTimerState(prev => ({ ...prev, isRunning: false, pausedTime: elapsed, lastUpdateTime: Date.now() }));
   }, [getActualElapsedTime]);
 
-  const resetTimer = () => {
+  const resetTimer = useCallback(() => {
     const totalDuration = getModeDuration(mode);
     setTimerState(prev => ({
       ...prev,
@@ -129,7 +129,7 @@ export const TimerProvider = ({ children }) => {
       pausedTime: null,
       lastUpdateTime: null
     }));
-  };
+  }, [mode]);
 
   // When custom minutes change, reflect it in secondsLeft if not running and in custom mode
   const setCustomMinutes = (minutes) => {
