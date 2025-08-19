@@ -1164,7 +1164,7 @@ const Study = () => {
       {/* Gamification Reward Animations */}
       <AnimatePresence>
         {showRewards && (
-          <XPPopup 
+          <XPGainAnimation
             amount={recentRewards[recentRewards.length - 1]?.amount || 0}
             onComplete={() => setShowRewards(false)}
           />
