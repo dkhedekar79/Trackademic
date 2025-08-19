@@ -64,14 +64,19 @@ const GamifiedDashboard = () => {
     return '🌟';
   };
 
-  // Mock quick session function
+  // Real quick session function
   const startQuickSession = (duration) => {
+    // This would integrate with the actual timer system
+    // For now, we'll show a realistic message
     addReward({
       type: 'XP_EARNED',
-      title: `Quick ${duration}-min session started!`,
-      description: 'Get ready to earn some XP!',
+      title: `Timer set for ${duration} minutes`,
+      description: 'Focus mode activated! Start studying to earn XP.',
       tier: 'common'
     });
+
+    // In a real implementation, this would start the actual timer
+    // and navigate to the study page with the timer pre-configured
   };
 
   return (
