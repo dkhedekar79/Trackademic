@@ -321,7 +321,7 @@ const QuestProgressTracker = ({ quest, onComplete }) => {
           
           <div className="flex items-center gap-1 text-yellow-600">
             <Star className="w-4 h-4" />
-            <span className="font-semibold">+{quest.xp} XP</span>
+            <span className="font-semibold">+{quest.xp || 0} XP</span>
           </div>
         </div>
       </div>
