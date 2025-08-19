@@ -6,7 +6,7 @@ const TimerCard = ({ variant = 'full', className = '' }) => {
   const [subjects, setSubjects] = useState([]);
   const [customMinutes, setLocalCustomMinutes] = useState('25');
   const [showCustomInput, setShowCustomInput] = useState(false);
-  
+
   const {
     secondsLeft,
     isRunning,
@@ -23,6 +23,12 @@ const TimerCard = ({ variant = 'full', className = '' }) => {
     setCustomMinutes,
     getActualElapsedTime
   } = useTimer();
+
+  const {
+    addStudySession,
+    updateQuestProgress,
+    addReward
+  } = useGamification();
 
   const MODES = [
     { key: 'pomodoro', label: 'Pomodoro', duration: 25 * 60 },
