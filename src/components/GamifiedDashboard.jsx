@@ -302,34 +302,60 @@ const GamifiedDashboard = () => {
 
 // Enhanced Overview Tab
 const OverviewTab = ({ userStats }) => {
+  // Calculate real weekly statistics
+  const getWeeklyStats = () => {
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+    const thisWeekSessions = userStats.sessionHistory?.filter(session =>
+      new Date(session.timestamp) > oneWeekAgo
+    ) || [];
+
+    const thisWeekXP = thisWeekSessions.reduce((total, session) =>
+      total + (session.xpEarned || 0), 0
+    );
+
+    const thisWeekTime = thisWeekSessions.reduce((total, session) =>
+      total + (session.durationMinutes || 0), 0
+    );
+
+    return {
+      sessionsThisWeek: thisWeekSessions.length,
+      xpThisWeek: thisWeekXP,
+      timeThisWeek: Math.round(thisWeekTime / 60) // Convert to hours
+    };
+  };
+
+  const weeklyStats = getWeeklyStats();
+
   const stats = [
     {
       label: 'Total XP Earned',
       value: userStats.totalXPEarned?.toLocaleString() || userStats.xp.toLocaleString(),
       icon: Star,
       color: 'from-yellow-500 to-orange-500',
-      change: '+12% this week'
+      change: weeklyStats.xpThisWeek > 0 ? `+${weeklyStats.xpThisWeek.toLocaleString()} this week` : 'No XP this week'
     },
     {
       label: 'Study Sessions',
       value: userStats.totalSessions,
       icon: BookOpen,
       color: 'from-green-500 to-teal-500',
-      change: '+3 this week'
+      change: weeklyStats.sessionsThisWeek > 0 ? `+${weeklyStats.sessionsThisWeek} this week` : 'No sessions this week'
     },
     {
       label: 'Longest Streak',
       value: `${userStats.longestStreak} days`,
       icon: Flame,
       color: 'from-orange-500 to-red-500',
-      change: userStats.currentStreak === userStats.longestStreak ? 'Current!' : 'Personal best'
+      change: userStats.currentStreak === userStats.longestStreak ? 'Current record!' : 'Personal best'
     },
     {
       label: 'Total Study Time',
       value: `${Math.round(userStats.totalStudyTime / 60)}h`,
       icon: Clock,
       color: 'from-blue-500 to-indigo-500',
-      change: '+8h this week'
+      change: weeklyStats.timeThisWeek > 0 ? `+${weeklyStats.timeThisWeek}h this week` : 'No study time this week'
     }
   ];
 
