@@ -150,7 +150,7 @@ const ACHIEVEMENT_CATEGORIES = {
   
   streak_achievements: {
     name: 'Streak Master',
-    icon: Fire,
+    icon: Flame,
     color: 'orange',
     achievements: [
       {
