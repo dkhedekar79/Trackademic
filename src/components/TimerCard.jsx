@@ -238,7 +238,7 @@ const TimerCard = ({ variant = 'full', className = '' }) => {
         </div>
         <div className="flex justify-center gap-3">
           {isRunning ? (
-            <button onClick={stopTimer} className="px-6 py-2 rounded-xl bg-[#FEC260] text-[#23234a] font-bold shadow hover:bg-[#FFD580] transition">Pause</button>
+            <button onClick={handleStopTimer} className="px-6 py-2 rounded-xl bg-[#FEC260] text-[#23234a] font-bold shadow hover:bg-[#FFD580] transition">Complete Session</button>
           ) : (
             <button onClick={startTimer} disabled={mode !== 'stopwatch' && secondsLeft === 0} className="px-6 py-2 rounded-xl bg-[#6C5DD3] text-white font-bold shadow hover:bg-[#7A6AD9] transition">Start</button>
           )}
