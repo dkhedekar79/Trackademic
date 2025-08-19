@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Gift, Star, Trophy, Crown, Sparkles, Zap, Fire, Heart,
+import {
+  Gift, Star, Trophy, Crown, Sparkles, Zap, Flame, Heart,
   Gem, Award, Target, CheckCircle, X, Volume2, VolumeX,
-  TrendingUp, Calendar, Users, Book, Timer, Flame
+  TrendingUp, Calendar, Users, Book, Timer
 } from 'lucide-react';
 import { useGamification } from '../context/GamificationContext';
 import { 
