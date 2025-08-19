@@ -517,7 +517,7 @@ const RewardSystem = () => {
 
   const handleMysteryBoxOpen = () => {
     // Mystery box should only be available after real study achievements
-    const { userStats } = useGamification();
+    // userStats is already available from the component scope
 
     // Base reward on user's actual performance
     const baseXP = Math.max(50, Math.floor(userStats.xp / 100)); // Scale with user progress
