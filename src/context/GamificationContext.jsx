@@ -382,7 +382,7 @@ export const GamificationProvider = ({ children }) => {
     const newLevel = getLevelFromXP(newXP);
 
     // Update user stats
-    setUserStats(prev => ({
+    const newStats = {
       ...prev,
       xp: newXP,
       level: newLevel,
@@ -394,7 +394,19 @@ export const GamificationProvider = ({ children }) => {
         ...prev.subjectMastery,
         [subjectName]: (prev.subjectMastery[subjectName] || 0) + sessionDuration
       }
-    }));
+    };
+
+    console.log('🎯 Awarding XP:', {
+      sessionDuration,
+      subjectName,
+      oldXP: prev.xp,
+      newXP,
+      xpGained: xpData.totalXP,
+      oldTotalXPEarned: prev.totalXPEarned,
+      newTotalXPEarned: newStats.totalXPEarned
+    });
+
+    setUserStats(newStats);
 
     // Show XP reward
     addReward({
