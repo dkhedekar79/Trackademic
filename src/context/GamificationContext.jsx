@@ -118,65 +118,74 @@ export const GamificationProvider = ({ children }) => {
     };
   };
 
-  // Variable reward system with probability tiers
+  // Variable reward system with probability tiers based on real performance
   const calculateVariableReward = (baseXP, sessionDuration) => {
     const rand = Math.random();
     const sessionBonus = Math.min(2.0, sessionDuration / 60); // Up to 2x for longer sessions
-    
-    // Legendary (0.1% chance) - JACKPOT!
-    if (rand < 0.001) {
+
+    // Adjust probabilities based on user's recent performance
+    const recentSessions = userStats.sessionHistory.slice(0, 10);
+    const avgRecentDuration = recentSessions.length > 0
+      ? recentSessions.reduce((sum, s) => sum + s.durationMinutes, 0) / recentSessions.length
+      : sessionDuration;
+
+    // Better chance of bonus for longer than average sessions
+    const performanceMultiplier = sessionDuration > avgRecentDuration ? 1.5 : 1.0;
+
+    // Legendary (0.1% base chance, increased for exceptional performance)
+    if (rand < (0.001 * performanceMultiplier)) {
       return {
         tier: 'legendary',
         type: 'XP_JACKPOT',
         bonusXP: Math.floor(baseXP * 5 * sessionBonus),
         title: '🏆 LEGENDARY JACKPOT!',
-        description: '+500% bonus XP + Exclusive title',
+        description: `+500% bonus XP for ${sessionDuration}min session!`,
         animation: 'jackpot',
         sound: 'legendary',
         extras: { title: 'Jackpot Hunter', badge: 'legendary_jackpot' }
       };
     }
-    
-    // Epic (1% chance)
-    if (rand < 0.01) {
+
+    // Epic (1% base chance)
+    if (rand < (0.01 * performanceMultiplier)) {
       return {
         tier: 'epic',
         type: 'XP_BONUS',
         bonusXP: Math.floor(baseXP * 2 * sessionBonus),
         title: '✨ EPIC BONUS!',
-        description: '+200% bonus XP',
+        description: `+200% bonus XP for great focus!`,
         animation: 'epic',
         sound: 'epic'
       };
     }
-    
-    // Rare (5% chance)
-    if (rand < 0.05) {
+
+    // Rare (5% base chance)
+    if (rand < (0.05 * performanceMultiplier)) {
       return {
         tier: 'rare',
         type: 'XP_BONUS',
         bonusXP: Math.floor(baseXP * 1.5 * sessionBonus),
         title: '🌟 RARE BONUS!',
-        description: '+150% bonus XP',
+        description: `+150% bonus XP for consistency!`,
         animation: 'rare',
         sound: 'rare'
       };
     }
-    
-    // Uncommon (15% chance)
-    if (rand < 0.15) {
+
+    // Uncommon (15% base chance)
+    if (rand < (0.15 * performanceMultiplier)) {
       return {
         tier: 'uncommon',
         type: 'XP_BONUS',
         bonusXP: Math.floor(baseXP * 0.5 * sessionBonus),
         title: '⭐ Lucky Scholar!',
-        description: '+50% bonus XP',
+        description: `+50% bonus XP for good work!`,
         animation: 'uncommon',
         sound: 'uncommon'
       };
     }
-    
-    // No bonus (85% chance)
+
+    // No bonus (remaining chance)
     return {
       tier: 'none',
       bonusXP: 0
