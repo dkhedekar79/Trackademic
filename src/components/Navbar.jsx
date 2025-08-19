@@ -96,7 +96,7 @@ const Navbar = () => {
             <div className="text-2xl">🎉</div>
             <div>
               <h4 className="font-bold text-lg">Session Complete!</h4>
-              <p className="text-sm opacity-90">{recentRewards[recentRewards.length - 1]?.message}</p>
+              <p className="text-sm opacity-90">{rewardQueue[rewardQueue.length - 1]?.description || "Great work!"}</p>
             </div>
           </div>
         </div>
