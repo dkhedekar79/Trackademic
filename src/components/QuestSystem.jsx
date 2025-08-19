@@ -244,9 +244,14 @@ const DIFFICULTY_MULTIPLIERS = {
 
 // Quest Progress Tracker
 const QuestProgressTracker = ({ quest, onComplete }) => {
-  const progress = Math.min(quest.progress, quest.target);
-  const percentage = (progress / quest.target) * 100;
-  const isCompleted = quest.completed;
+  // Add safety checks for undefined properties
+  if (!quest || typeof quest !== 'object') {
+    return null;
+  }
+
+  const progress = Math.min(quest.progress || 0, quest.target || 1);
+  const percentage = (progress / (quest.target || 1)) * 100;
+  const isCompleted = quest.completed || false;
   
   const difficultyColors = {
     easy: 'from-green-400 to-green-600',
