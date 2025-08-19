@@ -176,7 +176,7 @@ const QUEST_TEMPLATES = {
     type: 'weekend',
     category: 'special',
     baseXP: 200,
-    icon: '🏋️',
+    icon: '����️',
     difficulty: 'medium',
     parameters: {
       hours: [3, 4, 5, 6]
@@ -283,12 +283,12 @@ const QuestProgressTracker = ({ quest, onComplete }) => {
             <h3 className={`font-bold text-lg ${
               isCompleted ? 'text-green-800' : 'text-gray-800'
             }`}>
-              {quest.name}
+              {quest.name || 'Unknown Quest'}
             </h3>
             <p className={`text-sm ${
               isCompleted ? 'text-green-600' : 'text-gray-600'
             }`}>
-              {quest.description}
+              {quest.description || 'No description available'}
             </p>
           </div>
         </div>
