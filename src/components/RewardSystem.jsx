@@ -519,10 +519,9 @@ const RewardSystem = ({ userStats = {} }) => {
     // Mystery box should only be available after real study achievements
     // userStats is already available from the component scope
 
-    // Base reward on user's actual performance from parent component
-    // Note: userStats should be passed as prop or accessed from context in parent
-    const baseXP = 100; // Default base, should be calculated from real user data
-    const sessionCount = 0; // Default, should be from real user data
+    // Base reward on user's actual performance
+    const baseXP = Math.max(50, Math.floor((userStats.xp || 0) / 100)); // Scale with user progress
+    const sessionCount = userStats.totalSessions || 0;
 
     // Realistic rewards based on user level and activity
     const rewardTiers = [
