@@ -519,8 +519,8 @@ const QuestSystem = () => {
     : 0;
   
   // Calculate total XP available
-  const totalXP = currentQuests.reduce((sum, quest) => sum + quest.xp, 0);
-  const earnedXP = completedQuests.reduce((sum, quest) => sum + quest.xp, 0);
+  const totalXP = currentQuests.reduce((sum, quest) => sum + (quest.xp || 0), 0);
+  const earnedXP = completedQuests.reduce((sum, quest) => sum + (quest.xp || 0), 0);
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
