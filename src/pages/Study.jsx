@@ -83,17 +83,18 @@ const Study = () => {
   } = useTimer();
 
   // Gamification context
-  const { 
-    awardStudySession, 
-    userStats, 
-    showRewards, 
-    setShowRewards, 
-    recentRewards, 
-    showLevelUp, 
-    setShowLevelUp, 
-    showAchievement, 
+  const {
+    awardStudySession,
+    userStats,
+    showRewards,
+    setShowRewards,
+    recentRewards,
+    showLevelUp,
+    setShowLevelUp,
+    showAchievement,
     setShowAchievement,
-    addStudySession
+    addStudySession,
+    updateQuestProgress
   } = useGamification();
 
   // Sync local input with context value when it changes
