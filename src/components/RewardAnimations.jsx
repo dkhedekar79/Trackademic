@@ -724,15 +724,6 @@ export const SoundToggle = ({ soundEnabled, onToggle }) => {
 };
 
 export {
-  XPGainAnimation,
-  LevelUpCelebration,
-  AchievementUnlock,
-  StreakMilestone,
-  QuestComplete,
-  VariableRewardPopup,
-  FloatingNotifications,
-  AnimatedProgressBar,
-  SoundToggle,
   EnhancedConfetti,
   useSound
 };
