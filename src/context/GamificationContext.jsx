@@ -589,16 +589,32 @@ export const GamificationProvider = ({ children }) => {
     return enhancedSession;
   };
 
-  // Generate contextual daily quests
+  // Generate contextual daily quests based on user's actual performance
   const generateDailyQuests = () => {
+    // Calculate user's average performance to set realistic targets
+    const avgSessionLength = userStats.sessionHistory.length > 0
+      ? Math.round(userStats.sessionHistory.reduce((sum, s) => sum + s.durationMinutes, 0) / userStats.sessionHistory.length)
+      : 25;
+
+    const avgSessionsPerDay = userStats.totalSessions > 0 && userStats.sessionHistory.length > 0
+      ? Math.max(1, Math.round(userStats.totalSessions / Math.max(1, Math.floor((Date.now() - new Date(userStats.sessionHistory[userStats.sessionHistory.length - 1]?.timestamp || Date.now()).getTime()) / (1000 * 60 * 60 * 24)))))
+      : 1;
+
+    const userSubjectCount = Object.keys(userStats.subjectMastery || {}).length;
+
     const questTemplates = [
       {
         id: 'study_time',
         name: 'Time Master',
         description: 'Study for {target} minutes today',
         type: 'time',
-        targets: [30, 45, 60, 90],
-        xp: (target) => target,
+        targets: [
+          Math.max(15, avgSessionLength - 10),
+          avgSessionLength,
+          Math.min(120, avgSessionLength + 15),
+          Math.min(180, avgSessionLength + 30)
+        ],
+        xp: (target) => Math.round(target * 1.5),
         icon: '⏰'
       },
       {
@@ -606,8 +622,13 @@ export const GamificationProvider = ({ children }) => {
         name: 'Session Warrior',
         description: 'Complete {target} study sessions',
         type: 'sessions',
-        targets: [2, 3, 4, 5],
-        xp: (target) => target * 20,
+        targets: [
+          Math.max(1, avgSessionsPerDay),
+          Math.max(2, avgSessionsPerDay + 1),
+          Math.max(3, avgSessionsPerDay + 2),
+          Math.max(4, avgSessionsPerDay + 3)
+        ],
+        xp: (target) => target * 25,
         icon: '🎯'
       },
       {
@@ -615,8 +636,12 @@ export const GamificationProvider = ({ children }) => {
         name: 'Scholar\'s Variety',
         description: 'Study {target} different subjects',
         type: 'subjects',
-        targets: [2, 3, 4],
-        xp: (target) => target * 25,
+        targets: userSubjectCount > 0 ? [
+          Math.min(userSubjectCount, 2),
+          Math.min(userSubjectCount, 3),
+          Math.min(userSubjectCount + 1, 4)
+        ] : [2, 3],
+        xp: (target) => target * 30,
         icon: '📚'
       },
       {
@@ -625,7 +650,7 @@ export const GamificationProvider = ({ children }) => {
         description: 'Maintain your daily streak',
         type: 'streak',
         targets: [1],
-        xp: () => 50 + userStats.currentStreak * 5,
+        xp: () => 50 + Math.max(0, userStats.currentStreak) * 5,
         icon: '🔥'
       }
     ];
