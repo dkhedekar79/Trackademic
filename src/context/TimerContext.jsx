@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 const TimerContext = createContext();
 
@@ -29,7 +29,7 @@ export const TimerProvider = ({ children }) => {
   const { isRunning, mode, secondsLeft, stopwatchSeconds, isPomodoroBreak, pomodoroCount, subjectName, startTime, pausedTime, lastUpdateTime, customMinutes } = timerState;
 
   // Calculate actual elapsed time based on real timestamps
-  const getActualElapsedTime = () => {
+  const getActualElapsedTime = useCallback(() => {
     if (!startTime) return 0;
     if (isRunning) {
       return Math.floor((Date.now() - startTime) / 1000);
@@ -37,7 +37,7 @@ export const TimerProvider = ({ children }) => {
       return pausedTime;
     }
     return 0;
-  };
+  }, [startTime, isRunning, pausedTime]);
 
   // Update timer display based on actual elapsed time
   const updateTimerDisplay = () => {
@@ -101,7 +101,7 @@ export const TimerProvider = ({ children }) => {
   };
 
   // Start or resume timer
-  const startTimer = () => {
+  const startTimer = useCallback(() => {
     const now = Date.now();
     setTimerState(prev => ({
       ...prev,
@@ -111,14 +111,14 @@ export const TimerProvider = ({ children }) => {
       pausedTime: null,
       lastUpdateTime: now
     }));
-  };
+  }, []);
 
-  const stopTimer = () => {
+  const stopTimer = useCallback(() => {
     const elapsed = getActualElapsedTime();
     setTimerState(prev => ({ ...prev, isRunning: false, pausedTime: elapsed, lastUpdateTime: Date.now() }));
-  };
+  }, [getActualElapsedTime]);
 
-  const resetTimer = () => {
+  const resetTimer = useCallback(() => {
     const totalDuration = getModeDuration(mode);
     setTimerState(prev => ({
       ...prev,
@@ -129,10 +129,10 @@ export const TimerProvider = ({ children }) => {
       pausedTime: null,
       lastUpdateTime: null
     }));
-  };
+  }, [mode]);
 
   // When custom minutes change, reflect it in secondsLeft if not running and in custom mode
-  const setCustomMinutes = (minutes) => {
+  const setCustomMinutes = useCallback((minutes) => {
     setTimerState(prev => {
       const next = { ...prev, customMinutes: minutes };
       if (!prev.isRunning && prev.mode === 'custom') {
@@ -140,9 +140,9 @@ export const TimerProvider = ({ children }) => {
       }
       return next;
     });
-  };
+  }, []);
 
-  const setTimerMode = (newMode) => {
+  const setTimerMode = useCallback((newMode) => {
     const totalDuration = getModeDuration(newMode);
     setTimerState(prev => ({
       ...prev,
@@ -155,11 +155,11 @@ export const TimerProvider = ({ children }) => {
       pausedTime: null,
       lastUpdateTime: null
     }));
-  };
+  }, []);
 
-  const setTimerSubject = (subject) => {
+  const setTimerSubject = useCallback((subject) => {
     setTimerState(prev => ({ ...prev, subjectName: subject }));
-  };
+  }, []);
 
   const handleTimerComplete = () => {
     if (mode === 'pomodoro') {
@@ -173,13 +173,13 @@ export const TimerProvider = ({ children }) => {
     }
   };
 
-  const saveStudySession = (sessionData) => {
+  const saveStudySession = useCallback((sessionData) => {
     const actualDuration = mode === 'stopwatch' ? stopwatchSeconds : getModeDuration(mode) - secondsLeft;
     const session = { ...sessionData, durationMinutes: Math.round((actualDuration / 60) * 100) / 100, timestamp: new Date().toISOString(), subjectName: subjectName || sessionData.subjectName };
     const existingSessions = JSON.parse(localStorage.getItem('studySessions') || '[]');
     const updatedSessions = [...existingSessions, session];
     localStorage.setItem('studySessions', JSON.stringify(updatedSessions));
-  };
+  }, [mode, stopwatchSeconds, secondsLeft, subjectName]);
 
   const value = {
     ...timerState,
@@ -198,4 +198,4 @@ export const TimerProvider = ({ children }) => {
       {children}
     </TimerContext.Provider>
   );
-}; 
+};

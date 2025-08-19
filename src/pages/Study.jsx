@@ -84,17 +84,14 @@ const Study = () => {
 
   // Gamification context
   const {
-    awardStudySession,
     userStats,
-    showRewards,
-    setShowRewards,
-    recentRewards,
-    showLevelUp,
-    setShowLevelUp,
-    showAchievement,
-    setShowAchievement,
     addStudySession,
-    updateQuestProgress
+    updateQuestProgress,
+    awardXP,
+    addReward,
+    rewardQueue,
+    showRewards,
+    setShowRewards
   } = useGamification();
 
   // Sync local input with context value when it changes
@@ -177,7 +174,7 @@ const Study = () => {
     if (subject) {
       setTimerSubject(subject);
     }
-  }, [subject, setTimerSubject]);
+  }, [subject, setTimerSubject]); // setTimerSubject is now stable with useCallback
 
   // Get subject tasks
   const getSubjectTasks = () => {
@@ -396,11 +393,20 @@ const Study = () => {
       isTaskComplete
     };
 
-    // Add to gamification system for XP calculation
-    const sessionResult = addStudySession(sessionData);
+    // Award XP using the gamification system
+    const xpData = awardXP(sessionDurationMinutes, subject, sessionDifficulty);
+
+    // Add to gamification system for session tracking
+    const sessionWithXP = {
+      ...sessionData,
+      xpEarned: xpData.totalXP,
+      bonuses: xpData.bonuses
+    };
+
+    const sessionResult = addStudySession(sessionWithXP);
 
     // Update study sessions in localStorage
-    const updatedSessions = [...studySessions, sessionData];
+    const updatedSessions = [...studySessions, sessionWithXP];
     localStorage.setItem('studySessions', JSON.stringify(updatedSessions));
     setStudySessions(updatedSessions);
 
@@ -419,6 +425,16 @@ const Study = () => {
     updateQuestProgress('subjects', 1, subject);
     updateQuestProgress('streak', 1);
 
+    // Show completion success with rewards
+    addReward({
+      type: 'SESSION_COMPLETE',
+      title: `🎉 Session Complete!`,
+      description: `You studied ${subject} for ${sessionDurationMinutes.toFixed(1)} minutes and earned ${xpData.totalXP} XP!`,
+      tier: 'uncommon',
+      xp: xpData.totalXP,
+      bonuses: xpData.bonuses
+    });
+
     // Reset session state but keep subject to avoid blank screen
     setSessionNotes('');
     setCurrentTask('');
@@ -431,6 +447,9 @@ const Study = () => {
     // Reset timers but keep the subject active
     resetLocalTimer();
     resetTimer();
+
+    // Show rewards for a few seconds then allow continuing
+    setShowRewards(true);
 
     // Stay on the study page instead of going to subject selection
     // The subject remains in the URL so user can continue studying
@@ -1175,26 +1194,94 @@ const Study = () => {
 
       {/* Gamification Reward Animations */}
       <AnimatePresence>
-        {showRewards && (
-          <XPGainAnimation
-            amount={recentRewards[recentRewards.length - 1]?.amount || 0}
-            onComplete={() => setShowRewards(false)}
-          />
-        )}
-        
-        {showLevelUp && (
-          <LevelUpCelebration 
-            newLevel={userStats.level}
-            onComplete={() => setShowLevelUp(false)}
-          />
-        )}
-        
-        {showAchievement && (
-          <AchievementUnlock 
-            achievement={userStats.achievements[userStats.achievements.length - 1]}
-            onComplete={() => setShowAchievement(false)}
-          />
-        )}
+        {rewardQueue && rewardQueue.length > 0 && rewardQueue.map((reward, index) => {
+          if (reward.type === 'SESSION_COMPLETE') {
+            return (
+              <motion.div
+                key={reward.id}
+                initial={{ opacity: 0, scale: 0.8, y: 50 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.8, y: -50 }}
+                className="fixed inset-0 bg-black/60 flex items-center justify-center z-50"
+              >
+                <motion.div
+                  initial={{ scale: 0.8 }}
+                  animate={{ scale: 1 }}
+                  className="bg-gradient-to-br from-green-500 to-emerald-600 text-white p-8 rounded-3xl shadow-2xl text-center max-w-md mx-4 border-4 border-yellow-400"
+                >
+                  <div className="text-6xl mb-4">🎉</div>
+                  <h2 className="text-3xl font-bold mb-4">{reward.title}</h2>
+                  <p className="text-lg mb-6">{reward.description}</p>
+
+                  {reward.bonuses && Object.keys(reward.bonuses).length > 0 && (
+                    <div className="bg-black/20 rounded-lg p-4 mb-6">
+                      <h3 className="font-semibold mb-2">XP Breakdown:</h3>
+                      {Object.entries(reward.bonuses).map(([type, value]) => (
+                        value > 0 && (
+                          <div key={type} className="flex justify-between text-sm">
+                            <span className="capitalize">{type} Bonus:</span>
+                            <span>+{value} XP</span>
+                          </div>
+                        )
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="flex gap-4">
+                    <button
+                      onClick={() => {
+                        setShowRewards(false);
+                        navigate('/dashboard');
+                      }}
+                      className="flex-1 bg-white/20 hover:bg-white/30 px-6 py-3 rounded-xl font-semibold transition-all"
+                    >
+                      View Dashboard
+                    </button>
+                    <button
+                      onClick={() => setShowRewards(false)}
+                      className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-black px-6 py-3 rounded-xl font-semibold transition-all"
+                    >
+                      Continue Studying
+                    </button>
+                  </div>
+                </motion.div>
+              </motion.div>
+            );
+          }
+
+          if (reward.type === 'XP_EARNED') {
+            return (
+              <XPGainAnimation
+                key={reward.id}
+                amount={reward.xp || 0}
+                bonuses={reward.bonuses || {}}
+                onComplete={() => setShowRewards(false)}
+              />
+            );
+          }
+
+          if (reward.type === 'LEVEL_UP') {
+            return (
+              <LevelUpCelebration
+                key={reward.id}
+                newLevel={userStats.level}
+                onComplete={() => setShowRewards(false)}
+              />
+            );
+          }
+
+          if (reward.type === 'ACHIEVEMENT') {
+            return (
+              <AchievementUnlock
+                key={reward.id}
+                achievement={reward}
+                onComplete={() => setShowRewards(false)}
+              />
+            );
+          }
+
+          return null;
+        })}
       </AnimatePresence>
     </div>
   );

@@ -244,9 +244,14 @@ const DIFFICULTY_MULTIPLIERS = {
 
 // Quest Progress Tracker
 const QuestProgressTracker = ({ quest, onComplete }) => {
-  const progress = Math.min(quest.progress, quest.target);
-  const percentage = (progress / quest.target) * 100;
-  const isCompleted = quest.completed;
+  // Add safety checks for undefined properties
+  if (!quest || typeof quest !== 'object') {
+    return null;
+  }
+
+  const progress = Math.min(quest.progress || 0, quest.target || 1);
+  const percentage = (progress / (quest.target || 1)) * 100;
+  const isCompleted = quest.completed || false;
   
   const difficultyColors = {
     easy: 'from-green-400 to-green-600',
@@ -269,21 +274,21 @@ const QuestProgressTracker = ({ quest, onComplete }) => {
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
           <div className={`w-12 h-12 rounded-full bg-gradient-to-r ${
-            difficultyColors[quest.difficulty]
+            difficultyColors[quest.difficulty || 'medium']
           } flex items-center justify-center text-2xl shadow-lg`}>
-            {quest.icon}
+            {quest.icon || '🎯'}
           </div>
           
           <div>
             <h3 className={`font-bold text-lg ${
               isCompleted ? 'text-green-800' : 'text-gray-800'
             }`}>
-              {quest.name}
+              {quest.name || 'Unknown Quest'}
             </h3>
             <p className={`text-sm ${
               isCompleted ? 'text-green-600' : 'text-gray-600'
             }`}>
-              {quest.description}
+              {quest.description || 'No description available'}
             </p>
           </div>
         </div>
@@ -301,7 +306,7 @@ const QuestProgressTracker = ({ quest, onComplete }) => {
           ) : (
             <div className="text-right">
               <span className="text-sm font-medium text-gray-600">
-                {progress} / {quest.target}
+                {progress} / {quest.target || 1}
               </span>
               <div className={`px-2 py-1 rounded-full text-xs font-bold ${
                 quest.difficulty === 'easy' ? 'bg-green-100 text-green-700' :
@@ -309,14 +314,14 @@ const QuestProgressTracker = ({ quest, onComplete }) => {
                 quest.difficulty === 'hard' ? 'bg-purple-100 text-purple-700' :
                 'bg-yellow-100 text-yellow-700'
               }`}>
-                {quest.difficulty.toUpperCase()}
+                {(quest.difficulty || 'medium').toUpperCase()}
               </div>
             </div>
           )}
           
           <div className="flex items-center gap-1 text-yellow-600">
             <Star className="w-4 h-4" />
-            <span className="font-semibold">+{quest.xp} XP</span>
+            <span className="font-semibold">+{quest.xp || 0} XP</span>
           </div>
         </div>
       </div>
@@ -332,7 +337,7 @@ const QuestProgressTracker = ({ quest, onComplete }) => {
       </div>
       
       {/* Tips */}
-      {quest.tips && quest.tips.length > 0 && !isCompleted && (
+      {quest.tips && Array.isArray(quest.tips) && quest.tips.length > 0 && !isCompleted && (
         <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
@@ -490,16 +495,27 @@ const QuestSystem = () => {
   
   // Get quests for active category
   const getQuestsForCategory = (category) => {
+    let quests = [];
     switch (category) {
       case 'daily':
-        return userStats.dailyQuests || [];
+        quests = userStats.dailyQuests || [];
+        break;
       case 'weekly':
-        return userStats.weeklyQuests || [];
+        quests = userStats.weeklyQuests || [];
+        break;
       case 'special':
-        return userStats.specialQuests || [];
+        quests = userStats.specialQuests || [];
+        break;
       default:
-        return [];
+        quests = [];
     }
+
+    // Filter out any invalid quest objects
+    return quests.filter(quest =>
+      quest &&
+      typeof quest === 'object' &&
+      typeof quest.name === 'string'
+    );
   };
   
   const currentQuests = getQuestsForCategory(activeCategory);
@@ -514,8 +530,8 @@ const QuestSystem = () => {
     : 0;
   
   // Calculate total XP available
-  const totalXP = currentQuests.reduce((sum, quest) => sum + quest.xp, 0);
-  const earnedXP = completedQuests.reduce((sum, quest) => sum + quest.xp, 0);
+  const totalXP = currentQuests.reduce((sum, quest) => sum + (quest.xp || 0), 0);
+  const earnedXP = completedQuests.reduce((sum, quest) => sum + (quest.xp || 0), 0);
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">

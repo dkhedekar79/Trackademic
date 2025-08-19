@@ -102,9 +102,9 @@ const Subjects = () => {
   };
 
   return (
-    <div className="p-6 space-y-6  bg-gradient-to-br from-[#1a1a2e] to-[#16213e] mt-20 pl-[70px]">
+    <div className="bg-gradient-to-br from-[#1a1a2e] to-[#16213e] min-h-screen mt-20 pl-[70px] pr-6 py-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-white">Subjects</h1>
           <p className="text-gray-600">Manage your study subjects and track progress</p>
@@ -359,4 +359,4 @@ const Subjects = () => {
   );
 };
 
-export default Subjects; 
+export default Subjects;

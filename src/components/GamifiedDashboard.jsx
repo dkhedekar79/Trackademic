@@ -13,6 +13,7 @@ import AchievementSystem from './AchievementSystem';
 import LeaderboardSystem from './LeaderboardSystem';
 import PremiumSystem from './PremiumSystem';
 import RewardSystem from './RewardSystem';
+import MysteryBox from './MysteryBox';
 
 const GamifiedDashboard = () => {
   const { 
@@ -331,7 +332,7 @@ const OverviewTab = ({ userStats }) => {
   const stats = [
     {
       label: 'Total XP Earned',
-      value: userStats.totalXPEarned?.toLocaleString() || userStats.xp.toLocaleString(),
+      value: (userStats.totalXPEarned || userStats.xp || 0).toLocaleString(),
       icon: Star,
       color: 'from-yellow-500 to-orange-500',
       change: weeklyStats.xpThisWeek > 0 ? `+${weeklyStats.xpThisWeek.toLocaleString()} this week` : 'No XP this week'
@@ -399,7 +400,7 @@ const OverviewTab = ({ userStats }) => {
             </h3>
             <motion.button
               whileHover={{ scale: 1.05 }}
-              onClick={() => {/* Switch to quests tab */}}
+              onClick={() => setActiveTab('quests')}
               className="text-blue-600 hover:text-blue-700 font-medium text-sm flex items-center gap-1"
             >
               View All <ChevronRight className="w-4 h-4" />
@@ -444,6 +445,7 @@ const OverviewTab = ({ userStats }) => {
             </h3>
             <motion.button
               whileHover={{ scale: 1.05 }}
+              onClick={() => setActiveTab('achievements')}
               className="text-yellow-600 hover:text-yellow-700 font-medium text-sm flex items-center gap-1"
             >
               View All <ChevronRight className="w-4 h-4" />
@@ -480,6 +482,33 @@ const OverviewTab = ({ userStats }) => {
         </div>
       </div>
 
+      {/* Mystery Box Section */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="md:col-span-2">
+          <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <Gift className="w-5 h-5 text-purple-500" />
+            Mystery Rewards
+          </h3>
+          <div className="bg-gradient-to-r from-purple-100 to-indigo-100 rounded-2xl p-6">
+            <p className="text-gray-700 mb-4">
+              Complete study sessions to earn mystery boxes with surprise rewards!
+              Get bonus XP, streak savers, special titles, and more!
+            </p>
+            <div className="flex items-center gap-2 text-sm text-purple-600">
+              <Sparkles className="w-4 h-4" />
+              <span>Next box available after 3 more sessions</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-center">
+          <MysteryBox
+            available={userStats.totalSessions >= 3 && (userStats.totalSessions % 3 === 0)}
+            onOpen={() => console.log('Mystery box opened!')}
+          />
+        </div>
+      </div>
+
       {/* Premium Teaser */}
       <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl shadow-xl p-8 text-white">
         <div className="flex items-center justify-between">
@@ -506,7 +535,7 @@ const OverviewTab = ({ userStats }) => {
               </li>
             </ul>
           </div>
-          
+
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}

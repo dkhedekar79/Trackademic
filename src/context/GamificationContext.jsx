@@ -13,7 +13,7 @@ export const useGamification = () => {
 export const GamificationProvider = ({ children }) => {
   const [userStats, setUserStats] = useState(() => {
     const saved = localStorage.getItem('userStats');
-    return saved ? JSON.parse(saved) : {
+    const defaultStats = {
       // Core progression
       xp: 0,
       level: 1,
@@ -66,6 +66,25 @@ export const GamificationProvider = ({ children }) => {
       luckyStreak: 0,
       jackpotCount: 0
     };
+
+    if (saved) {
+      const savedStats = JSON.parse(saved);
+      // Migrate old data that might be missing required fields
+      return {
+        ...defaultStats,
+        ...savedStats,
+        // Ensure required fields are present
+        totalXPEarned: savedStats.totalXPEarned ?? savedStats.xp ?? 0,
+        totalSessions: savedStats.totalSessions ?? 0,
+        totalStudyTime: savedStats.totalStudyTime ?? 0,
+        subjectMastery: savedStats.subjectMastery ?? {},
+        achievements: savedStats.achievements ?? [],
+        dailyQuests: savedStats.dailyQuests ?? [],
+        weeklyQuests: savedStats.weeklyQuests ?? []
+      };
+    }
+
+    return defaultStats;
   });
 
   const [rewardQueue, setRewardQueue] = useState([]);
@@ -74,6 +93,7 @@ export const GamificationProvider = ({ children }) => {
 
   // Save stats to localStorage whenever they change
   useEffect(() => {
+    console.log('💾 Saving userStats to localStorage:', userStats);
     localStorage.setItem('userStats', JSON.stringify(userStats));
   }, [userStats]);
 
@@ -224,13 +244,13 @@ export const GamificationProvider = ({ children }) => {
     const currentLevel = userStats.level;
     const totalXPForCurrentLevel = getTotalXPForLevel(currentLevel);
     const totalXPForNextLevel = getTotalXPForLevel(currentLevel + 1);
-    const progressXP = userStats.xp - totalXPForCurrentLevel;
+    const progressXP = Math.max(0, userStats.xp - totalXPForCurrentLevel);
     const neededXP = totalXPForNextLevel - totalXPForCurrentLevel;
-    
+
     return {
       current: progressXP,
       needed: neededXP,
-      percentage: Math.min(100, (progressXP / neededXP) * 100)
+      percentage: Math.min(100, Math.max(0, (progressXP / neededXP) * 100))
     };
   };
 
@@ -363,19 +383,33 @@ export const GamificationProvider = ({ children }) => {
     const newLevel = getLevelFromXP(newXP);
 
     // Update user stats
-    setUserStats(prev => ({
-      ...prev,
-      xp: newXP,
-      level: newLevel,
-      totalSessions: prev.totalSessions + 1,
-      totalStudyTime: prev.totalStudyTime + sessionDuration,
-      totalXPEarned: prev.totalXPEarned + xpData.totalXP,
-      weeklyXP: prev.weeklyXP + xpData.totalXP,
-      subjectMastery: {
-        ...prev.subjectMastery,
-        [subjectName]: (prev.subjectMastery[subjectName] || 0) + sessionDuration
-      }
-    }));
+    setUserStats(prev => {
+      const newStats = {
+        ...prev,
+        xp: newXP,
+        level: newLevel,
+        totalSessions: (prev.totalSessions || 0) + 1,
+        totalStudyTime: (prev.totalStudyTime || 0) + sessionDuration,
+        totalXPEarned: (prev.totalXPEarned || prev.xp || 0) + xpData.totalXP,
+        weeklyXP: (prev.weeklyXP || 0) + xpData.totalXP,
+        subjectMastery: {
+          ...prev.subjectMastery,
+          [subjectName]: (prev.subjectMastery[subjectName] || 0) + sessionDuration
+        }
+      };
+
+      console.log('🎯 Awarding XP:', {
+        sessionDuration,
+        subjectName,
+        oldXP: prev.xp,
+        newXP,
+        xpGained: xpData.totalXP,
+        oldTotalXPEarned: prev.totalXPEarned,
+        newTotalXPEarned: newStats.totalXPEarned
+      });
+
+      return newStats;
+    });
 
     // Show XP reward
     addReward({
@@ -660,7 +694,7 @@ export const GamificationProvider = ({ children }) => {
         type: 'streak',
         targets: [1],
         xp: () => 50 + Math.max(0, userStats.currentStreak) * 5,
-        icon: '🔥'
+        icon: '����'
       }
     ];
 
@@ -721,13 +755,23 @@ export const GamificationProvider = ({ children }) => {
         
         if (completed && !quest.completed) {
           // Award quest completion XP
+          const questXP = quest.xp || 0;
           setTimeout(() => {
+            // Actually add XP to user stats
+            setUserStats(prevStats => ({
+              ...prevStats,
+              xp: prevStats.xp + questXP,
+              totalXPEarned: (prevStats.totalXPEarned || prevStats.xp || 0) + questXP,
+              weeklyXP: (prevStats.weeklyXP || 0) + questXP,
+              level: getLevelFromXP(prevStats.xp + questXP)
+            }));
+
             addReward({
               type: 'QUEST_COMPLETE',
               title: `✅ ${quest.name}`,
               description: quest.description,
               tier: 'uncommon',
-              xp: quest.xp
+              xp: questXP
             });
           }, 100);
         }
@@ -743,6 +787,64 @@ export const GamificationProvider = ({ children }) => {
         ...prev,
         dailyQuests: updatedQuests
       };
+    });
+  };
+
+  // Debug function to reset user stats
+  const resetUserStats = () => {
+    localStorage.removeItem('userStats');
+    setUserStats({
+      // Core progression
+      xp: 0,
+      level: 1,
+      prestigeLevel: 0,
+
+      // Session tracking
+      totalSessions: 0,
+      totalStudyTime: 0,
+      sessionHistory: [],
+
+      // Streak system
+      currentStreak: 0,
+      longestStreak: 0,
+      lastStudyDate: null,
+      streakSavers: 3,
+
+      // Achievement & badge system
+      badges: [],
+      achievements: [],
+      unlockedTitles: [],
+      currentTitle: 'Rookie Scholar',
+
+      // Quest system
+      dailyQuests: [],
+      weeklyQuests: [],
+      completedQuestsToday: 0,
+      questStreak: 0,
+
+      // Social & competition
+      weeklyXP: 0,
+      weeklyRank: 0,
+      friends: [],
+      challenges: [],
+
+      // Premium features
+      isPremium: false,
+      xpMultiplier: 1.0,
+      premiumSkins: [],
+      currentSkin: 'default',
+
+      // Statistics
+      subjectMastery: {},
+      weeklyGoal: 0,
+      weeklyProgress: 0,
+      totalXPEarned: 0,
+
+      // Variable reward tracking
+      lastRewardTime: null,
+      rewardStreak: 0,
+      luckyStreak: 0,
+      jackpotCount: 0
     });
   };
 
@@ -766,7 +868,8 @@ export const GamificationProvider = ({ children }) => {
     prestige,
     setShowRewards,
     calculateXP,
-    getTotalXPForLevel
+    getTotalXPForLevel,
+    resetUserStats // Debug function
   };
 
   return (
