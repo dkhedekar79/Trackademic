@@ -269,7 +269,7 @@ const QuestProgressTracker = ({ quest, onComplete }) => {
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
           <div className={`w-12 h-12 rounded-full bg-gradient-to-r ${
-            difficultyColors[quest.difficulty]
+            difficultyColors[quest.difficulty || 'medium']
           } flex items-center justify-center text-2xl shadow-lg`}>
             {quest.icon}
           </div>
