@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 const TimerContext = createContext();
 
@@ -198,4 +198,4 @@ export const TimerProvider = ({ children }) => {
       {children}
     </TimerContext.Provider>
   );
-}; 
+};
