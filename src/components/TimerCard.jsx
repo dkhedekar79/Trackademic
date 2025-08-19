@@ -57,6 +57,54 @@ const TimerCard = ({ variant = 'full', className = '' }) => {
     }
   };
 
+  // Handle timer completion with gamification integration
+  const handleTimerComplete = () => {
+    if (!subjectName) {
+      addReward({
+        type: 'XP_EARNED',
+        title: 'Session Complete!',
+        description: 'Don\'t forget to select a subject next time for full XP!',
+        tier: 'common'
+      });
+      return;
+    }
+
+    const duration = mode === 'stopwatch' ? stopwatchSeconds : getActualElapsedTime();
+    const durationMinutes = Math.max(1, Math.round(duration / 60)); // Minimum 1 minute
+
+    // Add study session to gamification system
+    const sessionData = {
+      subjectName,
+      durationMinutes,
+      mode,
+      difficulty: 1.0, // Default difficulty
+      mood: 'neutral' // Default mood
+    };
+
+    addStudySession(sessionData);
+
+    // Update quest progress
+    updateQuestProgress('time', durationMinutes);
+    updateQuestProgress('sessions', 1);
+    updateQuestProgress('subjects', 1, subjectName);
+
+    // Show completion reward
+    addReward({
+      type: 'XP_EARNED',
+      title: `🎉 ${durationMinutes} min session complete!`,
+      description: `Great work studying ${subjectName}!`,
+      tier: durationMinutes >= 60 ? 'rare' : durationMinutes >= 30 ? 'uncommon' : 'common'
+    });
+  };
+
+  // Override stop timer to include completion logic
+  const handleStopTimer = () => {
+    if (isRunning) {
+      handleTimerComplete();
+    }
+    stopTimer();
+  };
+
   const handleModeChange = (modeKey) => {
     if (modeKey === 'custom') {
       setShowCustomInput(true);
