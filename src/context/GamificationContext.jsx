@@ -13,7 +13,7 @@ export const useGamification = () => {
 export const GamificationProvider = ({ children }) => {
   const [userStats, setUserStats] = useState(() => {
     const saved = localStorage.getItem('userStats');
-    return saved ? JSON.parse(saved) : {
+    const defaultStats = {
       // Core progression
       xp: 0,
       level: 1,
