@@ -80,7 +80,7 @@ const GamifiedDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 mt-20">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 mt-2 pl-10">
       {/* Reward System - Always Active */}
       <RewardSystem userStats={userStats} />
       
