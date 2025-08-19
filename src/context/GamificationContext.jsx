@@ -93,6 +93,7 @@ export const GamificationProvider = ({ children }) => {
 
   // Save stats to localStorage whenever they change
   useEffect(() => {
+    console.log('💾 Saving userStats to localStorage:', userStats);
     localStorage.setItem('userStats', JSON.stringify(userStats));
   }, [userStats]);
 
@@ -693,7 +694,7 @@ export const GamificationProvider = ({ children }) => {
         type: 'streak',
         targets: [1],
         xp: () => 50 + Math.max(0, userStats.currentStreak) * 5,
-        icon: '🔥'
+        icon: '����'
       }
     ];
 
