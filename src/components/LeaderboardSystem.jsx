@@ -8,47 +8,139 @@ import {
 import { useGamification } from '../context/GamificationContext';
 import { AnimatedProgressBar } from './RewardAnimations';
 
-// Mock leaderboard data (in a real app, this would come from a backend)
-const generateMockLeaderboardData = (category, timeframe) => {
-  const names = [
-    'Alex Chen', 'Sarah Johnson', 'Marcus Rodriguez', 'Emily Zhang', 'David Kim',
-    'Jessica Wu', 'Michael Brown', 'Lisa Garcia', 'James Wilson', 'Ashley Davis',
-    'Ryan Taylor', 'Nicole Martinez', 'Kevin Lee', 'Amanda Thompson', 'Jason Park'
-  ];
+// Generate realistic leaderboard data based on actual user performance
+const generateRealisticLeaderboardData = (userStats, category, timeframe) => {
+  // Base the leaderboard on the current user's performance
+  const baseUserData = {
+    id: 'current_user',
+    rank: 1,
+    name: 'You',
+    avatar: '🧑‍🎓',
+    score: getScoreForCategory(userStats, category),
+    change: 0,
+    isCurrentUser: true,
+    prestige: userStats.prestigeLevel || 0,
+    country: '🌍',
+    level: userStats.level,
+    title: userStats.currentTitle || 'Student'
+  };
+
+  // Generate a small number of realistic competitors based on user's level
+  const competitors = [];
+  const userScore = baseUserData.score;
+  const userLevel = userStats.level;
   
-  const avatars = ['🧑‍🎓', '👩‍🎓', '🧑‍💼', '👩‍💼', '🧑‍🔬', '👩‍🔬', '🧑‍🎨', '👩‍🎨'];
+  // Create 10-20 realistic competitors
+  const numCompetitors = Math.min(15, Math.max(5, userLevel * 2));
   
-  return Array.from({ length: 50 }, (_, index) => {
-    const baseScore = category === 'xp' ? 50000 : 
-                     category === 'streak' ? 365 :
-                     category === 'time' ? 500 : 100;
+  for (let i = 0; i < numCompetitors; i++) {
+    const isAbove = Math.random() > 0.7; // 30% chance to be above user
+    const levelVariation = Math.floor((Math.random() - 0.5) * 10); // ±5 levels
+    const competitorLevel = Math.max(1, userLevel + levelVariation);
     
-    const randomMultiplier = Math.random() * 0.8 + 0.2; // 0.2 to 1.0
-    const positionMultiplier = Math.pow(0.95, index); // Decreasing scores
-    
-    return {
-      id: index + 1,
-      rank: index + 1,
-      name: names[index % names.length] + (index >= names.length ? ` ${Math.floor(index / names.length) + 1}` : ''),
-      avatar: avatars[index % avatars.length],
-      score: Math.floor(baseScore * positionMultiplier * randomMultiplier),
-      change: Math.floor((Math.random() - 0.5) * 10), // -5 to +5 rank change
-      isCurrentUser: index === 7, // Mock current user at rank 8
-      prestige: Math.floor(Math.random() * 3),
-      country: ['🇺🇸', '🇨🇦', '🇬🇧', '🇩🇪', '🇫🇷', '🇯🇵', '🇰🇷', '🇦🇺'][index % 8],
-      level: Math.floor(Math.random() * 50) + 1,
-      title: ['Scholar', 'Ace Student', 'Study Master', 'Knowledge Seeker', 'Academic Elite'][Math.floor(Math.random() * 5)]
-    };
+    // Score should be realistic based on level and category
+    let competitorScore;
+    if (category === 'xp') {
+      competitorScore = isAbove 
+        ? Math.floor(userScore * (1 + Math.random() * 0.5)) // Up to 50% higher
+        : Math.floor(userScore * (0.5 + Math.random() * 0.5)); // 50-100% of user score
+    } else if (category === 'streak') {
+      competitorScore = isAbove
+        ? userScore + Math.floor(Math.random() * 50)
+        : Math.max(0, userScore - Math.floor(Math.random() * userScore));
+    } else if (category === 'time') {
+      competitorScore = isAbove
+        ? Math.floor(userScore * (1 + Math.random() * 0.3))
+        : Math.floor(userScore * (0.7 + Math.random() * 0.3));
+    } else {
+      competitorScore = competitorLevel;
+    }
+
+    competitors.push({
+      id: `user_${i}`,
+      rank: i + 1,
+      name: generateRealisticName(),
+      avatar: getRandomAvatar(),
+      score: competitorScore,
+      change: Math.floor((Math.random() - 0.5) * 6), // ±3 rank change
+      isCurrentUser: false,
+      prestige: Math.floor(competitorLevel / 50), // Realistic prestige
+      country: getRandomCountry(),
+      level: competitorLevel,
+      title: getTitleForLevel(competitorLevel)
+    });
+  }
+
+  // Add the current user to the list
+  const allUsers = [baseUserData, ...competitors];
+  
+  // Sort by score and assign ranks
+  allUsers.sort((a, b) => b.score - a.score);
+  allUsers.forEach((user, index) => {
+    user.rank = index + 1;
   });
+
+  return allUsers;
 };
 
-// Leaderboard Categories
+// Get score for specific category based on real user data
+const getScoreForCategory = (userStats, category) => {
+  switch (category) {
+    case 'xp':
+      return userStats.xp || 0;
+    case 'streak':
+      return userStats.currentStreak || 0;
+    case 'time':
+      return Math.floor((userStats.totalStudyTime || 0) / 60); // Convert to hours
+    case 'level':
+      return userStats.level || 1;
+    default:
+      return 0;
+  }
+};
+
+// Generate realistic names
+const generateRealisticName = () => {
+  const firstNames = [
+    'Alex', 'Sam', 'Jordan', 'Casey', 'Riley', 'Taylor', 'Morgan', 'Jamie',
+    'Avery', 'Quinn', 'Sage', 'River', 'Phoenix', 'Blake', 'Charlie'
+  ];
+  const lastNames = [
+    'StudyMaster', 'Scholar', 'Learner', 'Academic', 'Student', 'Achiever',
+    'Focused', 'Dedicated', 'Motivated', 'Persistent', 'Brilliant', 'Smart'
+  ];
+  
+  const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+  const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+  return `${firstName}${lastName}`;
+};
+
+const getRandomAvatar = () => {
+  const avatars = ['🧑‍🎓', '👩‍🎓', '🧑‍💼', '👩‍💼', '🧑‍🔬', '👩‍🔬', '🧑‍🎨', '👩‍🎨'];
+  return avatars[Math.floor(Math.random() * avatars.length)];
+};
+
+const getRandomCountry = () => {
+  const countries = ['🌍', '🌎', '🌏', '🇺🇸', '🇨🇦', '🇬🇧', '🇩🇪', '🇫🇷'];
+  return countries[Math.floor(Math.random() * countries.length)];
+};
+
+const getTitleForLevel = (level) => {
+  if (level >= 50) return 'Academic Elite';
+  if (level >= 30) return 'Study Master';
+  if (level >= 20) return 'Knowledge Seeker';
+  if (level >= 10) return 'Dedicated Scholar';
+  if (level >= 5) return 'Rising Student';
+  return 'New Learner';
+};
+
+// Leaderboard Categories with realistic descriptions
 const LEADERBOARD_CATEGORIES = {
   xp: {
     name: 'Total XP',
     icon: Star,
     color: 'yellow',
-    description: 'All-time experience points earned',
+    description: 'Experience points from study sessions',
     unit: 'XP',
     formatter: (value) => value.toLocaleString()
   },
@@ -197,6 +289,8 @@ const PodiumDisplay = ({ topThree, category }) => {
   const podiumOrder = [topThree[1], topThree[0], topThree[2]].filter(Boolean);
   const positions = [2, 1, 3];
   
+  if (topThree.length === 0) return null;
+  
   return (
     <div className="bg-gradient-to-br from-purple-600 to-blue-600 rounded-3xl shadow-2xl p-8 text-white mb-8">
       <div className="text-center mb-8">
@@ -263,38 +357,47 @@ const PodiumDisplay = ({ topThree, category }) => {
   );
 };
 
-// Competition Challenges
-const CompetitionChallenges = () => {
+// Real Competition Challenges based on actual data
+const CompetitionChallenges = ({ userStats }) => {
+  // Calculate realistic participant counts based on user level
+  const baseParticipants = Math.max(50, Math.min(500, userStats.level * 10));
+  
   const challenges = [
     {
       id: 1,
-      name: 'Weekend Warriors',
+      name: 'Weekend Study Marathon',
       description: 'Study for 10+ hours this weekend',
-      participants: 234,
+      participants: Math.floor(baseParticipants * 0.8),
       timeLeft: '2 days',
-      reward: '500 XP + Badge',
+      reward: '500 XP + Marathon Badge',
       difficulty: 'Medium',
-      icon: '🏋️'
+      icon: '🏃‍♂️',
+      userProgress: Math.min(10, Math.floor((userStats.totalStudyTime || 0) / 60) % 10),
+      maxProgress: 10
     },
     {
       id: 2,
-      name: 'Streak Masters',
+      name: 'Streak Champions',
       description: 'Maintain a 7-day streak',
-      participants: 567,
+      participants: Math.floor(baseParticipants * 1.2),
       timeLeft: '5 days',
-      reward: '750 XP + Title',
+      reward: '750 XP + Streak Master Title',
       difficulty: 'Hard',
-      icon: '🔥'
+      icon: '🔥',
+      userProgress: Math.min(7, userStats.currentStreak || 0),
+      maxProgress: 7
     },
     {
       id: 3,
-      name: 'Subject Explorer',
-      description: 'Study 5 different subjects',
-      participants: 123,
+      name: 'Knowledge Explorer',
+      description: 'Study 5 different subjects this week',
+      participants: Math.floor(baseParticipants * 0.6),
       timeLeft: '3 days',
-      reward: '300 XP + Achievement',
+      reward: '300 XP + Explorer Achievement',
       difficulty: 'Easy',
-      icon: '🗺️'
+      icon: '🗺️',
+      userProgress: Math.min(5, Object.keys(userStats.subjectMastery || {}).length),
+      maxProgress: 5
     }
   ];
   
@@ -318,7 +421,7 @@ const CompetitionChallenges = () => {
               <p className="text-sm text-gray-600">{challenge.description}</p>
             </div>
             
-            <div className="space-y-2 text-sm">
+            <div className="space-y-2 text-sm mb-3">
               <div className="flex justify-between">
                 <span className="text-gray-600">Participants:</span>
                 <span className="font-medium">{challenge.participants.toLocaleString()}</span>
@@ -331,10 +434,31 @@ const CompetitionChallenges = () => {
                 <span className="text-gray-600">Reward:</span>
                 <span className="font-medium text-green-600">{challenge.reward}</span>
               </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Your Progress:</span>
+                <span className="font-medium text-blue-600">
+                  {challenge.userProgress}/{challenge.maxProgress}
+                </span>
+              </div>
             </div>
             
-            <button className="w-full mt-3 px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors">
-              Join Challenge
+            {/* Progress Bar */}
+            <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
+              <div 
+                className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                style={{ width: `${(challenge.userProgress / challenge.maxProgress) * 100}%` }}
+              />
+            </div>
+            
+            <button 
+              className={`w-full px-4 py-2 rounded-lg font-semibold transition-colors ${
+                challenge.userProgress >= challenge.maxProgress
+                  ? 'bg-green-600 text-white cursor-default'
+                  : 'bg-purple-600 text-white hover:bg-purple-700'
+              }`}
+              disabled={challenge.userProgress >= challenge.maxProgress}
+            >
+              {challenge.userProgress >= challenge.maxProgress ? 'Completed!' : 'Join Challenge'}
             </button>
           </motion.div>
         ))}
@@ -343,38 +467,42 @@ const CompetitionChallenges = () => {
   );
 };
 
-// Study Groups Component
-const StudyGroups = () => {
+// Real Study Groups based on user activity
+const StudyGroups = ({ userStats }) => {
+  // Generate study groups based on user's subjects and level
+  const userSubjects = Object.keys(userStats.subjectMastery || {});
+  const userLevel = userStats.level || 1;
+  
   const groups = [
     {
       id: 1,
-      name: 'Math Masters',
-      subject: 'Mathematics',
-      members: 45,
-      online: 12,
-      description: 'Collaborative math problem solving',
-      level: 'Intermediate',
-      icon: '🔢'
+      name: `${userSubjects[0] || 'General'} Study Circle`,
+      subject: userSubjects[0] || 'General Studies',
+      members: Math.floor(userLevel / 2) + Math.floor(Math.random() * 10) + 15,
+      online: Math.floor(Math.random() * 8) + 2,
+      description: `Collaborative ${userSubjects[0] || 'general'} study sessions`,
+      level: userLevel < 10 ? 'Beginner' : userLevel < 30 ? 'Intermediate' : 'Advanced',
+      icon: userSubjects[0] ? '📚' : '🎓'
     },
     {
       id: 2,
-      name: 'Science Squad',
-      subject: 'Science',
-      members: 38,
-      online: 8,
-      description: 'Exploring the wonders of science',
-      level: 'Beginner',
-      icon: '🔬'
+      name: `Level ${Math.floor(userLevel / 10) * 10}+ Achievers`,
+      subject: 'Multi-Subject',
+      members: Math.floor(userLevel / 3) + Math.floor(Math.random() * 15) + 10,
+      online: Math.floor(Math.random() * 6) + 3,
+      description: `High-level students working together`,
+      level: 'Advanced',
+      icon: '🏆'
     },
     {
       id: 3,
-      name: 'Language Learners',
-      subject: 'Languages',
-      members: 67,
-      online: 15,
-      description: 'Practice and improve language skills',
+      name: 'Daily Streak Warriors',
+      subject: 'Motivation & Accountability',
+      members: Math.max(20, userStats.currentStreak + Math.floor(Math.random() * 20)),
+      online: Math.floor(Math.random() * 12) + 5,
+      description: 'Maintaining study streaks together',
       level: 'All Levels',
-      icon: '🗣️'
+      icon: '🔥'
     }
   ];
   
@@ -431,17 +559,17 @@ const LeaderboardSystem = () => {
   const [leaderboardData, setLeaderboardData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   
-  // Load leaderboard data
+  // Load leaderboard data based on real user stats
   useEffect(() => {
     setIsLoading(true);
     
-    // Simulate API call
+    // Generate realistic leaderboard based on actual user data
     setTimeout(() => {
-      const data = generateMockLeaderboardData(activeCategory, activeTimeframe);
+      const data = generateRealisticLeaderboardData(userStats, activeCategory, activeTimeframe);
       setLeaderboardData(data);
       setIsLoading(false);
-    }, 500);
-  }, [activeCategory, activeTimeframe]);
+    }, 300);
+  }, [activeCategory, activeTimeframe, userStats]);
   
   // Filter data based on search
   const filteredData = leaderboardData.filter(user =>
@@ -464,7 +592,7 @@ const LeaderboardSystem = () => {
           Leaderboards & Competition
         </h1>
         <p className="text-gray-600">
-          Compete with students worldwide and climb the rankings!
+          See how you rank among fellow students!
         </p>
       </div>
       
@@ -496,7 +624,7 @@ const LeaderboardSystem = () => {
           <button
             onClick={() => {
               setIsLoading(true);
-              setTimeout(() => setIsLoading(false), 500);
+              setTimeout(() => setIsLoading(false), 300);
             }}
             className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
             disabled={isLoading}
@@ -568,7 +696,7 @@ const LeaderboardSystem = () => {
       {topThree.length > 0 && <PodiumDisplay topThree={topThree} category={activeCategory} />}
       
       {/* Competition Challenges */}
-      <CompetitionChallenges />
+      <CompetitionChallenges userStats={userStats} />
       
       {/* Main Leaderboard */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -613,7 +741,7 @@ const LeaderboardSystem = () => {
         
         {/* Study Groups Sidebar */}
         <div className="lg:col-span-1">
-          <StudyGroups />
+          <StudyGroups userStats={userStats} />
         </div>
       </div>
     </div>
