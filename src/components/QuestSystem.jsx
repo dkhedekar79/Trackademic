@@ -176,7 +176,7 @@ const QUEST_TEMPLATES = {
     type: 'weekend',
     category: 'special',
     baseXP: 200,
-    icon: '����️',
+    icon: '🏋️',
     difficulty: 'medium',
     parameters: {
       hours: [3, 4, 5, 6]
@@ -276,7 +276,7 @@ const QuestProgressTracker = ({ quest, onComplete }) => {
           <div className={`w-12 h-12 rounded-full bg-gradient-to-r ${
             difficultyColors[quest.difficulty || 'medium']
           } flex items-center justify-center text-2xl shadow-lg`}>
-            {quest.icon}
+            {quest.icon || '🎯'}
           </div>
           
           <div>
