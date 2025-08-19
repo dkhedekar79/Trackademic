@@ -5,6 +5,7 @@ import { GamificationProvider } from './context/GamificationContext';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import Dashboard from './pages/Dashboard';
+import GamifiedDashboard from './components/GamifiedDashboard';
 import Subjects from './pages/Subjects';
 import Study from './pages/Study';
 import Tasks from './pages/Tasks';
