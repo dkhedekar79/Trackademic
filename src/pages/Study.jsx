@@ -174,7 +174,7 @@ const Study = () => {
     if (subject) {
       setTimerSubject(subject);
     }
-  }, [subject]); // Removed setTimerSubject to prevent infinite loop
+  }, [subject, setTimerSubject]); // setTimerSubject is now stable with useCallback
 
   // Get subject tasks
   const getSubjectTasks = () => {
