@@ -101,7 +101,7 @@ export const TimerProvider = ({ children }) => {
   };
 
   // Start or resume timer
-  const startTimer = () => {
+  const startTimer = useCallback(() => {
     const now = Date.now();
     setTimerState(prev => ({
       ...prev,
@@ -111,7 +111,7 @@ export const TimerProvider = ({ children }) => {
       pausedTime: null,
       lastUpdateTime: now
     }));
-  };
+  }, []);
 
   const stopTimer = () => {
     const elapsed = getActualElapsedTime();
