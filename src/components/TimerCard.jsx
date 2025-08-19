@@ -157,7 +157,7 @@ const TimerCard = ({ variant = 'full', className = '' }) => {
             {isRunning ? (
               <button
                 className="px-3 py-1 rounded bg-[#FEC260] text-[#23234a] font-bold shadow hover:bg-[#FFD580] transition text-xs"
-                onClick={stopTimer}
+                onClick={handleStopTimer}
               >
                 Stop
               </button>
