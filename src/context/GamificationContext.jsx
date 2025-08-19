@@ -66,6 +66,25 @@ export const GamificationProvider = ({ children }) => {
       luckyStreak: 0,
       jackpotCount: 0
     };
+
+    if (saved) {
+      const savedStats = JSON.parse(saved);
+      // Migrate old data that might be missing required fields
+      return {
+        ...defaultStats,
+        ...savedStats,
+        // Ensure required fields are present
+        totalXPEarned: savedStats.totalXPEarned ?? savedStats.xp ?? 0,
+        totalSessions: savedStats.totalSessions ?? 0,
+        totalStudyTime: savedStats.totalStudyTime ?? 0,
+        subjectMastery: savedStats.subjectMastery ?? {},
+        achievements: savedStats.achievements ?? [],
+        dailyQuests: savedStats.dailyQuests ?? [],
+        weeklyQuests: savedStats.weeklyQuests ?? []
+      };
+    }
+
+    return defaultStats;
   });
 
   const [rewardQueue, setRewardQueue] = useState([]);
