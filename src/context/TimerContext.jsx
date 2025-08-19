@@ -113,10 +113,10 @@ export const TimerProvider = ({ children }) => {
     }));
   }, []);
 
-  const stopTimer = () => {
+  const stopTimer = useCallback(() => {
     const elapsed = getActualElapsedTime();
     setTimerState(prev => ({ ...prev, isRunning: false, pausedTime: elapsed, lastUpdateTime: Date.now() }));
-  };
+  }, [getActualElapsedTime]);
 
   const resetTimer = () => {
     const totalDuration = getModeDuration(mode);
