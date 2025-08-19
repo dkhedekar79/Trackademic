@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useTimer } from '../context/TimerContext';
+import { useGamification } from '../context/GamificationContext';
 
 const TimerCard = ({ variant = 'full', className = '' }) => {
   const [subjects, setSubjects] = useState([]);
   const [customMinutes, setLocalCustomMinutes] = useState('25');
   const [showCustomInput, setShowCustomInput] = useState(false);
-  
+
   const {
     secondsLeft,
     isRunning,
@@ -22,6 +23,12 @@ const TimerCard = ({ variant = 'full', className = '' }) => {
     setCustomMinutes,
     getActualElapsedTime
   } = useTimer();
+
+  const {
+    addStudySession,
+    updateQuestProgress,
+    addReward
+  } = useGamification();
 
   const MODES = [
     { key: 'pomodoro', label: 'Pomodoro', duration: 25 * 60 },
@@ -48,6 +55,54 @@ const TimerCard = ({ variant = 'full', className = '' }) => {
       setTimerMode('custom');
       setShowCustomInput(false);
     }
+  };
+
+  // Handle timer completion with gamification integration
+  const handleTimerComplete = () => {
+    if (!subjectName) {
+      addReward({
+        type: 'XP_EARNED',
+        title: 'Session Complete!',
+        description: 'Don\'t forget to select a subject next time for full XP!',
+        tier: 'common'
+      });
+      return;
+    }
+
+    const duration = mode === 'stopwatch' ? stopwatchSeconds : getActualElapsedTime();
+    const durationMinutes = Math.max(1, Math.round(duration / 60)); // Minimum 1 minute
+
+    // Add study session to gamification system
+    const sessionData = {
+      subjectName,
+      durationMinutes,
+      mode,
+      difficulty: 1.0, // Default difficulty
+      mood: 'neutral' // Default mood
+    };
+
+    addStudySession(sessionData);
+
+    // Update quest progress
+    updateQuestProgress('time', durationMinutes);
+    updateQuestProgress('sessions', 1);
+    updateQuestProgress('subjects', 1, subjectName);
+
+    // Show completion reward
+    addReward({
+      type: 'XP_EARNED',
+      title: `🎉 ${durationMinutes} min session complete!`,
+      description: `Great work studying ${subjectName}!`,
+      tier: durationMinutes >= 60 ? 'rare' : durationMinutes >= 30 ? 'uncommon' : 'common'
+    });
+  };
+
+  // Override stop timer to include completion logic
+  const handleStopTimer = () => {
+    if (isRunning) {
+      handleTimerComplete();
+    }
+    stopTimer();
   };
 
   const handleModeChange = (modeKey) => {
@@ -102,7 +157,7 @@ const TimerCard = ({ variant = 'full', className = '' }) => {
             {isRunning ? (
               <button
                 className="px-3 py-1 rounded bg-[#FEC260] text-[#23234a] font-bold shadow hover:bg-[#FFD580] transition text-xs"
-                onClick={stopTimer}
+                onClick={handleStopTimer}
               >
                 Stop
               </button>
@@ -183,7 +238,7 @@ const TimerCard = ({ variant = 'full', className = '' }) => {
         </div>
         <div className="flex justify-center gap-3">
           {isRunning ? (
-            <button onClick={stopTimer} className="px-6 py-2 rounded-xl bg-[#FEC260] text-[#23234a] font-bold shadow hover:bg-[#FFD580] transition">Pause</button>
+            <button onClick={handleStopTimer} className="px-6 py-2 rounded-xl bg-[#FEC260] text-[#23234a] font-bold shadow hover:bg-[#FFD580] transition">Complete Session</button>
           ) : (
             <button onClick={startTimer} disabled={mode !== 'stopwatch' && secondsLeft === 0} className="px-6 py-2 rounded-xl bg-[#6C5DD3] text-white font-bold shadow hover:bg-[#7A6AD9] transition">Start</button>
           )}

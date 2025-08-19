@@ -102,11 +102,11 @@ const Subjects = () => {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6  bg-gradient-to-br from-[#1a1a2e] to-[#16213e] mt-20 pl-[70px]">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Subjects</h1>
+          <h1 className="text-3xl font-bold text-white">Subjects</h1>
           <p className="text-gray-600">Manage your study subjects and track progress</p>
         </div>
         <motion.button

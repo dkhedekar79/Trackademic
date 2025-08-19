@@ -143,21 +143,21 @@ export default function Dashboard() {
     const minutesThisWeek = weekSessions.reduce((sum, s) => sum + (s.durationMinutes || 0), 0);
     const hoursThisWeek = minutesThisWeek / 60;
     
-    // Calculate progress percentage
-    const progress = totalGoal > 0 ? Math.min((hoursThisWeek / totalGoal) * 100, 100) : 0;
-    
+    // Get accurate weekly statistics
+    const accurateStats = getAccurateWeeklyStats();
+
     // Calculate streak
     const currentStreak = calculateStreak(studySessions);
-    
+
     // Calculate completed tasks this week
     const completedTasks = getCompletedTasksThisWeek(tasks);
-    
+
     setStudyStats({
-      hoursThisWeek,
+      hoursThisWeek: accurateStats.hoursThisWeek,
       totalGoal,
-      progress
+      progress: accurateStats.progress
     });
-    
+
     setStreak(currentStreak);
     setCompletedTasksThisWeek(completedTasks.length);
   }, [subjects, studySessions, tasks]);
@@ -214,6 +214,26 @@ export default function Dashboard() {
     if (count < 5) return "You're making progress!";
     if (count < 10) return "Excellent productivity!";
     return "Outstanding work this week!";
+  };
+
+  // Calculate accurate weekly study statistics
+  const getAccurateWeeklyStats = () => {
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+    const thisWeekSessions = studySessions.filter(session =>
+      new Date(session.timestamp) > oneWeekAgo
+    );
+
+    const thisWeekMinutes = thisWeekSessions.reduce((total, session) =>
+      total + (session.durationMinutes || 0), 0
+    );
+
+    return {
+      sessionsThisWeek: thisWeekSessions.length,
+      hoursThisWeek: thisWeekMinutes / 60,
+      progress: totalGoal > 0 ? Math.min((thisWeekMinutes / 60 / totalGoal) * 100, 100) : 0
+    };
   };
 
   return (
@@ -373,7 +393,7 @@ export default function Dashboard() {
           <button className="flex-1 min-w-[200px] px-6 py-4 rounded-2xl bg-[#6C5DD3] text-white font-semibold shadow hover:bg-[#7A6AD9] transition">+ Add Subject</button>
           <button className="flex-1 min-w-[200px] px-6 py-4 rounded-2xl bg-[#6C5DD3] text-white font-semibold shadow hover:bg-[#7A6AD9] transition">+ Add Task</button>
           <button className="flex-1 min-w-[200px] px-6 py-4 rounded-2xl bg-[#6C5DD3] text-white font-semibold shadow hover:bg-[#7A6AD9] transition">+ Schedule tasks</button>
-          <button className="flex-1 min-w-[200px] px-6 py-4 rounded-2xl bg-[#6C5DD3] text-white font-semibold shadow hover:bg-[#7A6AD9] transition">-> Study</button>
+          <button className="flex-1 min-w-[200px] px-6 py-4 rounded-2xl bg-[#6C5DD3] text-white font-semibold shadow hover:bg-[#7A6AD9] transition">→ Study</button>
         </section>
         {/* Footer */}
         <footer className="py-6 text-center bg-[#3F3D56] text-white mt-10">
