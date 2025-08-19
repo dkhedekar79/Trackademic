@@ -740,13 +740,23 @@ export const GamificationProvider = ({ children }) => {
         
         if (completed && !quest.completed) {
           // Award quest completion XP
+          const questXP = quest.xp || 0;
           setTimeout(() => {
+            // Actually add XP to user stats
+            setUserStats(prevStats => ({
+              ...prevStats,
+              xp: prevStats.xp + questXP,
+              totalXPEarned: (prevStats.totalXPEarned || prevStats.xp || 0) + questXP,
+              weeklyXP: (prevStats.weeklyXP || 0) + questXP,
+              level: getLevelFromXP(prevStats.xp + questXP)
+            }));
+
             addReward({
               type: 'QUEST_COMPLETE',
               title: `✅ ${quest.name}`,
               description: quest.description,
               tier: 'uncommon',
-              xp: quest.xp
+              xp: questXP
             });
           }, 100);
         }
