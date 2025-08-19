@@ -82,7 +82,7 @@ const GamifiedDashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Reward System - Always Active */}
-      <RewardSystem />
+      <RewardSystem userStats={userStats} />
       
       {/* Hero Section with User Stats */}
       <div className="bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700 text-white">
