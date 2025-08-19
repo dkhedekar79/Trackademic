@@ -309,7 +309,7 @@ const QuestProgressTracker = ({ quest, onComplete }) => {
                 quest.difficulty === 'hard' ? 'bg-purple-100 text-purple-700' :
                 'bg-yellow-100 text-yellow-700'
               }`}>
-                {quest.difficulty.toUpperCase()}
+                {(quest.difficulty || 'medium').toUpperCase()}
               </div>
             </div>
           )}
