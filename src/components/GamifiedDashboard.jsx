@@ -38,7 +38,7 @@ const GamifiedDashboard = () => {
     { id: 'overview', label: 'Overview', icon: BarChart3 },
     { id: 'quests', label: 'Quests', icon: Target },
     { id: 'achievements', label: 'Achievements', icon: Trophy },
-    { id: 'streaks', label: 'Streaks', icon: Fire },
+    { id: 'streaks', label: 'Streaks', icon: Flame },
     { id: 'leaderboards', label: 'Leaderboards', icon: Users },
     { id: 'premium', label: 'Premium', icon: Crown }
   ];
