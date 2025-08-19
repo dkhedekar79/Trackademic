@@ -13,6 +13,7 @@ import AchievementSystem from './AchievementSystem';
 import LeaderboardSystem from './LeaderboardSystem';
 import PremiumSystem from './PremiumSystem';
 import RewardSystem from './RewardSystem';
+import MysteryBox from './MysteryBox';
 
 const GamifiedDashboard = () => {
   const { 
