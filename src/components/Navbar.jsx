@@ -90,12 +90,12 @@ const Navbar = () => {
       </div>
 
       {/* Gamification Notifications */}
-      {showRewards && rewardQueue && rewardQueue.length > 0 && (
+      {showRewards && rewardQueue && Array.isArray(rewardQueue) && rewardQueue.length > 0 && (
         <div className="fixed top-24 right-6 bg-gradient-to-r from-green-500 to-emerald-600 text-white p-4 rounded-2xl shadow-2xl z-50 max-w-sm">
           <div className="flex items-center gap-3">
             <div className="text-2xl">🎉</div>
             <div>
-              <h4 className="font-bold text-lg">Session Complete!</h4>
+              <h4 className="font-bold text-lg">{rewardQueue[rewardQueue.length - 1]?.title || "Session Complete!"}</h4>
               <p className="text-sm opacity-90">{rewardQueue[rewardQueue.length - 1]?.description || "Great work!"}</p>
             </div>
           </div>
