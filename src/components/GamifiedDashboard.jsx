@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
+import {
   Star, Trophy, Target, Fire, Crown, TrendingUp, Calendar,
   Award, Zap, BookOpen, Clock, Users, Share2, Plus, Settings,
-  Sparkles, Gift, Shield, Gem, ChevronRight, BarChart3
+  Sparkles, Gift, Shield, Gem, ChevronRight, BarChart3, CheckCircle
 } from 'lucide-react';
 import { useGamification } from '../context/GamificationContext';
 import { AnimatedProgressBar } from './RewardAnimations';
