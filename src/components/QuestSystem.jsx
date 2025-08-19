@@ -306,7 +306,7 @@ const QuestProgressTracker = ({ quest, onComplete }) => {
           ) : (
             <div className="text-right">
               <span className="text-sm font-medium text-gray-600">
-                {progress} / {quest.target}
+                {progress} / {quest.target || 1}
               </span>
               <div className={`px-2 py-1 rounded-full text-xs font-bold ${
                 quest.difficulty === 'easy' ? 'bg-green-100 text-green-700' :
