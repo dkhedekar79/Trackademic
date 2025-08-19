@@ -315,7 +315,7 @@ const OverviewTab = ({ userStats }) => {
     {
       label: 'Longest Streak',
       value: `${userStats.longestStreak} days`,
-      icon: Fire,
+      icon: Flame,
       color: 'from-orange-500 to-red-500',
       change: userStats.currentStreak === userStats.longestStreak ? 'Current!' : 'Personal best'
     },
