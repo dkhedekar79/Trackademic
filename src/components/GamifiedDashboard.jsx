@@ -332,7 +332,7 @@ const OverviewTab = ({ userStats }) => {
   const stats = [
     {
       label: 'Total XP Earned',
-      value: userStats.totalXPEarned?.toLocaleString() || userStats.xp.toLocaleString(),
+      value: (userStats.totalXPEarned || userStats.xp || 0).toLocaleString(),
       icon: Star,
       color: 'from-yellow-500 to-orange-500',
       change: weeklyStats.xpThisWeek > 0 ? `+${weeklyStats.xpThisWeek.toLocaleString()} this week` : 'No XP this week'
