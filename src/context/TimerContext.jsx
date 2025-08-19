@@ -29,7 +29,7 @@ export const TimerProvider = ({ children }) => {
   const { isRunning, mode, secondsLeft, stopwatchSeconds, isPomodoroBreak, pomodoroCount, subjectName, startTime, pausedTime, lastUpdateTime, customMinutes } = timerState;
 
   // Calculate actual elapsed time based on real timestamps
-  const getActualElapsedTime = () => {
+  const getActualElapsedTime = useCallback(() => {
     if (!startTime) return 0;
     if (isRunning) {
       return Math.floor((Date.now() - startTime) / 1000);
@@ -37,7 +37,7 @@ export const TimerProvider = ({ children }) => {
       return pausedTime;
     }
     return 0;
-  };
+  }, [startTime, isRunning, pausedTime]);
 
   // Update timer display based on actual elapsed time
   const updateTimerDisplay = () => {
