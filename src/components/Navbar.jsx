@@ -90,7 +90,7 @@ const Navbar = () => {
       </div>
 
       {/* Gamification Notifications */}
-      {showRewards && recentRewards.length > 0 && (
+      {showRewards && rewardQueue && rewardQueue.length > 0 && (
         <div className="fixed top-24 right-6 bg-gradient-to-r from-green-500 to-emerald-600 text-white p-4 rounded-2xl shadow-2xl z-50 max-w-sm">
           <div className="flex items-center gap-3">
             <div className="text-2xl">🎉</div>
