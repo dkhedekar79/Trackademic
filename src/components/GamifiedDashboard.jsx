@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Star, Trophy, Target, Fire, Crown, TrendingUp, Calendar,
+  Star, Trophy, Target, Flame, Crown, TrendingUp, Calendar,
   Award, Zap, BookOpen, Clock, Users, Share2, Plus, Settings,
   Sparkles, Gift, Shield, Gem, ChevronRight, BarChart3, CheckCircle
 } from 'lucide-react';
