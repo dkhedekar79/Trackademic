@@ -216,6 +216,26 @@ export default function Dashboard() {
     return "Outstanding work this week!";
   };
 
+  // Calculate accurate weekly study statistics
+  const getAccurateWeeklyStats = () => {
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+    const thisWeekSessions = studySessions.filter(session =>
+      new Date(session.timestamp) > oneWeekAgo
+    );
+
+    const thisWeekMinutes = thisWeekSessions.reduce((total, session) =>
+      total + (session.durationMinutes || 0), 0
+    );
+
+    return {
+      sessionsThisWeek: thisWeekSessions.length,
+      hoursThisWeek: thisWeekMinutes / 60,
+      progress: totalGoal > 0 ? Math.min((thisWeekMinutes / 60 / totalGoal) * 100, 100) : 0
+    };
+  };
+
   return (
      
     <div className="min-h-screen bg-gradient-to-br from-[#1a1a2e] to-[#16213e] mt-20 flex">
