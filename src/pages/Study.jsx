@@ -379,10 +379,13 @@ const Study = () => {
   };
 
   const handleSaveSession = () => {
+    // Ensure we have a valid duration - use minimum 1 minute if session was very short
+    const sessionDurationMinutes = Math.max(1, Math.round((elapsedSeconds / 60) * 100) / 100);
+
     // Save session data based on actual elapsedSeconds
     const sessionData = {
       subjectName: subject,
-      durationMinutes: Math.round((elapsedSeconds / 60) * 100) / 100,
+      durationMinutes: sessionDurationMinutes,
       timestamp: new Date().toISOString(),
       notes: sessionNotes,
       task: currentTask,
@@ -392,24 +395,30 @@ const Study = () => {
       isTaskComplete
     };
 
-    // Add to gamification system
-    addStudySession(sessionData);
+    // Add to gamification system for XP calculation
+    const sessionResult = addStudySession(sessionData);
 
-    // Update study sessions
+    // Update study sessions in localStorage
     const updatedSessions = [...studySessions, sessionData];
     localStorage.setItem('studySessions', JSON.stringify(updatedSessions));
     setStudySessions(updatedSessions);
 
     // Update task if completed
     if (isTaskComplete && currentTask) {
-      const updatedTasks = tasks.map(task => 
+      const updatedTasks = tasks.map(task =>
         task.name === currentTask ? { ...task, done: true, doneAt: Date.now() } : task
       );
       localStorage.setItem('tasks', JSON.stringify(updatedTasks));
       setTasks(updatedTasks);
     }
 
-    // Reset session state
+    // Update quest progress for gamification
+    updateQuestProgress('time', sessionDurationMinutes);
+    updateQuestProgress('sessions', 1);
+    updateQuestProgress('subjects', 1, subject);
+    updateQuestProgress('streak', 1);
+
+    // Reset session state but keep subject to avoid blank screen
     setSessionNotes('');
     setCurrentTask('');
     setIsTaskComplete(false);
@@ -417,11 +426,13 @@ const Study = () => {
     setSessionMood('');
     setSessionReflection('');
     setSessionDifficulty(2);
-    
-    // Reset timers and subject
+
+    // Reset timers but keep the subject active
     resetLocalTimer();
     resetTimer();
-    setTimerSubject('No Subject');
+
+    // Stay on the study page instead of going to subject selection
+    // The subject remains in the URL so user can continue studying
   };
 
   const deleteStudySession = (index) => {
