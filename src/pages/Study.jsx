@@ -18,12 +18,12 @@ import {
 } from 'lucide-react';
 import { useTimer } from '../context/TimerContext';
 import { useGamification } from '../context/GamificationContext';
-import { 
-  XPPopup, 
-  LevelUpCelebration, 
-  AchievementUnlock, 
+import {
+  XPGainAnimation,
+  LevelUpCelebration,
+  AchievementUnlock,
   StreakMilestone,
-  AnimatedProgressBar 
+  AnimatedProgressBar
 } from '../components/RewardAnimations';
 import Sidebar from '../components/Sidebar';
 import { 
@@ -1188,5 +1188,4 @@ const Study = () => {
   );
 };
 
-export default Study; 
-
+export default Study;
