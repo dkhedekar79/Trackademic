@@ -337,7 +337,7 @@ const QuestProgressTracker = ({ quest, onComplete }) => {
       </div>
       
       {/* Tips */}
-      {quest.tips && quest.tips.length > 0 && !isCompleted && (
+      {quest.tips && Array.isArray(quest.tips) && quest.tips.length > 0 && !isCompleted && (
         <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
