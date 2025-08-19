@@ -789,6 +789,64 @@ export const GamificationProvider = ({ children }) => {
     });
   };
 
+  // Debug function to reset user stats
+  const resetUserStats = () => {
+    localStorage.removeItem('userStats');
+    setUserStats({
+      // Core progression
+      xp: 0,
+      level: 1,
+      prestigeLevel: 0,
+
+      // Session tracking
+      totalSessions: 0,
+      totalStudyTime: 0,
+      sessionHistory: [],
+
+      // Streak system
+      currentStreak: 0,
+      longestStreak: 0,
+      lastStudyDate: null,
+      streakSavers: 3,
+
+      // Achievement & badge system
+      badges: [],
+      achievements: [],
+      unlockedTitles: [],
+      currentTitle: 'Rookie Scholar',
+
+      // Quest system
+      dailyQuests: [],
+      weeklyQuests: [],
+      completedQuestsToday: 0,
+      questStreak: 0,
+
+      // Social & competition
+      weeklyXP: 0,
+      weeklyRank: 0,
+      friends: [],
+      challenges: [],
+
+      // Premium features
+      isPremium: false,
+      xpMultiplier: 1.0,
+      premiumSkins: [],
+      currentSkin: 'default',
+
+      // Statistics
+      subjectMastery: {},
+      weeklyGoal: 0,
+      weeklyProgress: 0,
+      totalXPEarned: 0,
+
+      // Variable reward tracking
+      lastRewardTime: null,
+      rewardStreak: 0,
+      luckyStreak: 0,
+      jackpotCount: 0
+    });
+  };
+
   const value = {
     userStats,
     showRewards,
@@ -809,7 +867,8 @@ export const GamificationProvider = ({ children }) => {
     prestige,
     setShowRewards,
     calculateXP,
-    getTotalXPForLevel
+    getTotalXPForLevel,
+    resetUserStats // Debug function
   };
 
   return (
