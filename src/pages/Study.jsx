@@ -174,7 +174,7 @@ const Study = () => {
     if (subject) {
       setTimerSubject(subject);
     }
-  }, [subject, setTimerSubject]);
+  }, [subject]); // Removed setTimerSubject to prevent infinite loop
 
   // Get subject tasks
   const getSubjectTasks = () => {
