@@ -157,9 +157,9 @@ export const TimerProvider = ({ children }) => {
     }));
   };
 
-  const setTimerSubject = (subject) => {
+  const setTimerSubject = useCallback((subject) => {
     setTimerState(prev => ({ ...prev, subjectName: subject }));
-  };
+  }, []);
 
   const handleTimerComplete = () => {
     if (mode === 'pomodoro') {
