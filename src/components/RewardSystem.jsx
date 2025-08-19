@@ -490,7 +490,7 @@ const RewardSettings = ({ isOpen, onClose }) => {
 };
 
 // Main Reward System Component
-const RewardSystem = () => {
+const RewardSystem = ({ userStats = {} }) => {
   const [showHistory, setShowHistory] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [mysteryBoxAvailable, setMysteryBoxAvailable] = useState(false);
