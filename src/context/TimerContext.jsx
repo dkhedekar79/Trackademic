@@ -132,7 +132,7 @@ export const TimerProvider = ({ children }) => {
   }, [mode]);
 
   // When custom minutes change, reflect it in secondsLeft if not running and in custom mode
-  const setCustomMinutes = (minutes) => {
+  const setCustomMinutes = useCallback((minutes) => {
     setTimerState(prev => {
       const next = { ...prev, customMinutes: minutes };
       if (!prev.isRunning && prev.mode === 'custom') {
@@ -140,7 +140,7 @@ export const TimerProvider = ({ children }) => {
       }
       return next;
     });
-  };
+  }, []);
 
   const setTimerMode = (newMode) => {
     const totalDuration = getModeDuration(newMode);
