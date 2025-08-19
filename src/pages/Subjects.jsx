@@ -102,7 +102,7 @@ const Subjects = () => {
   };
 
   return (
-    <div className="p-6 space-y-6 mt-20 pl-[60px]">
+    <div className="p-6 space-y-6 mt-20 pl-[70px]">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
