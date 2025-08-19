@@ -173,13 +173,13 @@ export const TimerProvider = ({ children }) => {
     }
   };
 
-  const saveStudySession = (sessionData) => {
+  const saveStudySession = useCallback((sessionData) => {
     const actualDuration = mode === 'stopwatch' ? stopwatchSeconds : getModeDuration(mode) - secondsLeft;
     const session = { ...sessionData, durationMinutes: Math.round((actualDuration / 60) * 100) / 100, timestamp: new Date().toISOString(), subjectName: subjectName || sessionData.subjectName };
     const existingSessions = JSON.parse(localStorage.getItem('studySessions') || '[]');
     const updatedSessions = [...existingSessions, session];
     localStorage.setItem('studySessions', JSON.stringify(updatedSessions));
-  };
+  }, [mode, stopwatchSeconds, secondsLeft, subjectName]);
 
   const value = {
     ...timerState,
