@@ -30,8 +30,9 @@ function App() {
               <Navbar />
               <main className="flex-1 overflow-auto">
                 <Routes>
-                  <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-                  <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                  <Route path="/" element={<ProtectedRoute><GamifiedDashboard /></ProtectedRoute>} />
+                  <Route path="/dashboard" element={<ProtectedRoute><GamifiedDashboard /></ProtectedRoute>} />
+                  <Route path="/classic-dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
                   <Route path="/subjects" element={<ProtectedRoute><Subjects /></ProtectedRoute>} />
                   <Route path="/study" element={<ProtectedRoute><Study /></ProtectedRoute>} />
                   <Route path="/tasks" element={<ProtectedRoute><Tasks /></ProtectedRoute>} />
