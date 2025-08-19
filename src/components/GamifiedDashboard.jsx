@@ -444,6 +444,7 @@ const OverviewTab = ({ userStats }) => {
             </h3>
             <motion.button
               whileHover={{ scale: 1.05 }}
+              onClick={() => setActiveTab('achievements')}
               className="text-yellow-600 hover:text-yellow-700 font-medium text-sm flex items-center gap-1"
             >
               View All <ChevronRight className="w-4 h-4" />
