@@ -224,13 +224,13 @@ export const GamificationProvider = ({ children }) => {
     const currentLevel = userStats.level;
     const totalXPForCurrentLevel = getTotalXPForLevel(currentLevel);
     const totalXPForNextLevel = getTotalXPForLevel(currentLevel + 1);
-    const progressXP = userStats.xp - totalXPForCurrentLevel;
+    const progressXP = Math.max(0, userStats.xp - totalXPForCurrentLevel);
     const neededXP = totalXPForNextLevel - totalXPForCurrentLevel;
-    
+
     return {
       current: progressXP,
       needed: neededXP,
-      percentage: Math.min(100, (progressXP / neededXP) * 100)
+      percentage: Math.min(100, Math.max(0, (progressXP / neededXP) * 100))
     };
   };
 
