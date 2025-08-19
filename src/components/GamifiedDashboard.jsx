@@ -399,7 +399,7 @@ const OverviewTab = ({ userStats }) => {
             </h3>
             <motion.button
               whileHover={{ scale: 1.05 }}
-              onClick={() => {/* Switch to quests tab */}}
+              onClick={() => setActiveTab('quests')}
               className="text-blue-600 hover:text-blue-700 font-medium text-sm flex items-center gap-1"
             >
               View All <ChevronRight className="w-4 h-4" />
