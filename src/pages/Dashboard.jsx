@@ -143,21 +143,21 @@ export default function Dashboard() {
     const minutesThisWeek = weekSessions.reduce((sum, s) => sum + (s.durationMinutes || 0), 0);
     const hoursThisWeek = minutesThisWeek / 60;
     
-    // Calculate progress percentage
-    const progress = totalGoal > 0 ? Math.min((hoursThisWeek / totalGoal) * 100, 100) : 0;
-    
+    // Get accurate weekly statistics
+    const accurateStats = getAccurateWeeklyStats();
+
     // Calculate streak
     const currentStreak = calculateStreak(studySessions);
-    
+
     // Calculate completed tasks this week
     const completedTasks = getCompletedTasksThisWeek(tasks);
-    
+
     setStudyStats({
-      hoursThisWeek,
+      hoursThisWeek: accurateStats.hoursThisWeek,
       totalGoal,
-      progress
+      progress: accurateStats.progress
     });
-    
+
     setStreak(currentStreak);
     setCompletedTasksThisWeek(completedTasks.length);
   }, [subjects, studySessions, tasks]);
