@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTimer } from '../context/TimerContext';
+import { useGamification } from '../context/GamificationContext';
 
 const TimerCard = ({ variant = 'full', className = '' }) => {
   const [subjects, setSubjects] = useState([]);
