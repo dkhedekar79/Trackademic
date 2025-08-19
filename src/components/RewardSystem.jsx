@@ -516,26 +516,42 @@ const RewardSystem = () => {
   }, []);
 
   const handleMysteryBoxOpen = () => {
-    const rewards = [
-      { type: 'XP', amount: [50, 100, 150, 200], tier: 'common' },
-      { type: 'XP', amount: [250, 300, 400], tier: 'uncommon' },
-      { type: 'XP', amount: [500, 750], tier: 'rare' },
-      { type: 'XP', amount: [1000], tier: 'epic' },
-      { type: 'STREAK_SAVER', amount: [1, 2], tier: 'rare' },
-      { type: 'TITLE', titles: ['Mystery Hunter', 'Lucky Scholar', 'Box Opener'], tier: 'uncommon' }
+    // Mystery box should only be available after real study achievements
+    const { userStats } = useGamification();
+
+    // Base reward on user's actual performance
+    const baseXP = Math.max(50, Math.floor(userStats.xp / 100)); // Scale with user progress
+    const sessionCount = userStats.totalSessions || 0;
+
+    // Realistic rewards based on user level and activity
+    const rewardTiers = [
+      { type: 'XP', amount: Math.floor(baseXP * 0.5), tier: 'common', weight: 40 },
+      { type: 'XP', amount: Math.floor(baseXP * 1.0), tier: 'uncommon', weight: 30 },
+      { type: 'XP', amount: Math.floor(baseXP * 1.5), tier: 'rare', weight: 20 },
+      { type: 'STREAK_SAVER', amount: 1, tier: 'rare', weight: 8 },
+      { type: 'XP', amount: Math.floor(baseXP * 2.0), tier: 'epic', weight: 2 }
     ];
 
-    const randomReward = rewards[Math.floor(Math.random() * rewards.length)];
-    const amount = Array.isArray(randomReward.amount) 
-      ? randomReward.amount[Math.floor(Math.random() * randomReward.amount.length)]
-      : randomReward.amount;
+    // Weighted random selection
+    const totalWeight = rewardTiers.reduce((sum, reward) => sum + reward.weight, 0);
+    const random = Math.random() * totalWeight;
+    let currentWeight = 0;
+
+    let selectedReward = rewardTiers[0];
+    for (const reward of rewardTiers) {
+      currentWeight += reward.weight;
+      if (random <= currentWeight) {
+        selectedReward = reward;
+        break;
+      }
+    }
 
     addReward({
       type: 'VARIABLE_REWARD',
       title: '🎁 Mystery Box Reward!',
-      description: `You found ${randomReward.type === 'XP' ? `${amount} XP` : randomReward.type}!`,
-      tier: randomReward.tier,
-      bonusXP: randomReward.type === 'XP' ? amount : 0,
+      description: `You earned ${selectedReward.type === 'XP' ? `${selectedReward.amount} XP` : 'a Streak Saver'}!`,
+      tier: selectedReward.tier,
+      bonusXP: selectedReward.type === 'XP' ? selectedReward.amount : 0,
       animation: 'mystery_box'
     });
 
