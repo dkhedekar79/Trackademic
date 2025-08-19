@@ -142,7 +142,7 @@ export const TimerProvider = ({ children }) => {
     });
   }, []);
 
-  const setTimerMode = (newMode) => {
+  const setTimerMode = useCallback((newMode) => {
     const totalDuration = getModeDuration(newMode);
     setTimerState(prev => ({
       ...prev,
@@ -155,7 +155,7 @@ export const TimerProvider = ({ children }) => {
       pausedTime: null,
       lastUpdateTime: null
     }));
-  };
+  }, []);
 
   const setTimerSubject = useCallback((subject) => {
     setTimerState(prev => ({ ...prev, subjectName: subject }));
