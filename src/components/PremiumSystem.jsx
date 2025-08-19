@@ -420,7 +420,10 @@ const PremiumPlanCard = ({ plan, isCurrentPlan, onSelect }) => {
 const PremiumSystem = () => {
   const { userStats } = useGamification();
   const [activeTab, setActiveTab] = useState('plans');
-  const [currentPlan, setCurrentPlan] = useState('elite'); // Mock current plan
+  const [currentPlan, setCurrentPlan] = useState(() => {
+    // Check if user has premium features enabled
+    return userStats.isPremium ? (userStats.premiumPlan || 'scholar') : null;
+  });
   const [selectedTheme, setSelectedTheme] = useState('galaxy');
   
   const tabs = [
