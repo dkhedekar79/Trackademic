@@ -495,16 +495,27 @@ const QuestSystem = () => {
   
   // Get quests for active category
   const getQuestsForCategory = (category) => {
+    let quests = [];
     switch (category) {
       case 'daily':
-        return userStats.dailyQuests || [];
+        quests = userStats.dailyQuests || [];
+        break;
       case 'weekly':
-        return userStats.weeklyQuests || [];
+        quests = userStats.weeklyQuests || [];
+        break;
       case 'special':
-        return userStats.specialQuests || [];
+        quests = userStats.specialQuests || [];
+        break;
       default:
-        return [];
+        quests = [];
     }
+
+    // Filter out any invalid quest objects
+    return quests.filter(quest =>
+      quest &&
+      typeof quest === 'object' &&
+      typeof quest.name === 'string'
+    );
   };
   
   const currentQuests = getQuestsForCategory(activeCategory);
