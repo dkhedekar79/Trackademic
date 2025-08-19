@@ -367,10 +367,10 @@ export const GamificationProvider = ({ children }) => {
       ...prev,
       xp: newXP,
       level: newLevel,
-      totalSessions: prev.totalSessions + 1,
-      totalStudyTime: prev.totalStudyTime + sessionDuration,
-      totalXPEarned: prev.totalXPEarned + xpData.totalXP,
-      weeklyXP: prev.weeklyXP + xpData.totalXP,
+      totalSessions: (prev.totalSessions || 0) + 1,
+      totalStudyTime: (prev.totalStudyTime || 0) + sessionDuration,
+      totalXPEarned: (prev.totalXPEarned || prev.xp || 0) + xpData.totalXP,
+      weeklyXP: (prev.weeklyXP || 0) + xpData.totalXP,
       subjectMastery: {
         ...prev.subjectMastery,
         [subjectName]: (prev.subjectMastery[subjectName] || 0) + sessionDuration
