@@ -28,10 +28,13 @@ export default function NameCollection({ onComplete }) {
         updatedAt: new Date()
       });
 
+      // Refresh the user profile in AuthContext
+      await fetchUserProfile(user.uid);
+
       onComplete();
     } catch (err) {
       setError("Failed to save your name. Please try again.");
-      console.error(err);
+      console.error("Error saving name:", err);
     } finally {
       setLoading(false);
     }
