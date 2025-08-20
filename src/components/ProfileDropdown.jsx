@@ -15,6 +15,12 @@ export default function ProfileDropdown() {
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
 
+  // Debug logging
+  useEffect(() => {
+    console.log("ProfileDropdown - Current user:", user);
+    console.log("ProfileDropdown - Current userProfile:", userProfile);
+  }, [user, userProfile]);
+
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
