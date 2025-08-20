@@ -9,6 +9,7 @@ export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [showNameCollection, setShowNameCollection] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
