@@ -52,6 +52,45 @@ export const AuthProvider = ({ children }) => {
   const login = (email, password) => signInWithEmailAndPassword(auth, email, password);
   const logout = () => signOut(auth);
 
+  // Profile functions
+  const updateUserName = async (newName) => {
+    if (!user) throw new Error("No user logged in");
+
+    try {
+      await updateDoc(doc(db, "users", user.uid), {
+        name: newName,
+        updatedAt: new Date()
+      });
+
+      // Update local state
+      setUserProfile(prev => ({ ...prev, name: newName, updatedAt: new Date() }));
+      return true;
+    } catch (error) {
+      console.error("Error updating user name:", error);
+      throw error;
+    }
+  };
+
+  const deleteUserAccount = async () => {
+    if (!user) throw new Error("No user logged in");
+
+    try {
+      // Delete user document from Firestore
+      await deleteDoc(doc(db, "users", user.uid));
+
+      // Delete Firebase Auth account
+      await deleteUser(user);
+
+      // Clear local state
+      setUser(null);
+      setUserProfile(null);
+      return true;
+    } catch (error) {
+      console.error("Error deleting user account:", error);
+      throw error;
+    }
+  };
+
   return (
     <AuthContext.Provider value={{ user, signup, login, logout }}>
       {!loading && children}
