@@ -80,12 +80,7 @@ const Navbar = () => {
                 <span className="text-sm font-medium">{userStats?.currentStreak || 0}</span>
               </div>
             </div>
-            <button
-              onClick={handleLogout}
-              className="px-4 py-2 rounded-lg text-white bg-[#6C5DD3] font-semibold hover:bg-[#7A6AD9] transition"
-            >
-              Log Out
-            </button>
+            <ProfileDropdown />
           </>
         )}
       </div>
