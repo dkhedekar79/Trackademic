@@ -228,6 +228,7 @@ const Landing = () => {
             </nav>
         </div>
       </header>
+      <meta name="google-adsense-account" content="ca-pub-9570335781120627">
 
       {/* Main Content with Card */}
       <div id="central-content" className="relative flex flex-col items-center justify-start min-h-screen pt-32 pb-10 mt-20">
