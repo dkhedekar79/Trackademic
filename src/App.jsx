@@ -13,7 +13,7 @@ import Study from './pages/Study';
 import Tasks from './pages/Tasks';
 import Schedule from './pages/Schedule';
 import Insights from './pages/Insights';
-import Settings from './pages/Settings';
+import Privacy from './pages/Privacy';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -131,14 +131,14 @@ function App() {
                 </ProtectedRoute>
               } />
 
-              <Route path="/settings" element={
+              <Route path="/privacy" element={
                 <ProtectedRoute>
                   <div className="flex h-screen bg-gray-50">
                     <Sidebar />
                     <div className="flex-1 flex flex-col">
                       <Navbar />
                       <main className="flex-1 overflow-auto">
-                        <Settings />
+                        <Privacy />
                       </main>
                     </div>
                   </div>
