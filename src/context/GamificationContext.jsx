@@ -99,7 +99,7 @@ export const GamificationProvider = ({ children }) => {
 
   // Advanced XP calculation with variable rewards
   const calculateXP = (sessionDuration, subjectName, difficulty = 1.0) => {
-    const baseXP = Math.floor(sessionDuration / 5); // 1 XP per 5 minutes
+    const baseXP = Math.floor(sessionDuration / 0.1); // 10 XP per minute
     
     // Focus multiplier scales with session length (longer sessions = higher multiplier)
     const focusMultiplier = Math.min(3.0, 1.0 + (sessionDuration / 120)); // Max 3x at 2+ hours
