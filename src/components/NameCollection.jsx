@@ -20,6 +20,8 @@ export default function NameCollection({ onComplete }) {
     setError("");
 
     try {
+      console.log("Saving name to Firestore:", name.trim(), "for user:", user.uid);
+
       // Save user profile to Firestore
       await setDoc(doc(db, "users", user.uid), {
         name: name.trim(),
@@ -27,6 +29,8 @@ export default function NameCollection({ onComplete }) {
         createdAt: new Date(),
         updatedAt: new Date()
       });
+
+      console.log("Name saved successfully, refreshing profile...");
 
       // Refresh the user profile in AuthContext
       await fetchUserProfile(user.uid);
