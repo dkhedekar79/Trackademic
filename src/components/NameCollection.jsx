@@ -7,7 +7,7 @@ export default function NameCollection({ onComplete }) {
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const { user } = useAuth();
+  const { user, fetchUserProfile } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
