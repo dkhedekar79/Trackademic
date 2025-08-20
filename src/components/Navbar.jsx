@@ -22,10 +22,6 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleLogout = async () => {
-    await logout();
-    navigate("/");
-  };
 
   return (
     <nav
