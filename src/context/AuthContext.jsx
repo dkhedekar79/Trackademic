@@ -20,10 +20,14 @@ export const AuthProvider = ({ children }) => {
   // Fetch user profile data from Firestore
   const fetchUserProfile = async (uid) => {
     try {
+      console.log("Fetching user profile for UID:", uid);
       const userDoc = await getDoc(doc(db, "users", uid));
       if (userDoc.exists()) {
-        setUserProfile(userDoc.data());
+        const profileData = userDoc.data();
+        console.log("User profile found:", profileData);
+        setUserProfile(profileData);
       } else {
+        console.log("No user profile found in Firestore");
         setUserProfile(null);
       }
     } catch (error) {
