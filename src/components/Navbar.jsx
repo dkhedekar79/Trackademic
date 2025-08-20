@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useGamification } from "../context/GamificationContext";
 import { Bell, User, LogOut, Menu, X, Star, Trophy, Flame } from 'lucide-react';
+import ProfileDropdown from "./ProfileDropdown";
 
 const Navbar = () => {
   const [opacity, setOpacity] = useState(1);
@@ -21,10 +22,6 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleLogout = async () => {
-    await logout();
-    navigate("/");
-  };
 
   return (
     <nav
@@ -79,12 +76,7 @@ const Navbar = () => {
                 <span className="text-sm font-medium">{userStats?.currentStreak || 0}</span>
               </div>
             </div>
-            <button
-              onClick={handleLogout}
-              className="px-4 py-2 rounded-lg text-white bg-[#6C5DD3] font-semibold hover:bg-[#7A6AD9] transition"
-            >
-              Log Out
-            </button>
+            <ProfileDropdown />
           </>
         )}
       </div>
