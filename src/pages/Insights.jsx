@@ -462,6 +462,8 @@ export default function Insights() {
             </button>
           </div>
 
+          <meta name="google-adsense-account" content="ca-pub-9570335781120627">
+
           {/* Time Range Selector */}
           <div className="mb-6">
             <div className="flex gap-2 bg-white/5 rounded-lg p-1 w-fit">
