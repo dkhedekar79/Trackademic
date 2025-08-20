@@ -47,7 +47,7 @@ export default function Signup() {
           />
           <button className="w-full bg-green-600 text-white py-2 rounded">Sign Up</button>
         </form>
-        <meta name="google-adsense-account" content="ca-pub-9570335781120627">
+        
         <div className="text-center mt-4">
           <span>Have an account? </span>
           <a href="/login" className="text-blue-500 underline">Log in</a>
