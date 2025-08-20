@@ -259,9 +259,9 @@ export default function Dashboard() {
               <p className="text-[#FEC260] mt-2">Keep going!</p>
             )}
           </Card>
-          <meta name="google-adsense-account" content="ca-pub-9570335781120627">
+         
 
-          
+    
           <Card title="Streak" icon={null}>
             <div className="flex flex-col">
               <div>
