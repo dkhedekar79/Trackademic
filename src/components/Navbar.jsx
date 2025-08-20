@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useGamification } from "../context/GamificationContext";
 import { Bell, User, LogOut, Menu, X, Star, Trophy, Flame } from 'lucide-react';
+import ProfileDropdown from "./ProfileDropdown";
 
 const Navbar = () => {
   const [opacity, setOpacity] = useState(1);
