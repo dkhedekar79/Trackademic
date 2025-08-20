@@ -17,10 +17,14 @@ export default function Signup() {
     setError("");
     try {
       await signup(email, password);
-      navigate("/dashboard");
+      setShowNameCollection(true);
     } catch (err) {
       setError("Failed to sign up. " + err.message);
     }
+  };
+
+  const handleNameCollectionComplete = () => {
+    navigate("/dashboard");
   };
 
   return (
