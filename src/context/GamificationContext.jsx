@@ -153,7 +153,7 @@ export const GamificationProvider = ({ children }) => {
     const performanceMultiplier = sessionDuration > avgRecentDuration ? 1.5 : 1.0;
 
     // Legendary (0.1% base chance, increased for exceptional performance)
-    if (rand < (0.001 * performanceMultiplier)) {
+    if (rand < (0.1 * performanceMultiplier)) {
       return {
         tier: 'legendary',
         type: 'XP_JACKPOT',
@@ -167,7 +167,7 @@ export const GamificationProvider = ({ children }) => {
     }
 
     // Epic (1% base chance)
-    if (rand < (0.01 * performanceMultiplier)) {
+    if (rand < (0.2 * performanceMultiplier)) {
       return {
         tier: 'epic',
         type: 'XP_BONUS',
@@ -180,7 +180,7 @@ export const GamificationProvider = ({ children }) => {
     }
 
     // Rare (5% base chance)
-    if (rand < (0.05 * performanceMultiplier)) {
+    if (rand < (0.3 * performanceMultiplier)) {
       return {
         tier: 'rare',
         type: 'XP_BONUS',
@@ -193,7 +193,7 @@ export const GamificationProvider = ({ children }) => {
     }
 
     // Uncommon (15% base chance)
-    if (rand < (0.15 * performanceMultiplier)) {
+    if (rand < (0.4 * performanceMultiplier)) {
       return {
         tier: 'uncommon',
         type: 'XP_BONUS',
