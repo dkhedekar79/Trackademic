@@ -462,7 +462,7 @@ export default function Insights() {
             </button>
           </div>
 
-          <meta name="google-adsense-account" content="ca-pub-9570335781120627">
+      
 
           {/* Time Range Selector */}
           <div className="mb-6">
