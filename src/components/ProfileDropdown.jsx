@@ -89,7 +89,7 @@ export default function ProfileDropdown() {
       >
         <User className="w-4 h-4" />
         <span className="text-sm font-medium">
-          {userProfile?.name || user?.email?.split('@')[0] || "Profile"}
+          {userProfile?.name ? `Hey, ${userProfile.name}` : `Hey, ${user?.email?.split('@')[0] || "there"}`}
         </span>
       </button>
 
