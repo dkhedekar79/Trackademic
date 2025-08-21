@@ -67,7 +67,7 @@ const Landing = () => {
                 <Target className="w-5 h-5 text-white" />
               </div>
               <span className="text-xl font-bold bg-gradient-to-r from-emerald-600 to-blue-600 bg-clip-text text-transparent">
-                Trackademic
+                Trackviso
               </span>
             </div>
             <div className="hidden md:flex items-center space-x-8">
@@ -319,7 +319,7 @@ const Landing = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl lg:text-5xl font-bold mb-6">
-              How Trackademic{" "}
+              How Trackviso{" "}
               <span className="bg-gradient-to-r from-emerald-500 to-blue-600 bg-clip-text text-transparent">
                 Works
               </span>
@@ -384,7 +384,7 @@ const Landing = () => {
               viewport={{ once: true }}
             >
               <h2 className="text-4xl lg:text-5xl font-bold mb-6">
-                See Trackademic in{" "}
+                See Trackviso in{" "}
                 <span className="bg-gradient-to-r from-emerald-500 to-blue-600 bg-clip-text text-transparent">
                   Action
                 </span>
@@ -522,7 +522,7 @@ const Landing = () => {
               {
                 name: "Sarah Chen",
                 role: "Computer Science Major",
-                text: "Trackademic helped me identify my most productive study times. My GPA improved from 3.2 to 3.8 in one semester!",
+                text: "Trackviso helped me identify my most productive study times. My GPA improved from 3.2 to 3.8 in one semester!",
                 rating: 5
               },
               {
@@ -575,7 +575,7 @@ const Landing = () => {
             Ready to Transform Your Academic Journey?
           </h2>
           <p className="text-xl text-emerald-100 mb-10">
-            Join thousands of students who are already achieving better results with Trackademic
+            Join thousands of students who are already achieving better results with Trackviso
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
             <Link 
@@ -605,7 +605,7 @@ const Landing = () => {
                 <div className="w-8 h-8 bg-gradient-to-r from-emerald-500 to-blue-600 rounded-lg flex items-center justify-center">
                   <Target className="w-5 h-5 text-white" />
                 </div>
-                <span className="text-xl font-bold">Trackademic</span>
+                <span className="text-xl font-bold">Trackviso</span>
               </div>
               <p className="text-gray-400 mb-6">
                 Empowering students to achieve academic excellence through intelligent tracking and insights.
@@ -629,7 +629,7 @@ const Landing = () => {
                 <button onClick={() => scrollToSection('features')} className="block hover:text-white transition-colors">Features</button>
                 <button onClick={() => scrollToSection('pricing')} className="block hover:text-white transition-colors">Pricing</button>
                 <button onClick={() => scrollToSection('demo')} className="block hover:text-white transition-colors">Demo</button>
-                <div className="hover:text-white transition-colors cursor-pointer">Mobile App</div>
+                
               </div>
             </div>
             
@@ -656,7 +656,7 @@ const Landing = () => {
           </div>
           
           <div className="border-t border-gray-800 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 Trackademic. All rights reserved. Built with ❤️ for students.</p>
+            <p>&copy; 2025 Trackviso. All rights reserved. Built with ❤️ for students.</p>
           </div>
         </div>
       </footer>
