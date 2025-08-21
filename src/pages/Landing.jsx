@@ -126,19 +126,18 @@ const Landing = () => {
             className="text-5xl lg:text-7xl font-bold leading-tight mb-8"
             variants={itemVariants}
           >
-            Transform Your{" "}
+            Make every{" "}
             <span className="bg-gradient-to-r from-emerald-500 to-blue-600 bg-clip-text text-transparent">
-              Academic Success
+              Study Session
             </span>{" "}
-            with Smart Tracking
+            Count.
           </motion.h1>
           
           <motion.p 
             className="text-xl lg:text-2xl text-gray-600 mb-12 max-w-4xl mx-auto"
             variants={itemVariants}
           >
-            Monitor progress, optimize study habits, and achieve your academic goals with 
-            intelligent insights and personalized learning analytics.
+            Your revision dashboard: study tracker, analytics, calendar, and XP system in one.
           </motion.p>
           
           <motion.div 
@@ -149,7 +148,7 @@ const Landing = () => {
               to="/signup"
               className="bg-gradient-to-r from-emerald-600 to-blue-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center"
             >
-              Start Free Trial
+              Get Started for Free
               <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
             <button 
