@@ -261,7 +261,7 @@ const Landing = () => {
                   <div className="bg-white h-2 rounded-full" style={{ width: '87%' }}></div>
                 </div>
               </div>
-              </div>
+              
             </motion.div>
 
             {/* AI Insights */}
