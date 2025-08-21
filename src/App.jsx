@@ -1,110 +1,179 @@
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { TimerProvider } from './context/TimerContext';
 import { GamificationProvider } from './context/GamificationContext';
 import ProtectedRoute from './routes/ProtectedRoute';
-import Navbar from './components/Navbar';
-import Sidebar from './components/Sidebar';
+import LoadingSpinner from './components/LoadingSpinner';
+import ErrorFallback from './components/ErrorFallback';
+import { preloadCriticalRoutes, setupSmartPrefetch } from './utils/preloader';
 import './styles/index.css';
 
-// Lazy-loaded pages
-const Landing = lazy(() => import('./pages/Landing'));
-const Login = lazy(() => import('./pages/Login'));
-const Signup = lazy(() => import('./pages/Signup'));
-const Dashboard = lazy(() => import('./pages/Dashboard'));
-const GamifiedDashboard = lazy(() => import('./components/GamifiedDashboard'));
-const Subjects = lazy(() => import('./pages/Subjects'));
-const Study = lazy(() => import('./pages/Study'));
-const Tasks = lazy(() => import('./pages/Tasks'));
-const Schedule = lazy(() => import('./pages/Schedule'));
-const Insights = lazy(() => import('./pages/Insights'));
-const Privacy = lazy(() => import('./pages/Privacy'));
+// Import lazy components from centralized file
+import {
+  LazyLanding,
+  LazyLogin,
+  LazySignup,
+  LazyDashboard,
+  LazyGamifiedDashboard,
+  LazySubjects,
+  LazyStudy,
+  LazyTasks,
+  LazySchedule,
+  LazyInsights,
+  LazyPrivacy,
+  LazySidebar,
+  LazyNavbar
+} from './components/LazyComponents';
 
+// Error Boundary Component
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
 
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('App Error Boundary caught an error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <ErrorFallback error={this.state.error} resetError={() => this.setState({ hasError: false, error: null })} />;
+    }
+
+    return this.props.children;
+  }
+}
 
 function App() {
-  return (
-    <AuthProvider>
-      <GamificationProvider>
-        <TimerProvider>
-          <Router>
-            <Suspense fallback={<div className="flex items-center justify-center h-screen text-2xl">Loading…</div>}>
-              <Routes>
-                <Route path="/" element={<Landing />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<Signup />} />
+  useEffect(() => {
+    // Setup preloading and smart prefetching
+    preloadCriticalRoutes();
+    setupSmartPrefetch();
+  }, []);
 
-                {/* Protected Routes */}
-                <Route path="/dashboard" element={
-                  <ProtectedRoute>
-                    <Suspense fallback={<div className="text-center py-20">Loading Dashboard...</div>}>
-                      <div className="flex h-screen bg-gray-50">
-                        <Sidebar />
-                        <div className="flex-1 flex flex-col">
-                          <Navbar />
-                          <main className="flex-1 overflow-auto">
-                            <GamifiedDashboard />
-                          </main>
-                        </div>
-                      </div>
-                    </Suspense>
-                  </ProtectedRoute>
-                } />
-                
-                
-               
-                <Route path="/classic-dashboard" element={
-                  <ProtectedRoute>
-                    <Layout><Dashboard /></Layout>
-                  </ProtectedRoute>
-                } />
-                <Route path="/subjects" element={
-                  <ProtectedRoute>
-                    <Layout><Subjects /></Layout>
-                  </ProtectedRoute>
-                } />
-                <Route path="/study" element={
-                  <ProtectedRoute>
-                    <Layout><Study /></Layout>
-                  </ProtectedRoute>
-                } />
-                <Route path="/tasks" element={
-                  <ProtectedRoute>
-                    <Layout><Tasks /></Layout>
-                  </ProtectedRoute>
-                } />
-                <Route path="/schedule" element={
-                  <ProtectedRoute>
-                    <Layout><Schedule /></Layout>
-                  </ProtectedRoute>
-                } />
-                <Route path="/insights" element={
-                  <ProtectedRoute>
-                    <Layout><Insights /></Layout>
-                  </ProtectedRoute>
-                } />
-                <Route path="/privacy" element={
-                  <ProtectedRoute>
-                    <Layout><Privacy /></Layout>
-                  </ProtectedRoute>
-                } />
-              </Routes>
-            </Suspense>
-          </Router>
-        </TimerProvider>
-      </GamificationProvider>
-    </AuthProvider>
+  return (
+    <ErrorBoundary>
+      <AuthProvider>
+        <GamificationProvider>
+          <TimerProvider>
+            <Router>
+              <Suspense fallback={<LoadingSpinner variant="fullscreen" text="Loading Application..." />}>
+                <Routes>
+                  <Route path="/" element={<LazyLanding />} />
+                  <Route path="/login" element={<LazyLogin />} />
+                  <Route path="/signup" element={<LazySignup />} />
+
+                  {/* Protected Routes */}
+                  <Route path="/dashboard" element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<LoadingSpinner variant="fullscreen" text="Loading Dashboard..." />}>
+                        <Layout>
+                          <LazyGamifiedDashboard />
+                        </Layout>
+                      </Suspense>
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/classic-dashboard" element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <Suspense fallback={<LoadingSpinner text="Loading Classic Dashboard..." />}>
+                          <LazyDashboard />
+                        </Suspense>
+                      </Layout>
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/subjects" element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <Suspense fallback={<LoadingSpinner text="Loading Subjects..." />}>
+                          <LazySubjects />
+                        </Suspense>
+                      </Layout>
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/study" element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <Suspense fallback={<LoadingSpinner text="Loading Study..." />}>
+                          <LazyStudy />
+                        </Suspense>
+                      </Layout>
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/tasks" element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <Suspense fallback={<LoadingSpinner text="Loading Tasks..." />}>
+                          <LazyTasks />
+                        </Suspense>
+                      </Layout>
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/schedule" element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <Suspense fallback={<LoadingSpinner text="Loading Schedule..." />}>
+                          <LazySchedule />
+                        </Suspense>
+                      </Layout>
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/insights" element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <Suspense fallback={<LoadingSpinner text="Loading Insights..." />}>
+                          <LazyInsights />
+                        </Suspense>
+                      </Layout>
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/privacy" element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <Suspense fallback={<LoadingSpinner text="Loading Privacy..." />}>
+                          <LazyPrivacy />
+                        </Suspense>
+                      </Layout>
+                    </ProtectedRoute>
+                  } />
+                </Routes>
+              </Suspense>
+            </Router>
+          </TimerProvider>
+        </GamificationProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 
-// Extract common layout
+// Extract common layout with lazy loaded components
 const Layout = ({ children }) => (
   <div className="flex h-screen bg-gray-50">
-    <Sidebar />
+    <Suspense fallback={<div className="w-64 bg-gray-200 animate-pulse" />}>
+      <LazySidebar />
+    </Suspense>
     <div className="flex-1 flex flex-col">
-      <Navbar />
-      <main className="flex-1 overflow-auto">{children}</main>
+      <Suspense fallback={<div className="h-16 bg-gray-200 animate-pulse" />}>
+        <LazyNavbar />
+      </Suspense>
+      <main className="flex-1 overflow-auto">
+        <ErrorBoundary>
+          {children}
+        </ErrorBoundary>
+      </main>
     </div>
   </div>
 );
