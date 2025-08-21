@@ -273,7 +273,7 @@ const Landing = () => {
               viewport={{ once: true }}
             >
               <Brain className="w-12 h-12 mb-6" />
-              <h3 className="text-2xl font-bold mb-4">AI-Powered Insights</h3>
+              <h3 className="text-2xl font-bold mb-4">Get the best Insights</h3>
               <p className="text-purple-100 text-lg mb-6">
                 Get personalized recommendations and insights to optimize your study schedule and improve performance.
               </p>
