@@ -428,7 +428,7 @@ const Landing = () => {
                   </div>
                 ) : (
                   <div className="text-white text-center">
-                    <p className="text-xl">Demo video playing...</p>
+                    <p className="text-xl">If the video does not play, feel free to contact us</p>
                     <button 
                       className="mt-4 bg-white/20 px-4 py-2 rounded-lg"
                       onClick={(e) => {
