@@ -285,10 +285,8 @@ const GamifiedDashboard = () => {
             {activeTab === 'premium' && <PremiumSystem />}
           </Suspense>
         </div>
-        </div>
       </div>
-    );
-  };
+  );
 
 // Enhanced Overview Tab
 const OverviewTab = ({ userStats }) => {
