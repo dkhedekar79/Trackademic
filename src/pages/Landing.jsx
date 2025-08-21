@@ -1,394 +1,473 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import useInView from "../hooks/useInView";
-
-const fadeIn = "animate-fade-in";
-const slideUp = "animate-slide-up";
-const scaleOnHover = "transition-transform duration-300 hover:scale-105";
-
-// Study-related icons (more icons for denser effect)
-const floatingIcons = [
-  { icon: "📚", label: "books" },
-  { icon: "📝", label: "notepad" },
-  { icon: "⏰", label: "clock" },
-  { icon: "📊", label: "chart" },
-  { icon: "🧠", label: "brain" },
-  { icon: "🖊️", label: "pen" },
-  { icon: "📅", label: "calendar" },
-  { icon: "🔬", label: "microscope" },
-  { icon: "📓", label: "notebook" },
-  { icon: "📖", label: "openbook" },
-  { icon: "📚", label: "books2" },
-  { icon: "📝", label: "notepad2" },
-  { icon: "⏰", label: "clock2" },
-  { icon: "📊", label: "chart2" },
-  { icon: "🧠", label: "brain2" },
-  { icon: "🖊️", label: "pen2" },
-  { icon: "📅", label: "calendar2" },
-  { icon: "🔬", label: "microscope2" },
-  { icon: "📓", label: "notebook2" },
-  { icon: "📖", label: "openbook2" },
-];
-
-function getRandomPositions(count) {
-  return Array.from({ length: count }, () => ({
-    x: Math.random() * 90 + 5, // 5% to 95% (vw)
-    y: Math.random() * 60 + 10, // 10% to 70% (vh)
-  }));
-}
-
-const ICON_NUDGE = 8; // px per frame
-const FORBIDDEN_MARGIN = 24; // px extra margin around the card
-
-const isInForbiddenZone = (x, y, box) =>
-  x > box.left && x < box.right && y > box.top && y < box.bottom;
-
-const FloatingIcons = () => {
-  const [positions, setPositions] = useState(getRandomPositions(floatingIcons.length));
-  const [dragging, setDragging] = useState(null); // { index, offsetX, offsetY }
-  const containerRef = useRef();
-
-  // Get white card bounding box for forbidden zone
-  const getWhiteCardBox = () => {
-    const el = document.getElementById("main-white-card");
-    if (!el || !containerRef.current) return { left: 0, top: 0, right: 0, bottom: 0 };
-    const rect = el.getBoundingClientRect();
-    const cRect = containerRef.current.getBoundingClientRect();
-    return {
-      left: rect.left - cRect.left - FORBIDDEN_MARGIN,
-      top: rect.top - cRect.top - FORBIDDEN_MARGIN,
-      right: rect.right - cRect.left + FORBIDDEN_MARGIN,
-      bottom: rect.bottom - cRect.top + FORBIDDEN_MARGIN,
-    };
-  };
-
-  // Drag handlers
-  useEffect(() => {
-    if (dragging === null) return;
-    const handleMove = (e) => {
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      const rect = containerRef.current.getBoundingClientRect();
-      let x = ((clientX - rect.left - dragging.offsetX) / containerRef.current.offsetWidth) * 100;
-      let y = ((clientY - rect.top - dragging.offsetY) / containerRef.current.offsetHeight) * 100;
-      // Clamp to container
-      x = Math.max(5, Math.min(95, x));
-      y = Math.max(10, Math.min(70, y));
-      // Prevent dropping in forbidden zone
-      const box = getWhiteCardBox();
-      const px = (x / 100) * containerRef.current.offsetWidth;
-      const py = (y / 100) * containerRef.current.offsetHeight;
-      if (isInForbiddenZone(px, py, box)) return;
-      setPositions((prev) => prev.map((pos, i) => i === dragging.index ? { x, y } : pos));
-    };
-    const handleUp = () => setDragging(null);
-    window.addEventListener("mousemove", handleMove);
-    window.addEventListener("mouseup", handleUp);
-    window.addEventListener("touchmove", handleMove);
-    window.addEventListener("touchend", handleUp);
-    return () => {
-      window.removeEventListener("mousemove", handleMove);
-      window.removeEventListener("mouseup", handleUp);
-      window.removeEventListener("touchmove", handleMove);
-      window.removeEventListener("touchend", handleUp);
-    };
-  }, [dragging]);
-
-  return (
-    <div ref={containerRef} className="absolute inset-0 w-full h-full pointer-events-none select-none z-0">
-      {positions.map((pos, i) => (
-        <div
-          key={i}
-          id={`floating-icon-${i}`}
-          className="absolute"
-          style={{
-            left: `${pos.x}%`,
-            top: `${pos.y}%`,
-            transition: dragging && dragging.index === i ? 'none' : 'left 0.2s, top 0.2s',
-            cursor: 'grab',
-            pointerEvents: 'auto',
-            touchAction: 'none',
-          }}
-          onMouseDown={e => {
-            const iconRect = e.currentTarget.getBoundingClientRect();
-            setDragging({
-              index: i,
-              offsetX: e.clientX - iconRect.left - iconRect.width / 2,
-              offsetY: e.clientY - iconRect.top - iconRect.height / 2,
-            });
-          }}
-          onTouchStart={e => {
-            const touch = e.touches[0];
-            const iconRect = e.currentTarget.getBoundingClientRect();
-            setDragging({
-              index: i,
-              offsetX: touch.clientX - iconRect.left - iconRect.width / 2,
-              offsetY: touch.clientY - iconRect.top - iconRect.height / 2,
-            });
-          }}
-        >
-          {floatingIcons[i].icon}
-        </div>
-      ))}
-    </div>
-  );
-};
-
-const AnimatedCard = ({ icon, title, desc, delay = 0 }) => {
-  const [ref, inView] = useInView({ threshold: 0.15 });
-  return (
-    <div
-      ref={ref}
-      className={`flex flex-col items-center bg-white rounded-2xl shadow-lg p-8 ${scaleOnHover} transition-all duration-700 ${
-        inView ? "animate-slide-up" : "opacity-0 translate-y-10"
-      }`}
-      style={{ animationDelay: `${delay}s` }}
-    >
-      <span className="text-5xl mb-4">{icon}</span>
-      <h4 className="text-lg font-bold mb-2">{title}</h4>
-      <p className="text-gray-600 text-center text-sm">{desc}</p>
-    </div>
-  );
-};
-
-const AnimatedStep = ({ num, color, title, delay = 0 }) => {
-  const [ref, inView] = useInView({ threshold: 0.15 });
-  return (
-    <div
-      ref={ref}
-      className={`flex flex-col items-center bg-white rounded-2xl shadow-lg p-6 min-w-[260px] ${scaleOnHover} transition-all duration-700 ${
-        inView ? "animate-slide-up" : "opacity-0 translate-y-10"
-      }`}
-      style={{ animationDelay: `${delay}s` }}
-    >
-      <div className={`flex items-center justify-center w-14 h-14 rounded-full mb-4 text-3xl font-bold border-2 ${color.bg} ${color.text} ${color.border}`}>
-        {num}
-      </div>
-      <h4 className="text-lg font-bold mb-2">{title}</h4>
-    </div>
-  );
-};
+import { motion } from "framer-motion";
+import { 
+  BookOpen, 
+  Brain, 
+  Trophy, 
+  Zap, 
+  Users, 
+  Star, 
+  ArrowRight, 
+  Play,
+  CheckCircle,
+  Smartphone,
+  Laptop,
+  Tablet
+} from "lucide-react";
 
 const Landing = () => {
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.6
+      }
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-100 via-purple-100 to-green-100 relative overflow-x-hidden">
-      {/* Navigation Bar */}
-      <header class="pb-6 bg-white lg:pb-0">
-        <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-            
-            <nav class="flex items-center justify-between h-16 lg:h-20">
-                <div class="flex-shrink-0">
-                    <a href="#" title="" class="flex">
-                        <img class="w-auto h-8 lg:h-10" src="https://cdn.rareblocks.xyz/collection/celebration/images/logo.svg" alt="" />
-                    </a>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-cyan-50">
+      {/* Navigation */}
+      <nav className="fixed top-0 w-full bg-white/90 backdrop-blur-md z-50 border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <BookOpen className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                StudyFlow
+              </span>
+            </div>
+            <div className="hidden md:flex items-center space-x-8">
+              <a href="#features" className="text-gray-600 hover:text-gray-900 transition-colors">Features</a>
+              <a href="#pricing" className="text-gray-600 hover:text-gray-900 transition-colors">Pricing</a>
+              <a href="#testimonials" className="text-gray-600 hover:text-gray-900 transition-colors">Reviews</a>
+              <Link to="/login" className="text-blue-600 hover:text-blue-700 font-medium">Login</Link>
+              <Link 
+                to="/signup" 
+                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all duration-300 transform hover:scale-105"
+              >
+                Get Started Free
+              </Link>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section className="pt-24 pb-12 px-4">
+        <motion.div 
+          className="max-w-7xl mx-auto"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left Column - Main Content */}
+            <motion.div 
+              className="bg-gradient-to-br from-blue-600 to-purple-700 rounded-3xl p-8 lg:p-12 text-white relative overflow-hidden"
+              variants={itemVariants}
+            >
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-12 -translate-x-12"></div>
+              
+              <motion.h1 
+                className="text-4xl lg:text-6xl font-bold leading-tight mb-6"
+                variants={itemVariants}
+              >
+                A home designed to keep your{" "}
+                <span className="text-cyan-300">studies organised</span> and you{" "}
+                <span className="text-yellow-300">motivated</span>
+              </motion.h1>
+              
+              <motion.p 
+                className="text-xl mb-8 text-blue-100"
+                variants={itemVariants}
+              >
+                Transform your learning experience with AI-powered study tools that adapt to your needs.
+              </motion.p>
+              
+              <motion.div variants={itemVariants}>
+                <Link 
+                  to="/signup"
+                  className="inline-flex items-center bg-white text-blue-600 px-8 py-4 rounded-full font-semibold text-lg hover:bg-gray-50 transition-all duration-300 transform hover:scale-105 shadow-lg"
+                >
+                  Get started for free
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </Link>
+              </motion.div>
+            </motion.div>
+
+            {/* Right Column - Device Mockup */}
+            <motion.div 
+              className="relative"
+              variants={itemVariants}
+            >
+              <div className="bg-white rounded-3xl shadow-2xl p-8 transform rotate-3 hover:rotate-0 transition-transform duration-500">
+                <img 
+                  src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop&crop=center" 
+                  alt="StudyFlow Dashboard"
+                  className="w-full h-64 object-cover rounded-xl"
+                />
+                <div className="mt-4 space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <CheckCircle className="w-5 h-5 text-green-500" />
+                    <span className="text-gray-700">Study session completed</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Trophy className="w-5 h-5 text-yellow-500" />
+                    <span className="text-gray-700">Achievement unlocked!</span>
+                  </div>
                 </div>
-      
-                <button type="button" class="inline-flex p-2 text-black transition-all duration-200 rounded-md lg:hidden focus:bg-gray-100 hover:bg-gray-100">
-                    
-                    <svg class="block w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" />
-                    </svg>
-      
-                   
-                    <svg class="hidden w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-      
-                <div class="hidden lg:flex lg:items-center lg:ml-auto lg:space-x-10">
-                    <a href="#" title="" class="text-base font-medium text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600"> Features </a>
-      
-                    <a href="#" title="" class="text-base font-medium text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600"> Solutions </a>
-      
-                    <a href="#" title="" class="text-base font-medium text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600"> Resources </a>
-      
-                    <a href="#" title="" class="text-base font-medium text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600"> Pricing </a>
+              </div>
+            </motion.div>
+          </div>
+        </motion.div>
+      </section>
+
+      {/* Feature Panels */}
+      <section className="py-16 px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Flashcards Panel */}
+            <motion.div 
+              className="bg-gradient-to-br from-purple-500 to-purple-700 rounded-3xl p-8 text-white flex items-center justify-between"
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+            >
+              <div className="flex-1">
+                <h3 className="text-3xl font-bold mb-4">
+                  Create flashcards and notes in record time.
+                </h3>
+                <p className="text-purple-100 text-lg">
+                  AI-powered content generation makes studying faster and more effective.
+                </p>
+              </div>
+              <div className="ml-8">
+                <div className="w-24 h-32 bg-white/20 rounded-xl flex items-center justify-center">
+                  <Brain className="w-12 h-12 text-white" />
                 </div>
-      
-                <a href="#" title="" class="items-center justify-center hidden px-4 py-3 ml-10 text-base font-semibold text-white transition-all duration-200 bg-blue-600 border border-transparent rounded-md lg:inline-flex hover:bg-blue-700 focus:bg-blue-700" role="button"> Get started now </a>
-            </nav>
-      
-            
-            <nav class="pt-4 pb-6 bg-white border border-gray-200 rounded-md shadow-md lg:hidden">
-                <div class="flow-root">
-                    <div class="flex flex-col px-6 -my-2 space-y-1">
-                        <a href="#" title="" class="inline-flex py-2 text-base font-medium text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600"> Features </a>
-      
-                        <a href="#" title="" class="inline-flex py-2 text-base font-medium text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600"> Solutions </a>
-      
-                        <a href="#" title="" class="inline-flex py-2 text-base font-medium text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600"> Resources </a>
-      
-                        <a href="#" title="" class="inline-flex py-2 text-base font-medium text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600"> Pricing </a>
+              </div>
+            </motion.div>
+
+            {/* Testing Panel */}
+            <motion.div 
+              className="bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-3xl p-8 text-white flex items-center justify-between"
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+            >
+              <div className="ml-8">
+                <div className="w-24 h-32 bg-white/20 rounded-xl flex items-center justify-center">
+                  <Zap className="w-12 h-12 text-white" />
+                </div>
+              </div>
+              <div className="flex-1 text-right">
+                <h3 className="text-3xl font-bold mb-4">
+                  Test your knowledge. Get instant feedback.
+                </h3>
+                <p className="text-cyan-100 text-lg">
+                  Smart quizzes adapt to your learning pace and identify weak areas.
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Statistics Panel */}
+            <motion.div 
+              className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-3xl p-8 text-white"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+            >
+              <h3 className="text-3xl font-bold mb-6">
+                94% of users achieve better grades by using our smart learning platform.
+              </h3>
+              <Link 
+                to="/signup"
+                className="inline-flex items-center bg-white text-blue-600 px-6 py-3 rounded-full font-semibold hover:bg-gray-50 transition-colors"
+              >
+                Get started for free
+              </Link>
+            </motion.div>
+
+            {/* AI Learning Panel */}
+            <motion.div 
+              className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-3xl p-8 text-white text-center"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              viewport={{ once: true }}
+            >
+              <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Brain className="w-10 h-10 text-white" />
+              </div>
+              <h3 className="text-3xl font-bold mb-4">Learn with the help of AI</h3>
+              <a 
+                href="#features" 
+                className="inline-flex items-center text-white font-semibold hover:text-gray-200 transition-colors"
+              >
+                Learn more
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </a>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Video Section */}
+      <section className="py-16 px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12">
+            {/* Video Panel */}
+            <motion.div 
+              className="relative bg-gray-900 rounded-3xl overflow-hidden group cursor-pointer"
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              onClick={() => setIsVideoPlaying(!isVideoPlaying)}
+            >
+              <div className="aspect-video bg-gradient-to-br from-blue-600 to-purple-700 flex items-center justify-center">
+                {!isVideoPlaying ? (
+                  <div className="text-center">
+                    <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                      <Play className="w-8 h-8 text-white ml-1" />
                     </div>
+                    <p className="text-white text-lg font-medium">Watch Demo</p>
+                  </div>
+                ) : (
+                  <div className="text-white text-center">
+                    <p className="text-lg">Video playing...</p>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+
+            {/* App Features */}
+            <div className="space-y-8">
+              <motion.div 
+                className="bg-gradient-to-r from-purple-500 to-purple-700 rounded-2xl p-6 text-white text-center"
+                initial={{ opacity: 0, x: 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6 }}
+                viewport={{ once: true }}
+              >
+                <Star className="w-12 h-12 mx-auto mb-4" />
+                <h4 className="text-2xl font-bold mb-4">
+                  Apple loved us so much that they made us App of the day!
+                </h4>
+              </motion.div>
+
+              <motion.div 
+                className="bg-gray-900 rounded-2xl p-6 text-white text-center"
+                initial={{ opacity: 0, x: 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                viewport={{ once: true }}
+              >
+                <h4 className="text-2xl font-bold mb-6">
+                  Take us anywhere with the free StudyFlow app on iOS and Android.
+                </h4>
+                <div className="flex justify-center space-x-4">
+                  <div className="bg-white/10 px-4 py-2 rounded-lg">
+                    <Smartphone className="w-6 h-6 mx-auto mb-1" />
+                    <span className="text-sm">iOS</span>
+                  </div>
+                  <div className="bg-white/10 px-4 py-2 rounded-lg">
+                    <Smartphone className="w-6 h-6 mx-auto mb-1" />
+                    <span className="text-sm">Android</span>
+                  </div>
                 </div>
-      
-                <div class="px-6 mt-6">
-                    <a href="/signup" title="" class="inline-flex justify-center px-4 py-3 text-base font-semibold text-white transition-all duration-200 bg-blue-600 border border-transparent rounded-md tems-center hover:bg-blue-700 focus:bg-blue-700" role="button"> Get started now </a>
-                </div>
-            </nav>
+              </motion.div>
+            </div>
+          </div>
         </div>
-      </header>
-    
+      </section>
 
-      {/* Main Content with Card */}
-      <div id="central-content" className="relative flex flex-col items-center justify-start min-h-screen pt-32 pb-10 mt-20">
-        {/* Large White Card */}
-        <div id="main-white-card" className={`absolute left-1/2 -translate-x-1/2 top-1/2 mt-8 w-full max-w-xl min-h-[40vh] bg-white rounded-3xl shadow-2xl z-0 ${fadeIn}`} style={{ minHeight: '60vh' }}></div>
-        {/* Main Text Content */}
-        <div className={`relative z-10 flex flex-col items-center w-full max-w-3xl ${slideUp}`} style={{ animationDelay: '0.2s' }}>
-          <h2 className="text-3xl md:text-5xl font-semibold text-center mb-8 leading-tight">
-            Track <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-purple-600">your</span> progress<br className="hidden md:block" />
-            up to <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-purple-500 to-purple-700">3x</span> more efficiently!
-          </h2>
-          <p className="text-lg md:text-xl text-gray-700 mb-10 text-center font-medium max-w-2xl">
-            Stay organized, motivated, and efficient.<br />Track your revision progress and achieve your academic goals with ease.
-          </p>
-          <div className="flex flex-col md:flex-row gap-4 w-full justify-center max-w-md">
-            <Link
-              to="/login"
-              className="w-full md:w-auto px-8 py-3 rounded-lg bg-blue-600 text-white font-semibold text-lg shadow hover:bg-blue-700 transition-transform duration-300 hover:scale-105"
+      {/* AI Features */}
+      <section className="py-16 px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12">
+            <motion.div 
+              className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-3xl p-8 text-white flex items-center justify-between"
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
             >
-              Login
-            </Link>
-            <Link
-              to="/signup"
-              className="w-full md:w-auto px-8 py-3 rounded-lg bg-green-500 text-white font-semibold text-lg shadow hover:bg-green-600 transition-transform duration-300 hover:scale-105"
+              <div className="flex-1">
+                <h3 className="text-3xl font-bold mb-4">
+                  Generate explanations on any topic with AI.
+                </h3>
+                <p className="text-blue-100 text-lg">
+                  Get instant, personalized explanations that match your learning style.
+                </p>
+              </div>
+              <div className="ml-8">
+                <div className="w-24 h-32 bg-white/20 rounded-xl flex items-center justify-center">
+                  <Brain className="w-12 h-12 text-white" />
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div 
+              className="bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-3xl p-8 text-white flex items-center justify-between"
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
             >
-              Sign Up
-            </Link>
+              <div className="ml-8">
+                <div className="w-24 h-32 bg-white/20 rounded-xl flex items-center justify-center">
+                  <Zap className="w-12 h-12 text-white" />
+                </div>
+              </div>
+              <div className="flex-1 text-right">
+                <h3 className="text-3xl font-bold mb-4">
+                  Scientifically-proven learning with Spaced Repetition.
+                </h3>
+                <p className="text-cyan-100 text-lg">
+                  Optimize retention with evidence-based learning techniques.
+                </p>
+              </div>
+            </motion.div>
           </div>
         </div>
-      </div>
-      {/* Switch to plain white background for the rest of the page */}
-      <div className="bg-gradient-to-b from-white to-blue-50 w-full">
-        {/* Feature Highlights Section */}
-        <section className={`w-full flex flex-col items-center justify-center py-16 ${fadeIn}`} style={{ animationDelay: '0.4s' }}>
-          <h3 className="text-2xl md:text-3xl font-bold mb-10 text-center">Feature Highlights</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl w-full px-4">
-            <AnimatedCard icon="⏰" title="Smart Study Timer" desc="Custom timers to boost focus and track study hours effortlessly." delay={0.1} />
-            <AnimatedCard icon="📊" title="Insightful Analytics" desc="Understand your productivity and subject strengths at a glance." delay={0.2} />
-            <AnimatedCard icon="🗒️" title="Task Planner" desc="Organize exams, homework, and daily goals in one place." delay={0.3} />
-          </div>
-        </section>
-        {/* How It Works Section */}
-        <section className={`w-full flex flex-col items-center justify-center py-16 ${fadeIn}`} style={{ animationDelay: '0.6s' }}>
-          <h3 className="text-2xl md:text-3xl font-bold mb-10 text-center">How It Works</h3>
-          <div className="flex flex-col md:flex-row items-center justify-center gap-8 max-w-5xl w-full px-4 overflow-x-auto pb-24">
-            <AnimatedStep num={1} color={{ bg: "bg-blue-100", text: "text-blue-600", border: "border-blue-300" }} title="Set your subjects and goals" delay={0.1} />
-            <AnimatedStep num={2} color={{ bg: "bg-purple-100", text: "text-purple-600", border: "border-purple-300" }} title="Track your sessions with the smart timer" delay={0.2} />
-            <AnimatedStep num={3} color={{ bg: "bg-green-100", text: "text-green-600", border: "border-green-300" }} title="Improve with insights and revision reminders" delay={0.3} />
-          </div>
-        </section>
+      </section>
 
-        <section id="testimonials" className="py-16 bg-gradient-to-b from-purple-100 to-purple-50 overflow-hidden px-4">
-          <h2 className="text-2xl md:text-3xl font-bold mb-8 text-center">What Students Say</h2>
-          <div className="whitespace-nowrap overflow-hidden">
-            <div className="inline-block animate-carousel" style={{ animation: 'scrollTestimonials 2400s linear infinite' }}>
-              {/* Render many sets of testimonials for a truly infinite loop effect */}
-              {Array(100).fill(null).map((_, i) => (
-                <React.Fragment key={i}>
-                  <div className="inline-block w-[680px] bg-white p-5 mr-8 rounded-xl box-border align-top">
-                    <p>"I finally stuck to my revision plan thanks to this app. I actually know what to do every day!"</p>
-                    <strong>- Maya S., A-Level Biology</strong>
-                  </div>
-                  <div className="inline-block w-[650px] bg-white p-5 mr-8 rounded-xl box-border align-top">
-                    <p>"The analytics showed me my most productive hours—super helpful for exam prep!"</p>
-                    <strong>- Daniel K., GCSE Maths</strong>
-                  </div>
-                  <div className="inline-block w-[470px] bg-white p-5 mr-8 rounded-xl box-border align-top">
-                    <p>"Best revision app I've used. Clean, simple, and motivating!"</p>
-                    <strong>- Priya M., IB Student</strong>
-                  </div>
-                  <div className="inline-block w-[600px] bg-white p-5 mr-8 rounded-xl box-border align-top">
-                    <p>"It's like having a personal study coach. Keeps me on track and stress-free."</p>
-                    <strong>- Omar J., Year 11</strong>
-                  </div>
-                  <div className="inline-block w-[620px] bg-white p-5 mr-8 rounded-xl box-border align-top">
-                    <p>"I love the flashcard system—it's helped me memorize so much more in less time."</p>
-                    <strong>- Emily R., A-Level Psychology</strong>
-                  </div>
-                </React.Fragment>
-              ))}
+      {/* Final CTA */}
+      <section className="py-16 px-4">
+        <motion.div 
+          className="max-w-7xl mx-auto bg-gradient-to-r from-gray-900 to-gray-800 rounded-3xl p-12 text-white text-center"
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+        >
+          <div className="grid lg:grid-cols-3 gap-8 items-center">
+            <div className="lg:col-span-2">
+              <h2 className="text-4xl font-bold mb-6">
+                Learn on your phone, tablet, and laptop.
+              </h2>
+              <Link 
+                to="/signup"
+                className="inline-flex items-center bg-white text-gray-900 px-8 py-4 rounded-full font-semibold text-lg hover:bg-gray-50 transition-all duration-300 transform hover:scale-105"
+              >
+                Get started for free
+              </Link>
+            </div>
+            <div className="flex justify-center space-x-4">
+              <div className="bg-white/10 p-4 rounded-2xl">
+                <Smartphone className="w-8 h-8" />
+              </div>
+              <div className="bg-white/10 p-4 rounded-2xl">
+                <Tablet className="w-8 h-8" />
+              </div>
+              <div className="bg-white/10 p-4 rounded-2xl">
+                <Laptop className="w-8 h-8" />
+              </div>
             </div>
           </div>
-        </section>
+        </motion.div>
+      </section>
 
-        {/* Comparison Table Section */}
-        <section className="w-full flex flex-col items-center justify-center py-16 bg-gradient-to-b from-white to-blue-50 px-4">
-          <h3 className="text-2xl md:text-3xl font-bold mb-8 text-center">Trackviso vs Other Apps</h3>
-          <div className="w-full max-w-2xl p-0 rounded-2xl shadow-2xl bg-white overflow-hidden">
-            <table className="w-full border-collapse">
-              <thead className="bg-blue-100 sticky top-0">
-                <tr>
-                  <th className="py-3 px-6 text-left font-bold text-lg break-words">Feature</th>
-                  <th className="py-3 px-6 text-center font-bold text-lg break-words">Trackviso</th>
-                  <th className="py-3 px-6 text-center font-bold text-lg break-words">Other Apps</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="border-t">
-                  <td className="py-4 px-6 font-medium break-words">Unlimited Tracking Capabilities</td>
-                  <td className="py-4 px-6 text-center text-green-600 font-bold break-words">✅ Yes</td>
-                  <td className="py-4 px-6 text-center text-red-500 font-bold break-words">❌ No</td>
-                </tr>
-                <tr className="border-t">
-                  <td className="py-4 px-6 font-medium break-words">Inbuilt revision system</td>
-                  <td className="py-4 px-6 text-center text-green-600 font-bold break-words">✅ Yes</td>
-                  <td className="py-4 px-6 text-center text-yellow-500 font-bold break-words">⚠️ Limited</td>
-                </tr>
-                <tr className="border-t">
-                  <td className="py-4 px-6 font-medium break-words">Analytics Dashboard</td>
-                  <td className="py-4 px-6 text-center text-green-600 font-bold break-words">✅ Visual</td>
-                  <td className="py-4 px-6 text-center text-red-500 font-bold break-words">❌ Basic</td>
-                </tr>
-                <tr className="border-t">
-                  <td className="py-4 px-6 font-medium break-words">All-in-One Planner</td>
-                  <td className="py-4 px-6 text-center text-green-600 font-bold break-words">✅ Yes</td>
-                  <td className="py-4 px-6 text-center text-red-500 font-bold break-words">❌ No</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          
-        </section>
-        <section id="cta" className="py-16 bg-gradient-to-b from-purple-400 via-blue-500 to-blue-300 text-white text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-8">Get Started for Free</h2>
-            <p className="text-lg md:text-xl mb-10">Free to use. No credit card required. Optional Pro upgrade available.</p>
-            <Link to="/dashboard" className="px-8 py-3 rounded-lg bg-white text-white bg-clip-text bg-gradient-to-r from-purple-500 via-blue-500 to-blue-600 font-semibold text-lg shadow hover:bg-gradient-to-r hover:from-purple-100 hover:to-blue-100 hover:text-blue-700 transition-transform duration-300 hover:scale-105 border border-blue-100 inline-block">
-                Let's go!
-            </Link>
-        </section>
-
-        <section id="footer" className="py-16 bg-white text-black">
-            <div className="flex flex-wrap justify-around">
-                <div>
-                    <h4>Quick Links</h4>
-                    <ul className="list-none p-0">
-                        <li><a href="#" className="text-black no-underline">About</a></li>
-                        <li><a href="#" className="text-black no-underline">FAQ</a></li>
-                        <li><a href="#" className="text-black no-underline">Privacy</a></li>
-                        <li><a href="#" className="text-black no-underline">Terms</a></li>
-                    </ul>
+      {/* Testimonials */}
+      <section id="testimonials" className="py-16 px-4 bg-gradient-to-r from-purple-50 to-blue-50">
+        <div className="max-w-7xl mx-auto text-center">
+          <h2 className="text-4xl font-bold mb-12">What Students Say</h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              { name: "Sarah M.", role: "Medical Student", text: "StudyFlow helped me organize my MCAT prep and I scored in the 95th percentile!" },
+              { name: "James L.", role: "Engineering Student", text: "The AI explanations made complex calculus concepts finally click for me." },
+              { name: "Maya P.", role: "High School Student", text: "I went from C's to A's using the spaced repetition system. It actually works!" }
+            ].map((testimonial, index) => (
+              <motion.div 
+                key={index}
+                className="bg-white p-6 rounded-2xl shadow-lg"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                viewport={{ once: true }}
+              >
+                <div className="flex justify-center mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                  ))}
                 </div>
-                <div>
-                    <h4>Follow Us</h4>
-                    <p>
-                        <a href="#" className="text-black mr-4">Twitter</a>
-                        <a href="#" className="text-black mr-4">Instagram</a>
-                        <a href="#" className="text-black">TikTok</a>
-                    </p>
+                <p className="text-gray-700 mb-4">"{testimonial.text}"</p>
+                <div className="font-semibold">{testimonial.name}</div>
+                <div className="text-gray-500 text-sm">{testimonial.role}</div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-white py-12 px-4">
+        <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-8">
+          <div>
+            <div className="flex items-center space-x-2 mb-4">
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <BookOpen className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-xl font-bold">StudyFlow</span>
             </div>
-                <div>
-                    <h4>Newsletter</h4>
-                    <input type="email" placeholder="Your email" className="p-2 rounded-md border-none mt-2" />
-                    <button className="p-2 ml-2 rounded-md bg-blue-500 text-white">Subscribe</button>
-                </div>
+            <p className="text-gray-400">
+              Empowering students worldwide with AI-powered learning tools.
+            </p>
+          </div>
+          <div>
+            <h4 className="font-semibold mb-4">Product</h4>
+            <div className="space-y-2 text-gray-400">
+              <div>Features</div>
+              <div>Pricing</div>
+              <div>Mobile App</div>
             </div>
-            <p className="text-center mt-8 text-sm">© 2025 Trackviso. All rights reserved.</p>
-        </section>
-      </div>
+          </div>
+          <div>
+            <h4 className="font-semibold mb-4">Company</h4>
+            <div className="space-y-2 text-gray-400">
+              <div>About</div>
+              <div>Careers</div>
+              <div>Contact</div>
+            </div>
+          </div>
+          <div>
+            <h4 className="font-semibold mb-4">Support</h4>
+            <div className="space-y-2 text-gray-400">
+              <div>Help Center</div>
+              <div>Privacy Policy</div>
+              <div>Terms of Service</div>
+            </div>
+          </div>
+        </div>
+        <div className="max-w-7xl mx-auto border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+          <p>&copy; 2024 StudyFlow. All rights reserved.</p>
+        </div>
+      </footer>
     </div>
   );
 };
 
-export default Landing; 
+export default Landing;
