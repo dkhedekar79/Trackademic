@@ -505,7 +505,7 @@ const Landing = () => {
                 to="/signup"
                 className="w-full bg-white text-emerald-600 py-3 rounded-xl font-semibold text-center block hover:bg-gray-50 transition-colors"
               >
-                Start Pro Trial
+                Start for free
               </Link>
             </motion.div>
 
