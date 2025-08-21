@@ -1,11 +1,15 @@
-import React from "react";
+import React, { Suspense } from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
-import { AuthProvider } from "./context/AuthContext";
+import AppLoadingScreen from "./components/AppLoadingScreen";
+import { initPerformanceTracking } from "./utils/performance";
 import "./styles/index.css";
 
+// Initialize performance tracking
+initPerformanceTracking();
+
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <AuthProvider>
+  <Suspense fallback={<AppLoadingScreen />}>
     <App />
-  </AuthProvider>
+  </Suspense>
 );

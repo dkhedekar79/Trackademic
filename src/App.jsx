@@ -1,12 +1,19 @@
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { TimerProvider } from './context/TimerContext';
 import { GamificationProvider } from './context/GamificationContext';
 import ProtectedRoute from './routes/ProtectedRoute';
-import Navbar from './components/Navbar';
-import Sidebar from './components/Sidebar';
+import AppLoadingScreen from './components/AppLoadingScreen';
+import PageLoadingScreen from './components/PageLoadingScreen';
+import ComponentLoadingScreen from './components/ComponentLoadingScreen';
+import LazyLoadErrorBoundary from './components/LazyLoadErrorBoundary';
+import { preloadCriticalRoutes } from './utils/preloadRoutes';
 import './styles/index.css';
+
+// Lazy-loaded components for better code splitting
+const Navbar = lazy(() => import('./components/Navbar'));
+const Sidebar = lazy(() => import('./components/Sidebar'));
 
 // Lazy-loaded pages
 const Landing = lazy(() => import('./pages/Landing'));
@@ -21,90 +28,196 @@ const Schedule = lazy(() => import('./pages/Schedule'));
 const Insights = lazy(() => import('./pages/Insights'));
 const Privacy = lazy(() => import('./pages/Privacy'));
 
-
-
 function App() {
+  // Preload critical routes on app initialization
+  useEffect(() => {
+    // Use requestIdleCallback if available, otherwise use setTimeout
+    if (typeof window !== 'undefined') {
+      if (window.requestIdleCallback) {
+        window.requestIdleCallback(preloadCriticalRoutes);
+      } else {
+        setTimeout(preloadCriticalRoutes, 1000);
+      }
+    }
+  }, []);
+
   return (
-    <AuthProvider>
+    <LazyLoadErrorBoundary>
+      <AuthProvider>
       <GamificationProvider>
         <TimerProvider>
           <Router>
-            <Suspense fallback={<div className="flex items-center justify-center h-screen text-2xl">Loading…</div>}>
-              <Routes>
-                <Route path="/" element={<Landing />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<Signup />} />
+            <Routes>
+              {/* Public Routes */}
+              <Route 
+                path="/" 
+                element={
+                  <Suspense fallback={<AppLoadingScreen />}>
+                    <Landing />
+                  </Suspense>
+                } 
+              />
+              <Route 
+                path="/login" 
+                element={
+                  <Suspense fallback={<PageLoadingScreen message="Loading login..." />}>
+                    <Login />
+                  </Suspense>
+                } 
+              />
+              <Route 
+                path="/signup" 
+                element={
+                  <Suspense fallback={<PageLoadingScreen message="Loading signup..." />}>
+                    <Signup />
+                  </Suspense>
+                } 
+              />
 
-                {/* Protected Routes */}
-                <Route path="/dashboard" element={
+              {/* Protected Routes */}
+              <Route 
+                path="/dashboard" 
+                element={
                   <ProtectedRoute>
-                    <Suspense fallback={<div className="text-center py-20">Loading Dashboard...</div>}>
-                      <div className="flex h-screen bg-gray-50">
-                        <Sidebar />
-                        <div className="flex-1 flex flex-col">
-                          <Navbar />
-                          <main className="flex-1 overflow-auto">
-                            <GamifiedDashboard />
-                          </main>
-                        </div>
-                      </div>
+                    <Suspense fallback={<AppLoadingScreen />}>
+                      <DashboardLayout>
+                        <GamifiedDashboard />
+                      </DashboardLayout>
                     </Suspense>
                   </ProtectedRoute>
-                } />
-                
-                
-               
-                <Route path="/classic-dashboard" element={
+                } 
+              />
+              
+              <Route 
+                path="/classic-dashboard" 
+                element={
                   <ProtectedRoute>
-                    <Layout><Dashboard /></Layout>
+                    <Suspense fallback={<AppLoadingScreen />}>
+                      <StandardLayout>
+                        <Dashboard />
+                      </StandardLayout>
+                    </Suspense>
                   </ProtectedRoute>
-                } />
-                <Route path="/subjects" element={
+                } 
+              />
+              
+              <Route 
+                path="/subjects" 
+                element={
                   <ProtectedRoute>
-                    <Layout><Subjects /></Layout>
+                    <Suspense fallback={<PageLoadingScreen message="Loading subjects..." />}>
+                      <StandardLayout>
+                        <Subjects />
+                      </StandardLayout>
+                    </Suspense>
                   </ProtectedRoute>
-                } />
-                <Route path="/study" element={
+                } 
+              />
+              
+              <Route 
+                path="/study" 
+                element={
                   <ProtectedRoute>
-                    <Layout><Study /></Layout>
+                    <Suspense fallback={<PageLoadingScreen message="Loading study session..." />}>
+                      <StandardLayout>
+                        <Study />
+                      </StandardLayout>
+                    </Suspense>
                   </ProtectedRoute>
-                } />
-                <Route path="/tasks" element={
+                } 
+              />
+              
+              <Route 
+                path="/tasks" 
+                element={
                   <ProtectedRoute>
-                    <Layout><Tasks /></Layout>
+                    <Suspense fallback={<PageLoadingScreen message="Loading tasks..." />}>
+                      <StandardLayout>
+                        <Tasks />
+                      </StandardLayout>
+                    </Suspense>
                   </ProtectedRoute>
-                } />
-                <Route path="/schedule" element={
+                } 
+              />
+              
+              <Route 
+                path="/schedule" 
+                element={
                   <ProtectedRoute>
-                    <Layout><Schedule /></Layout>
+                    <Suspense fallback={<PageLoadingScreen message="Loading schedule..." />}>
+                      <StandardLayout>
+                        <Schedule />
+                      </StandardLayout>
+                    </Suspense>
                   </ProtectedRoute>
-                } />
-                <Route path="/insights" element={
+                } 
+              />
+              
+              <Route 
+                path="/insights" 
+                element={
                   <ProtectedRoute>
-                    <Layout><Insights /></Layout>
+                    <Suspense fallback={<PageLoadingScreen message="Loading insights..." />}>
+                      <StandardLayout>
+                        <Insights />
+                      </StandardLayout>
+                    </Suspense>
                   </ProtectedRoute>
-                } />
-                <Route path="/privacy" element={
+                } 
+              />
+              
+              <Route 
+                path="/privacy" 
+                element={
                   <ProtectedRoute>
-                    <Layout><Privacy /></Layout>
+                    <Suspense fallback={<PageLoadingScreen message="Loading privacy policy..." />}>
+                      <StandardLayout>
+                        <Privacy />
+                      </StandardLayout>
+                    </Suspense>
                   </ProtectedRoute>
-                } />
-              </Routes>
-            </Suspense>
+                } 
+              />
+            </Routes>
           </Router>
         </TimerProvider>
       </GamificationProvider>
-    </AuthProvider>
+      </AuthProvider>
+    </LazyLoadErrorBoundary>
   );
 }
 
-// Extract common layout
-const Layout = ({ children }) => (
+// Layout Components with their own loading states
+const StandardLayout = ({ children }) => (
   <div className="flex h-screen bg-gray-50">
-    <Sidebar />
+    <Suspense fallback={<ComponentLoadingScreen size="md" message="Loading navigation..." />}>
+      <Sidebar />
+    </Suspense>
     <div className="flex-1 flex flex-col">
-      <Navbar />
-      <main className="flex-1 overflow-auto">{children}</main>
+      <Suspense fallback={<ComponentLoadingScreen size="sm" message="Loading header..." />}>
+        <Navbar />
+      </Suspense>
+      <main className="flex-1 overflow-auto">
+        {children}
+      </main>
+    </div>
+  </div>
+);
+
+const DashboardLayout = ({ children }) => (
+  <div className="flex h-screen bg-gray-50">
+    <Suspense fallback={<ComponentLoadingScreen size="md" message="Loading navigation..." />}>
+      <Sidebar />
+    </Suspense>
+    <div className="flex-1 flex flex-col">
+      <Suspense fallback={<ComponentLoadingScreen size="sm" message="Loading header..." />}>
+        <Navbar />
+      </Suspense>
+      <main className="flex-1 overflow-auto">
+        <Suspense fallback={<ComponentLoadingScreen size="lg" message="Loading dashboard..." />}>
+          {children}
+        </Suspense>
+      </main>
     </div>
   </div>
 );
