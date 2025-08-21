@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useEffect } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { TimerProvider } from './context/TimerContext';
@@ -53,8 +53,12 @@ class ErrorBoundary extends React.Component {
 function App() {
   useEffect(() => {
     // Setup preloading and smart prefetching
-    preloadCriticalRoutes();
-    setupSmartPrefetch();
+    try {
+      preloadCriticalRoutes();
+      setupSmartPrefetch();
+    } catch (error) {
+      console.warn('Preloading failed:', error);
+    }
   }, []);
 
   return (
