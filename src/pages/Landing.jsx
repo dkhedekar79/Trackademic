@@ -509,37 +509,8 @@ const Landing = () => {
               </Link>
             </motion.div>
 
-            {/* Enterprise Plan */}
-            <motion.div 
-              className="bg-white rounded-3xl p-8 shadow-lg border border-gray-200"
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              viewport={{ once: true }}
-            >
-              <div className="text-center mb-8">
-                <h3 className="text-2xl font-bold mb-2">Enterprise</h3>
-                <div className="text-4xl font-bold mb-4">$29<span className="text-lg text-gray-500">/month</span></div>
-                <p className="text-gray-600">For institutions</p>
-              </div>
-              <ul className="space-y-4 mb-8">
-                <li className="flex items-center space-x-3">
-                  <CheckCircle className="w-5 h-5 text-emerald-500" />
-                  <span>Multi-user management</span>
-                </li>
-                <li className="flex items-center space-x-3">
-                  <CheckCircle className="w-5 h-5 text-emerald-500" />
-                  <span>Custom integrations</span>
-                </li>
-                <li className="flex items-center space-x-3">
-                  <CheckCircle className="w-5 h-5 text-emerald-500" />
-                  <span>Priority support</span>
-                </li>
-              </ul>
-              <button className="w-full bg-gray-100 text-gray-700 py-3 rounded-xl font-semibold text-center hover:bg-gray-200 transition-colors">
-                Contact Sales
-              </button>
-            </motion.div>
+            
+            
           </div>
         </div>
       </section>
