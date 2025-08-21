@@ -1,83 +1,25 @@
 import { lazy } from 'react';
 
 // Lazy load all page components with proper error boundaries
-export const LazyLanding = lazy(() => 
-  import('../pages/Landing').catch(() => import('./ErrorFallback'))
-);
-
-export const LazyLogin = lazy(() => 
-  import('../pages/Login').catch(() => import('./ErrorFallback'))
-);
-
-export const LazySignup = lazy(() => 
-  import('../pages/Signup').catch(() => import('./ErrorFallback'))
-);
-
-export const LazyDashboard = lazy(() => 
-  import('../pages/Dashboard').catch(() => import('./ErrorFallback'))
-);
-
-export const LazyGamifiedDashboard = lazy(() => 
-  import('./GamifiedDashboard').catch(() => import('./ErrorFallback'))
-);
-
-export const LazySubjects = lazy(() => 
-  import('../pages/Subjects').catch(() => import('./ErrorFallback'))
-);
-
-export const LazyStudy = lazy(() => 
-  import('../pages/Study').catch(() => import('./ErrorFallback'))
-);
-
-export const LazyTasks = lazy(() => 
-  import('../pages/Tasks').catch(() => import('./ErrorFallback'))
-);
-
-export const LazySchedule = lazy(() => 
-  import('../pages/Schedule').catch(() => import('./ErrorFallback'))
-);
-
-export const LazyInsights = lazy(() => 
-  import('../pages/Insights').catch(() => import('./ErrorFallback'))
-);
-
-export const LazyPrivacy = lazy(() => 
-  import('../pages/Privacy').catch(() => import('./ErrorFallback'))
-);
+export const LazyLanding = lazy(() => import('../pages/Landing'));
+export const LazyLogin = lazy(() => import('../pages/Login'));
+export const LazySignup = lazy(() => import('../pages/Signup'));
+export const LazyDashboard = lazy(() => import('../pages/Dashboard'));
+export const LazyGamifiedDashboard = lazy(() => import('./GamifiedDashboard'));
+export const LazySubjects = lazy(() => import('../pages/Subjects'));
+export const LazyStudy = lazy(() => import('../pages/Study'));
+export const LazyTasks = lazy(() => import('../pages/Tasks'));
+export const LazySchedule = lazy(() => import('../pages/Schedule'));
+export const LazyInsights = lazy(() => import('../pages/Insights'));
+export const LazyPrivacy = lazy(() => import('../pages/Privacy'));
 
 // Lazy load heavy components
-export const LazySidebar = lazy(() => 
-  import('./Sidebar').catch(() => import('./ErrorFallback'))
-);
-
-export const LazyNavbar = lazy(() => 
-  import('./Navbar').catch(() => import('./ErrorFallback'))
-);
-
-export const LazyAchievementSystem = lazy(() => 
-  import('./AchievementSystem').catch(() => import('./ErrorFallback'))
-);
-
-export const LazyLeaderboardSystem = lazy(() => 
-  import('./LeaderboardSystem').catch(() => import('./ErrorFallback'))
-);
-
-export const LazyMysteryBox = lazy(() => 
-  import('./MysteryBox').catch(() => import('./ErrorFallback'))
-);
-
-export const LazyPremiumSystem = lazy(() => 
-  import('./PremiumSystem').catch(() => import('./ErrorFallback'))
-);
-
-export const LazyQuestSystem = lazy(() => 
-  import('./QuestSystem').catch(() => import('./ErrorFallback'))
-);
-
-export const LazyRewardSystem = lazy(() => 
-  import('./RewardSystem').catch(() => import('./ErrorFallback'))
-);
-
-export const LazyStreakTracker = lazy(() => 
-  import('./StreakTracker').catch(() => import('./ErrorFallback'))
-);
+export const LazySidebar = lazy(() => import('./Sidebar'));
+export const LazyNavbar = lazy(() => import('./Navbar'));
+export const LazyAchievementSystem = lazy(() => import('./AchievementSystem'));
+export const LazyLeaderboardSystem = lazy(() => import('./LeaderboardSystem'));
+export const LazyMysteryBox = lazy(() => import('./MysteryBox'));
+export const LazyPremiumSystem = lazy(() => import('./PremiumSystem'));
+export const LazyQuestSystem = lazy(() => import('./QuestSystem'));
+export const LazyRewardSystem = lazy(() => import('./RewardSystem'));
+export const LazyStreakTracker = lazy(() => import('./StreakTracker'));
