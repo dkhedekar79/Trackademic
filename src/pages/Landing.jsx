@@ -522,19 +522,19 @@ const Landing = () => {
               {
                 name: "Sarah Chen",
                 role: "Computer Science Major",
-                text: "Trackviso helped me identify my most productive study times. My GPA improved from 3.2 to 3.8 in one semester!",
+                text: "Trackviso saved my junior year, I used to journal all of my sessions but I became so burnt out, now this keeps me going!",
                 rating: 5
               },
               {
-                name: "Marcus Johnson", 
-                role: "Pre-Med Student",
-                text: "The AI insights are incredible. It showed me I was spending too much time on topics I already knew. Game changer!",
+                name: "IDK875_9", 
+                role: "Secondary school student",
+                text: "It actually helped me study a fair bit, I wasn't getting lost anymore and I could keep track while having fun.",
                 rating: 5
               },
               {
                 name: "Emma Rodriguez",
                 role: "Engineering Student", 
-                text: "Finally, a tool that actually helps me stay organized. The goal tracking feature keeps me motivated every day.",
+                text: "Finally, a tool that actually helps me stay organized. The gamification feature keeps me motivated every day.",
                 rating: 5
               }
             ].map((testimonial, index) => (
