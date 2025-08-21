@@ -623,22 +623,12 @@ const Landing = () => {
               </div>
             </div>
             
-            <div>
-              <h4 className="font-semibold mb-4">Support</h4>
-              <div className="space-y-3 text-gray-400">
-                <div className="hover:text-white transition-colors cursor-pointer">Help Center</div>
-                <div className="hover:text-white transition-colors cursor-pointer">Contact Us</div>
-                <div className="hover:text-white transition-colors cursor-pointer">API Docs</div>
-                <div className="hover:text-white transition-colors cursor-pointer">Status</div>
-              </div>
-            </div>
+            
             
             <div>
               <h4 className="font-semibold mb-4">Company</h4>
               <div className="space-y-3 text-gray-400">
-                <div className="hover:text-white transition-colors cursor-pointer">About</div>
-                <div className="hover:text-white transition-colors cursor-pointer">Blog</div>
-                <div className="hover:text-white transition-colors cursor-pointer">Careers</div>
+                
                 <div className="hover:text-white transition-colors cursor-pointer">Privacy</div>
                 <div className="hover:text-white transition-colors cursor-pointer">Terms</div>
               </div>
