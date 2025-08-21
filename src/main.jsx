@@ -21,13 +21,3 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
       });
   });
 }
-
-// Performance monitoring
-if (import.meta.env.DEV) {
-  import('react-dom/profiling').then(({ unstable_Profiler }) => {
-    // Enable React Profiler in development
-    console.log('React Profiler available for performance monitoring');
-  }).catch(() => {
-    // Profiler not available, that's okay
-  });
-}
