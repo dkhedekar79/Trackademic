@@ -4,6 +4,7 @@ import {
   FlameIcon, BookIcon, CalendarIcon, ListChecksIcon, BrainIcon,
   BarChart2Icon, Settings2Icon, LayoutDashboardIcon, BarChart3
 } from "lucide-react";
+import { preloadOnHover } from "../utils/preloadRoutes";
 
 export default function Sidebar() {
   return (
@@ -61,4 +62,4 @@ export default function Sidebar() {
       </Link>
     </aside>
   );
-} 
+}
