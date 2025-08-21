@@ -28,6 +28,18 @@ const Insights = lazy(() => import('./pages/Insights'));
 const Privacy = lazy(() => import('./pages/Privacy'));
 
 function App() {
+  // Preload critical routes on app initialization
+  useEffect(() => {
+    // Use requestIdleCallback if available, otherwise use setTimeout
+    if (typeof window !== 'undefined') {
+      if (window.requestIdleCallback) {
+        window.requestIdleCallback(preloadCriticalRoutes);
+      } else {
+        setTimeout(preloadCriticalRoutes, 1000);
+      }
+    }
+  }, []);
+
   return (
     <AuthProvider>
       <GamificationProvider>
