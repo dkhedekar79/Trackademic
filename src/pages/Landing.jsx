@@ -292,7 +292,7 @@ const Landing = () => {
           {/* Feature Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mt-16">
             {[
-              { icon: Clock, title: "Time Tracking", desc: "Automatic study session tracking" },
+              { icon: Clock, title: "Time Tracking", desc: "Log your study sessions" },
               { icon: Award, title: "Achievement System", desc: "Gamified progress rewards" },
               { icon: Shield, title: "Privacy First", desc: "Your data stays secure" },
               { icon: Smartphone, title: "Cross-Platform", desc: "Works on all devices" }
