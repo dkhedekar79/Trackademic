@@ -1,394 +1,647 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import useInView from "../hooks/useInView";
-
-const fadeIn = "animate-fade-in";
-const slideUp = "animate-slide-up";
-const scaleOnHover = "transition-transform duration-300 hover:scale-105";
-
-// Study-related icons (more icons for denser effect)
-const floatingIcons = [
-  { icon: "📚", label: "books" },
-  { icon: "📝", label: "notepad" },
-  { icon: "⏰", label: "clock" },
-  { icon: "📊", label: "chart" },
-  { icon: "🧠", label: "brain" },
-  { icon: "🖊️", label: "pen" },
-  { icon: "📅", label: "calendar" },
-  { icon: "🔬", label: "microscope" },
-  { icon: "📓", label: "notebook" },
-  { icon: "📖", label: "openbook" },
-  { icon: "📚", label: "books2" },
-  { icon: "📝", label: "notepad2" },
-  { icon: "⏰", label: "clock2" },
-  { icon: "📊", label: "chart2" },
-  { icon: "🧠", label: "brain2" },
-  { icon: "🖊️", label: "pen2" },
-  { icon: "📅", label: "calendar2" },
-  { icon: "🔬", label: "microscope2" },
-  { icon: "📓", label: "notebook2" },
-  { icon: "📖", label: "openbook2" },
-];
-
-function getRandomPositions(count) {
-  return Array.from({ length: count }, () => ({
-    x: Math.random() * 90 + 5, // 5% to 95% (vw)
-    y: Math.random() * 60 + 10, // 10% to 70% (vh)
-  }));
-}
-
-const ICON_NUDGE = 8; // px per frame
-const FORBIDDEN_MARGIN = 24; // px extra margin around the card
-
-const isInForbiddenZone = (x, y, box) =>
-  x > box.left && x < box.right && y > box.top && y < box.bottom;
-
-const FloatingIcons = () => {
-  const [positions, setPositions] = useState(getRandomPositions(floatingIcons.length));
-  const [dragging, setDragging] = useState(null); // { index, offsetX, offsetY }
-  const containerRef = useRef();
-
-  // Get white card bounding box for forbidden zone
-  const getWhiteCardBox = () => {
-    const el = document.getElementById("main-white-card");
-    if (!el || !containerRef.current) return { left: 0, top: 0, right: 0, bottom: 0 };
-    const rect = el.getBoundingClientRect();
-    const cRect = containerRef.current.getBoundingClientRect();
-    return {
-      left: rect.left - cRect.left - FORBIDDEN_MARGIN,
-      top: rect.top - cRect.top - FORBIDDEN_MARGIN,
-      right: rect.right - cRect.left + FORBIDDEN_MARGIN,
-      bottom: rect.bottom - cRect.top + FORBIDDEN_MARGIN,
-    };
-  };
-
-  // Drag handlers
-  useEffect(() => {
-    if (dragging === null) return;
-    const handleMove = (e) => {
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      const rect = containerRef.current.getBoundingClientRect();
-      let x = ((clientX - rect.left - dragging.offsetX) / containerRef.current.offsetWidth) * 100;
-      let y = ((clientY - rect.top - dragging.offsetY) / containerRef.current.offsetHeight) * 100;
-      // Clamp to container
-      x = Math.max(5, Math.min(95, x));
-      y = Math.max(10, Math.min(70, y));
-      // Prevent dropping in forbidden zone
-      const box = getWhiteCardBox();
-      const px = (x / 100) * containerRef.current.offsetWidth;
-      const py = (y / 100) * containerRef.current.offsetHeight;
-      if (isInForbiddenZone(px, py, box)) return;
-      setPositions((prev) => prev.map((pos, i) => i === dragging.index ? { x, y } : pos));
-    };
-    const handleUp = () => setDragging(null);
-    window.addEventListener("mousemove", handleMove);
-    window.addEventListener("mouseup", handleUp);
-    window.addEventListener("touchmove", handleMove);
-    window.addEventListener("touchend", handleUp);
-    return () => {
-      window.removeEventListener("mousemove", handleMove);
-      window.removeEventListener("mouseup", handleUp);
-      window.removeEventListener("touchmove", handleMove);
-      window.removeEventListener("touchend", handleUp);
-    };
-  }, [dragging]);
-
-  return (
-    <div ref={containerRef} className="absolute inset-0 w-full h-full pointer-events-none select-none z-0">
-      {positions.map((pos, i) => (
-        <div
-          key={i}
-          id={`floating-icon-${i}`}
-          className="absolute"
-          style={{
-            left: `${pos.x}%`,
-            top: `${pos.y}%`,
-            transition: dragging && dragging.index === i ? 'none' : 'left 0.2s, top 0.2s',
-            cursor: 'grab',
-            pointerEvents: 'auto',
-            touchAction: 'none',
-          }}
-          onMouseDown={e => {
-            const iconRect = e.currentTarget.getBoundingClientRect();
-            setDragging({
-              index: i,
-              offsetX: e.clientX - iconRect.left - iconRect.width / 2,
-              offsetY: e.clientY - iconRect.top - iconRect.height / 2,
-            });
-          }}
-          onTouchStart={e => {
-            const touch = e.touches[0];
-            const iconRect = e.currentTarget.getBoundingClientRect();
-            setDragging({
-              index: i,
-              offsetX: touch.clientX - iconRect.left - iconRect.width / 2,
-              offsetY: touch.clientY - iconRect.top - iconRect.height / 2,
-            });
-          }}
-        >
-          {floatingIcons[i].icon}
-        </div>
-      ))}
-    </div>
-  );
-};
-
-const AnimatedCard = ({ icon, title, desc, delay = 0 }) => {
-  const [ref, inView] = useInView({ threshold: 0.15 });
-  return (
-    <div
-      ref={ref}
-      className={`flex flex-col items-center bg-white rounded-2xl shadow-lg p-8 ${scaleOnHover} transition-all duration-700 ${
-        inView ? "animate-slide-up" : "opacity-0 translate-y-10"
-      }`}
-      style={{ animationDelay: `${delay}s` }}
-    >
-      <span className="text-5xl mb-4">{icon}</span>
-      <h4 className="text-lg font-bold mb-2">{title}</h4>
-      <p className="text-gray-600 text-center text-sm">{desc}</p>
-    </div>
-  );
-};
-
-const AnimatedStep = ({ num, color, title, delay = 0 }) => {
-  const [ref, inView] = useInView({ threshold: 0.15 });
-  return (
-    <div
-      ref={ref}
-      className={`flex flex-col items-center bg-white rounded-2xl shadow-lg p-6 min-w-[260px] ${scaleOnHover} transition-all duration-700 ${
-        inView ? "animate-slide-up" : "opacity-0 translate-y-10"
-      }`}
-      style={{ animationDelay: `${delay}s` }}
-    >
-      <div className={`flex items-center justify-center w-14 h-14 rounded-full mb-4 text-3xl font-bold border-2 ${color.bg} ${color.text} ${color.border}`}>
-        {num}
-      </div>
-      <h4 className="text-lg font-bold mb-2">{title}</h4>
-    </div>
-  );
-};
+import { motion } from "framer-motion";
+import { 
+  BookOpen, 
+  Brain, 
+  Trophy, 
+  Zap, 
+  Users, 
+  Star, 
+  ArrowRight, 
+  Play,
+  CheckCircle,
+  Smartphone,
+  Laptop,
+  Tablet,
+  Target,
+  Clock,
+  BarChart3,
+  GraduationCap,
+  Award,
+  Lightbulb,
+  TrendingUp,
+  Shield,
+  Sparkles
+} from "lucide-react";
 
 const Landing = () => {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-100 via-purple-100 to-green-100 relative overflow-x-hidden">
-      {/* Navigation Bar */}
-      <header class="pb-6 bg-white lg:pb-0">
-        <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-            
-            <nav class="flex items-center justify-between h-16 lg:h-20">
-                <div class="flex-shrink-0">
-                    <a href="#" title="" class="flex">
-                        <img class="w-auto h-8 lg:h-10" src="https://cdn.rareblocks.xyz/collection/celebration/images/logo.svg" alt="" />
-                    </a>
-                </div>
-      
-                <button type="button" class="inline-flex p-2 text-black transition-all duration-200 rounded-md lg:hidden focus:bg-gray-100 hover:bg-gray-100">
-                    
-                    <svg class="block w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" />
-                    </svg>
-      
-                   
-                    <svg class="hidden w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-      
-                <div class="hidden lg:flex lg:items-center lg:ml-auto lg:space-x-10">
-                    <a href="#" title="" class="text-base font-medium text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600"> Features </a>
-      
-                    <a href="#" title="" class="text-base font-medium text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600"> Solutions </a>
-      
-                    <a href="#" title="" class="text-base font-medium text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600"> Resources </a>
-      
-                    <a href="#" title="" class="text-base font-medium text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600"> Pricing </a>
-                </div>
-      
-                <a href="#" title="" class="items-center justify-center hidden px-4 py-3 ml-10 text-base font-semibold text-white transition-all duration-200 bg-blue-600 border border-transparent rounded-md lg:inline-flex hover:bg-blue-700 focus:bg-blue-700" role="button"> Get started now </a>
-            </nav>
-      
-            
-            <nav class="pt-4 pb-6 bg-white border border-gray-200 rounded-md shadow-md lg:hidden">
-                <div class="flow-root">
-                    <div class="flex flex-col px-6 -my-2 space-y-1">
-                        <a href="#" title="" class="inline-flex py-2 text-base font-medium text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600"> Features </a>
-      
-                        <a href="#" title="" class="inline-flex py-2 text-base font-medium text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600"> Solutions </a>
-      
-                        <a href="#" title="" class="inline-flex py-2 text-base font-medium text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600"> Resources </a>
-      
-                        <a href="#" title="" class="inline-flex py-2 text-base font-medium text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600"> Pricing </a>
-                    </div>
-                </div>
-      
-                <div class="px-6 mt-6">
-                    <a href="/signup" title="" class="inline-flex justify-center px-4 py-3 text-base font-semibold text-white transition-all duration-200 bg-blue-600 border border-transparent rounded-md tems-center hover:bg-blue-700 focus:bg-blue-700" role="button"> Get started now </a>
-                </div>
-            </nav>
-        </div>
-      </header>
-    
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
 
-      {/* Main Content with Card */}
-      <div id="central-content" className="relative flex flex-col items-center justify-start min-h-screen pt-32 pb-10 mt-20">
-        {/* Large White Card */}
-        <div id="main-white-card" className={`absolute left-1/2 -translate-x-1/2 top-1/2 mt-8 w-full max-w-xl min-h-[40vh] bg-white rounded-3xl shadow-2xl z-0 ${fadeIn}`} style={{ minHeight: '60vh' }}></div>
-        {/* Main Text Content */}
-        <div className={`relative z-10 flex flex-col items-center w-full max-w-3xl ${slideUp}`} style={{ animationDelay: '0.2s' }}>
-          <h2 className="text-3xl md:text-5xl font-semibold text-center mb-8 leading-tight">
-            Track <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-purple-600">your</span> progress<br className="hidden md:block" />
-            up to <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-purple-500 to-purple-700">3x</span> more efficiently!
-          </h2>
-          <p className="text-lg md:text-xl text-gray-700 mb-10 text-center font-medium max-w-2xl">
-            Stay organized, motivated, and efficient.<br />Track your revision progress and achieve your academic goals with ease.
-          </p>
-          <div className="flex flex-col md:flex-row gap-4 w-full justify-center max-w-md">
-            <Link
-              to="/login"
-              className="w-full md:w-auto px-8 py-3 rounded-lg bg-blue-600 text-white font-semibold text-lg shadow hover:bg-blue-700 transition-transform duration-300 hover:scale-105"
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.6
+      }
+    }
+  };
+
+  const scrollToSection = (sectionId) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-cyan-50">
+      {/* Navigation */}
+      <nav className="fixed top-0 w-full bg-white/90 backdrop-blur-md z-50 border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gradient-to-r from-emerald-500 to-blue-600 rounded-lg flex items-center justify-center">
+                <Target className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-xl font-bold bg-gradient-to-r from-emerald-600 to-blue-600 bg-clip-text text-transparent">
+                Trackviso
+              </span>
+            </div>
+            <div className="hidden md:flex items-center space-x-8">
+              <button 
+                onClick={() => scrollToSection('features')} 
+                className="text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
+              >
+                Features
+              </button>
+              <button 
+                onClick={() => scrollToSection('how-it-works')} 
+                className="text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
+              >
+                How It Works
+              </button>
+              <button 
+                onClick={() => scrollToSection('pricing')} 
+                className="text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
+              >
+                Pricing
+              </button>
+              <button 
+                onClick={() => scrollToSection('testimonials')} 
+                className="text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
+              >
+                Reviews
+              </button>
+              <Link to="/login" className="text-emerald-600 hover:text-emerald-700 font-medium">Login</Link>
+              <Link 
+                to="/signup" 
+                className="bg-gradient-to-r from-emerald-600 to-blue-600 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all duration-300 transform hover:scale-105"
+              >
+                Let's go!
+              </Link>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section className="pt-24 pb-16 px-4">
+        <motion.div 
+          className="max-w-7xl mx-auto text-center"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.div variants={itemVariants} className="mb-8">
+            <div className="inline-flex items-center bg-emerald-100 text-emerald-800 px-4 py-2 rounded-full text-sm font-medium mb-6">
+              <Sparkles className="w-4 h-4 mr-2" />
+              Track your academic journey like never before
+            </div>
+          </motion.div>
+          
+          <motion.h1 
+            className="text-5xl lg:text-7xl font-bold leading-tight mb-8"
+            variants={itemVariants}
+          >
+            Make every{" "}
+            <span className="bg-gradient-to-r from-emerald-500 to-blue-600 bg-clip-text text-transparent">
+              Study Session
+            </span>{" "}
+            Count.
+          </motion.h1>
+          
+          <motion.p 
+            className="text-xl lg:text-2xl text-gray-600 mb-12 max-w-4xl mx-auto"
+            variants={itemVariants}
+          >
+            Your revision dashboard: study tracker, analytics, calendar, and XP system in one.
+          </motion.p>
+          
+          <motion.div 
+            className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto"
+            variants={itemVariants}
+          >
+            <Link 
+              to="/signup"
+              className="bg-gradient-to-r from-emerald-600 to-blue-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center"
             >
-              Login
+              It's 100% Free
+              <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
+            <button 
+              onClick={() => scrollToSection('demo')}
+              className="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-xl font-semibold text-lg hover:border-emerald-500 hover:text-emerald-600 transition-all duration-300 flex items-center justify-center"
+            >
+              <Play className="mr-2 w-5 h-5" />
+              Watch Demo
+            </button>
+          </motion.div>
+
+          {/* Hero Visual */}
+          <motion.div 
+            className="mt-16 relative"
+            variants={itemVariants}
+          >
+            <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-4xl mx-auto">
+              <div className="bg-gradient-to-br from-emerald-50 to-blue-50 rounded-2xl p-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="bg-white rounded-xl p-4 shadow-sm">
+                    <div className="flex items-center justify-between mb-3">
+                      <Clock className="w-6 h-6 text-emerald-500" />
+                      <span className="text-sm text-gray-500">This Week</span>
+                    </div>
+                    <div className="text-2xl font-bold text-gray-900">32.5h</div>
+                    <div className="text-sm text-emerald-600">+18% from last week</div>
+                  </div>
+                  <div className="bg-white rounded-xl p-4 shadow-sm">
+                    <div className="flex items-center justify-between mb-3">
+                      <Trophy className="w-6 h-6 text-blue-500" />
+                      <span className="text-sm text-gray-500">Goals</span>
+                    </div>
+                    <div className="text-2xl font-bold text-gray-900">8/10</div>
+                    <div className="text-sm text-blue-600">Completed</div>
+                  </div>
+                  <div className="bg-white rounded-xl p-4 shadow-sm">
+                    <div className="flex items-center justify-between mb-3">
+                      <TrendingUp className="w-6 h-6 text-purple-500" />
+                      <span className="text-sm text-gray-500">Progress</span>
+                    </div>
+                    <div className="text-2xl font-bold text-gray-900">94%</div>
+                    <div className="text-sm text-purple-600">On track</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      </section>
+
+      {/* Features Section */}
+      <section id="features" className="py-20 px-4 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl lg:text-5xl font-bold mb-6">
+              Powerful Features for{" "}
+              <span className="bg-gradient-to-r from-emerald-500 to-blue-600 bg-clip-text text-transparent">
+                Academic Excellence
+              </span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Everything you need to track, analyze, and improve your academic performance
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-3 gap-8">
+            {/* Smart Analytics */}
+            <motion.div 
+              className="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-3xl p-8 text-white"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+            >
+              <BarChart3 className="w-12 h-12 mb-6" />
+              <h3 className="text-2xl font-bold mb-4">Track every session</h3>
+              <p className="text-emerald-100 text-lg mb-6">
+                Smart revision timer with inbuilt pomodoro mode, custom, and stopwatch features. Log every session you do.
+              </p>
+              <div className="bg-white/20 rounded-xl p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm">Time left</span>
+                  <span className="text-sm font-semibold">2 minutes</span>
+                </div>
+                <div className="w-full bg-white/30 rounded-full h-2">
+                  <div className="bg-white h-2 rounded-full" style={{ width: '96%' }}></div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Goal Tracking */}
+            <motion.div 
+              className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-3xl p-8 text-white"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              viewport={{ once: true }}
+            >
+              <Target className="w-12 h-12 mb-6" />
+              <h3 className="text-2xl font-bold mb-4">Gamified experience</h3>
+              <p className="text-blue-100 text-lg mb-6">
+                Become addicted to studying with streaks, xp, levels, achievements, quests, and more!
+              </p>
+              <div className="bg-white/20 rounded-xl p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm">Level 3 - 234 XP needed</span>
+                  <span className="text-sm font-semibold">87%</span>
+                </div>
+                <div className="w-full bg-white/30 rounded-full h-2">
+                  <div className="bg-white h-2 rounded-full" style={{ width: '87%' }}></div>
+                </div>
+              </div>
+              
+            </motion.div>
+
+            {/* AI Insights */}
+            <motion.div 
+              className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-3xl p-8 text-white"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              viewport={{ once: true }}
+            >
+              <Brain className="w-12 h-12 mb-6" />
+              <h3 className="text-2xl font-bold mb-4">Get the best Insights</h3>
+              <p className="text-purple-100 text-lg mb-6">
+                Get personalized recommendations and insights to optimize your study schedule and improve performance.
+              </p>
+              <div className="bg-white/20 rounded-xl p-4">
+                <div className="flex items-center space-x-2 mb-2">
+                  <Lightbulb className="w-4 h-4" />
+                  <span className="text-sm font-medium">Smart Tip</span>
+                </div>
+                <p className="text-sm text-purple-100">
+                  Study math between 2-4 PM for 23% better retention
+                </p>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Feature Grid */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mt-16">
+            {[
+              { icon: Clock, title: "Time Tracking", desc: "Log your study sessions" },
+              { icon: Award, title: "Achievement System", desc: "Gamified progress rewards" },
+              { icon: Shield, title: "Privacy First", desc: "Your data stays secure" },
+              { icon: Smartphone, title: "Cross-Platform", desc: "Works on all devices" }
+            ].map((feature, index) => (
+              <motion.div 
+                key={index}
+                className="bg-gray-50 rounded-2xl p-6 hover:bg-white hover:shadow-lg transition-all duration-300"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                viewport={{ once: true }}
+              >
+                <feature.icon className="w-8 h-8 text-emerald-500 mb-4" />
+                <h4 className="text-lg font-semibold mb-2">{feature.title}</h4>
+                <p className="text-gray-600 text-sm">{feature.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section id="how-it-works" className="py-20 px-4 bg-gradient-to-br from-gray-50 to-blue-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl lg:text-5xl font-bold mb-6">
+              How Trackviso{" "}
+              <span className="bg-gradient-to-r from-emerald-500 to-blue-600 bg-clip-text text-transparent">
+                Works
+              </span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Get started in minutes and see immediate improvements in your academic tracking
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-3 gap-12">
+            {[
+              {
+                step: "01",
+                title: "Connect Your Courses",
+                desc: "Add your own subjects and tasks to create your own study experience.",
+                icon: BookOpen,
+                color: "emerald"
+              },
+              {
+                step: "02", 
+                title: "Track Your Progress",
+                desc: "Log study sessions, assignments, and achievements. Earn XP and level up.",
+                icon: BarChart3,
+                color: "blue"
+              },
+              {
+                step: "03",
+                title: "Optimize & Improve",
+                desc: "Get personalized insights and recommendations to maximize your academic performance.",
+                icon: TrendingUp,
+                color: "purple"
+              }
+            ].map((item, index) => (
+              <motion.div 
+                key={index}
+                className="text-center"
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.2 }}
+                viewport={{ once: true }}
+              >
+                <div className={`w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-${item.color}-500 to-${item.color}-600 flex items-center justify-center text-white shadow-lg`}>
+                  <item.icon className="w-10 h-10" />
+                </div>
+                <div className={`text-4xl font-bold text-${item.color}-500 mb-4`}>{item.step}</div>
+                <h3 className="text-2xl font-bold mb-4">{item.title}</h3>
+                <p className="text-gray-600 text-lg leading-relaxed">{item.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Demo Section */}
+      <section id="demo" className="py-20 px-4 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+            >
+              <h2 className="text-4xl lg:text-5xl font-bold mb-6">
+                See Trackviso in{" "}
+                <span className="bg-gradient-to-r from-emerald-500 to-blue-600 bg-clip-text text-transparent">
+                  Action
+                </span>
+              </h2>
+              <p className="text-xl text-gray-600 mb-8">
+                Watch how students are transforming their academic journey with intelligent tracking and insights.
+              </p>
+              <div className="space-y-4">
+                <div className="flex items-center space-x-3">
+                  <CheckCircle className="w-6 h-6 text-emerald-500" />
+                  <span className="text-lg">Real-time progress tracking</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <CheckCircle className="w-6 h-6 text-emerald-500" />
+                  <span className="text-lg">Personalized study insights</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <CheckCircle className="w-6 h-6 text-emerald-500" />
+                  <span className="text-lg">Goal achievement system</span>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div 
+              className="relative"
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+            >
+              <div 
+                className="relative bg-gradient-to-br from-emerald-600 to-blue-700 rounded-3xl overflow-hidden group cursor-pointer aspect-video flex items-center justify-center"
+                onClick={() => setIsVideoPlaying(!isVideoPlaying)}
+              >
+                {!isVideoPlaying ? (
+                  <div className="text-center">
+                    <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                      <Play className="w-10 h-10 text-white ml-1" />
+                    </div>
+                    <p className="text-white text-xl font-semibold">Watch 2-minute demo</p>
+                  </div>
+                ) : (
+                  <div className="text-white text-center">
+                    <p className="text-xl">If the video does not play, feel free to contact us</p>
+                    <button 
+                      className="mt-4 bg-white/20 px-4 py-2 rounded-lg"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsVideoPlaying(false);
+                      }}
+                    >
+                      Close
+                    </button>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section id="pricing" className="py-20 px-4 bg-gradient-to-br from-gray-50 to-purple-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl lg:text-5xl font-bold mb-6">
+              Simple{" "}
+              <span className="bg-gradient-to-r from-emerald-500 to-blue-600 bg-clip-text text-transparent">
+                Pricing
+              </span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Start free, Stay free. No hidden fees, No Paywalls.
+            </p>
+          </div>
+
+          <div className="bg-gradient-to-br from-emerald-500 to-blue-600 rounded-3xl shadow-xl text-white relative px-48 py-8">
+            <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+              <div className="bg-yellow-400 text-yellow-900 px-4 py-1 rounded-full text-sm font-semibold">
+                Most Popular
+              </div>
+            </div>
+            <div className="text-center mb-8">
+              <h3 className="text-2xl font-bold mb-2">The Scholar</h3>
+              <div className="text-4xl font-bold mb-4">$0<span className="text-lg text-emerald-100">/month</span></div>
+              <p className="text-emerald-100">It's all free</p>
+            </div>
+            <ul className="space-y-4 mb-8">
+              <li className="flex items-center space-x-3">
+                <CheckCircle className="w-5 h-5 text-emerald-200" />
+                <span>Unlimited subjects</span>
+              </li>
+              <li className="flex items-center space-x-3">
+                <CheckCircle className="w-5 h-5 text-emerald-200" />
+                <span>Unlimited logging</span>
+              </li>
+              <li className="flex items-center space-x-3">
+                <CheckCircle className="w-5 h-5 text-emerald-200" />
+                <span>Full insight access</span>
+              </li>
+              <li className="flex items-center space-x-3">
+                <CheckCircle className="w-5 h-5 text-emerald-200" />
+                <span>Full gamification access</span>
+              </li>
+            </ul>
             <Link
               to="/signup"
-              className="w-full md:w-auto px-8 py-3 rounded-lg bg-green-500 text-white font-semibold text-lg shadow hover:bg-green-600 transition-transform duration-300 hover:scale-105"
+              className="w-full bg-white text-emerald-600 py-3 rounded-xl font-semibold text-center block hover:bg-gray-50 transition-colors"
             >
-              Sign Up
+              Start for free
             </Link>
+          </div>
+          <div className="grid lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
           </div>
         </div>
-      </div>
-      {/* Switch to plain white background for the rest of the page */}
-      <div className="bg-gradient-to-b from-white to-blue-50 w-full">
-        {/* Feature Highlights Section */}
-        <section className={`w-full flex flex-col items-center justify-center py-16 ${fadeIn}`} style={{ animationDelay: '0.4s' }}>
-          <h3 className="text-2xl md:text-3xl font-bold mb-10 text-center">Feature Highlights</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl w-full px-4">
-            <AnimatedCard icon="⏰" title="Smart Study Timer" desc="Custom timers to boost focus and track study hours effortlessly." delay={0.1} />
-            <AnimatedCard icon="📊" title="Insightful Analytics" desc="Understand your productivity and subject strengths at a glance." delay={0.2} />
-            <AnimatedCard icon="🗒️" title="Task Planner" desc="Organize exams, homework, and daily goals in one place." delay={0.3} />
-          </div>
-        </section>
-        {/* How It Works Section */}
-        <section className={`w-full flex flex-col items-center justify-center py-16 ${fadeIn}`} style={{ animationDelay: '0.6s' }}>
-          <h3 className="text-2xl md:text-3xl font-bold mb-10 text-center">How It Works</h3>
-          <div className="flex flex-col md:flex-row items-center justify-center gap-8 max-w-5xl w-full px-4 overflow-x-auto pb-24">
-            <AnimatedStep num={1} color={{ bg: "bg-blue-100", text: "text-blue-600", border: "border-blue-300" }} title="Set your subjects and goals" delay={0.1} />
-            <AnimatedStep num={2} color={{ bg: "bg-purple-100", text: "text-purple-600", border: "border-purple-300" }} title="Track your sessions with the smart timer" delay={0.2} />
-            <AnimatedStep num={3} color={{ bg: "bg-green-100", text: "text-green-600", border: "border-green-300" }} title="Improve with insights and revision reminders" delay={0.3} />
-          </div>
-        </section>
+      </section>
 
-        <section id="testimonials" className="py-16 bg-gradient-to-b from-purple-100 to-purple-50 overflow-hidden px-4">
-          <h2 className="text-2xl md:text-3xl font-bold mb-8 text-center">What Students Say</h2>
-          <div className="whitespace-nowrap overflow-hidden">
-            <div className="inline-block animate-carousel" style={{ animation: 'scrollTestimonials 2400s linear infinite' }}>
-              {/* Render many sets of testimonials for a truly infinite loop effect */}
-              {Array(100).fill(null).map((_, i) => (
-                <React.Fragment key={i}>
-                  <div className="inline-block w-[680px] bg-white p-5 mr-8 rounded-xl box-border align-top">
-                    <p>"I finally stuck to my revision plan thanks to this app. I actually know what to do every day!"</p>
-                    <strong>- Maya S., A-Level Biology</strong>
-                  </div>
-                  <div className="inline-block w-[650px] bg-white p-5 mr-8 rounded-xl box-border align-top">
-                    <p>"The analytics showed me my most productive hours—super helpful for exam prep!"</p>
-                    <strong>- Daniel K., GCSE Maths</strong>
-                  </div>
-                  <div className="inline-block w-[470px] bg-white p-5 mr-8 rounded-xl box-border align-top">
-                    <p>"Best revision app I've used. Clean, simple, and motivating!"</p>
-                    <strong>- Priya M., IB Student</strong>
-                  </div>
-                  <div className="inline-block w-[600px] bg-white p-5 mr-8 rounded-xl box-border align-top">
-                    <p>"It's like having a personal study coach. Keeps me on track and stress-free."</p>
-                    <strong>- Omar J., Year 11</strong>
-                  </div>
-                  <div className="inline-block w-[620px] bg-white p-5 mr-8 rounded-xl box-border align-top">
-                    <p>"I love the flashcard system—it's helped me memorize so much more in less time."</p>
-                    <strong>- Emily R., A-Level Psychology</strong>
-                  </div>
-                </React.Fragment>
-              ))}
+      {/* Testimonials Section */}
+      <section id="testimonials" className="py-20 px-4 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl lg:text-5xl font-bold mb-6">
+              What Students{" "}
+              <span className="bg-gradient-to-r from-emerald-500 to-blue-600 bg-clip-text text-transparent">
+                Say
+              </span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Join thousands of students who have transformed their academic journey
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                name: "Sara_672",
+                role: "Computer Science Major",
+                text: "Trackviso saved my junior year, I used to journal all of my sessions but I became so burnt out, now this keeps me going!",
+                rating: 5
+              },
+              {
+                name: "IDK875_9", 
+                role: "Secondary school student",
+                text: "It actually helped me study a fair bit, I wasn't getting lost anymore and I could keep track while having fun.",
+                rating: 5
+              },
+              {
+                name: "Emma_GOAT_",
+                role: "Engineering Student", 
+                text: "Finally, a tool that actually helps me stay organized. The gamification feature keeps me motivated every day.",
+                rating: 5
+              }
+            ].map((testimonial, index) => (
+              <motion.div 
+                key={index}
+                className="bg-gray-50 p-8 rounded-2xl hover:shadow-lg transition-all duration-300"
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                viewport={{ once: true }}
+              >
+                <div className="flex justify-center mb-4">
+                  {[...Array(testimonial.rating)].map((_, i) => (
+                    <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                  ))}
+                </div>
+                <p className="text-gray-700 mb-6 text-lg leading-relaxed">"{testimonial.text}"</p>
+                <div className="text-center">
+                  <div className="font-semibold text-lg">{testimonial.name}</div>
+                  <div className="text-gray-500">{testimonial.role}</div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="py-20 px-4 bg-gradient-to-r from-emerald-600 to-blue-700">
+        <motion.div 
+          className="max-w-4xl mx-auto text-center text-white"
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+        >
+          <h2 className="text-4xl lg:text-5xl font-bold mb-6">
+            Ready to Transform Your Academic Journey?
+          </h2>
+          <p className="text-xl text-emerald-100 mb-10">
+            Join thousands of students who are already achieving better results with Trackviso
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
+            <Link 
+              to="/signup"
+              className="bg-white text-emerald-600 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-50 transition-all duration-300 transform hover:scale-105 flex items-center justify-center"
+            >
+              Start Now
+              <ArrowRight className="ml-2 w-5 h-5" />
+            </Link>
+            <button 
+              onClick={() => scrollToSection('demo')}
+              className="border-2 border-white text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-white hover:text-emerald-600 transition-all duration-300 flex items-center justify-center"
+            >
+              <Play className="mr-2 w-5 h-5" />
+              Watch Demo
+            </button>
+          </div>
+        </motion.div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-white py-16 px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-4 gap-8 mb-12">
+            <div>
+              <div className="flex items-center space-x-2 mb-4">
+                <div className="w-8 h-8 bg-gradient-to-r from-emerald-500 to-blue-600 rounded-lg flex items-center justify-center">
+                  <Target className="w-5 h-5 text-white" />
+                </div>
+                <span className="text-xl font-bold">Trackviso</span>
+              </div>
+              <p className="text-gray-400 mb-6">
+                Empowering students to achieve academic excellence through intelligent tracking and insights.
+              </p>
+              
             </div>
-          </div>
-        </section>
-
-        {/* Comparison Table Section */}
-        <section className="w-full flex flex-col items-center justify-center py-16 bg-gradient-to-b from-white to-blue-50 px-4">
-          <h3 className="text-2xl md:text-3xl font-bold mb-8 text-center">Trackviso vs Other Apps</h3>
-          <div className="w-full max-w-2xl p-0 rounded-2xl shadow-2xl bg-white overflow-hidden">
-            <table className="w-full border-collapse">
-              <thead className="bg-blue-100 sticky top-0">
-                <tr>
-                  <th className="py-3 px-6 text-left font-bold text-lg break-words">Feature</th>
-                  <th className="py-3 px-6 text-center font-bold text-lg break-words">Trackviso</th>
-                  <th className="py-3 px-6 text-center font-bold text-lg break-words">Other Apps</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="border-t">
-                  <td className="py-4 px-6 font-medium break-words">Unlimited Tracking Capabilities</td>
-                  <td className="py-4 px-6 text-center text-green-600 font-bold break-words">✅ Yes</td>
-                  <td className="py-4 px-6 text-center text-red-500 font-bold break-words">❌ No</td>
-                </tr>
-                <tr className="border-t">
-                  <td className="py-4 px-6 font-medium break-words">Inbuilt revision system</td>
-                  <td className="py-4 px-6 text-center text-green-600 font-bold break-words">✅ Yes</td>
-                  <td className="py-4 px-6 text-center text-yellow-500 font-bold break-words">⚠️ Limited</td>
-                </tr>
-                <tr className="border-t">
-                  <td className="py-4 px-6 font-medium break-words">Analytics Dashboard</td>
-                  <td className="py-4 px-6 text-center text-green-600 font-bold break-words">✅ Visual</td>
-                  <td className="py-4 px-6 text-center text-red-500 font-bold break-words">❌ Basic</td>
-                </tr>
-                <tr className="border-t">
-                  <td className="py-4 px-6 font-medium break-words">All-in-One Planner</td>
-                  <td className="py-4 px-6 text-center text-green-600 font-bold break-words">✅ Yes</td>
-                  <td className="py-4 px-6 text-center text-red-500 font-bold break-words">❌ No</td>
-                </tr>
-              </tbody>
-            </table>
+            
+            <div>
+              <h4 className="font-semibold mb-4">Product</h4>
+              <div className="space-y-3 text-gray-400">
+                <button onClick={() => scrollToSection('features')} className="block hover:text-white transition-colors">Features</button>
+                <button onClick={() => scrollToSection('pricing')} className="block hover:text-white transition-colors">Pricing</button>
+                <button onClick={() => scrollToSection('demo')} className="block hover:text-white transition-colors">Demo</button>
+                
+              </div>
+            </div>
+            
+            
+            
+            <div>
+              <h4 className="font-semibold mb-4">Company</h4>
+              <div className="space-y-3 text-gray-400">
+                
+                <div className="hover:text-white transition-colors cursor-pointer">Privacy</div>
+                <div className="hover:text-white transition-colors cursor-pointer">Terms</div>
+              </div>
+            </div>
           </div>
           
-        </section>
-        <section id="cta" className="py-16 bg-gradient-to-b from-purple-400 via-blue-500 to-blue-300 text-white text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-8">Get Started for Free</h2>
-            <p className="text-lg md:text-xl mb-10">Free to use. No credit card required. Optional Pro upgrade available.</p>
-            <Link to="/dashboard" className="px-8 py-3 rounded-lg bg-white text-white bg-clip-text bg-gradient-to-r from-purple-500 via-blue-500 to-blue-600 font-semibold text-lg shadow hover:bg-gradient-to-r hover:from-purple-100 hover:to-blue-100 hover:text-blue-700 transition-transform duration-300 hover:scale-105 border border-blue-100 inline-block">
-                Let's go!
-            </Link>
-        </section>
-
-        <section id="footer" className="py-16 bg-white text-black">
-            <div className="flex flex-wrap justify-around">
-                <div>
-                    <h4>Quick Links</h4>
-                    <ul className="list-none p-0">
-                        <li><a href="#" className="text-black no-underline">About</a></li>
-                        <li><a href="#" className="text-black no-underline">FAQ</a></li>
-                        <li><a href="#" className="text-black no-underline">Privacy</a></li>
-                        <li><a href="#" className="text-black no-underline">Terms</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4>Follow Us</h4>
-                    <p>
-                        <a href="#" className="text-black mr-4">Twitter</a>
-                        <a href="#" className="text-black mr-4">Instagram</a>
-                        <a href="#" className="text-black">TikTok</a>
-                    </p>
-            </div>
-                <div>
-                    <h4>Newsletter</h4>
-                    <input type="email" placeholder="Your email" className="p-2 rounded-md border-none mt-2" />
-                    <button className="p-2 ml-2 rounded-md bg-blue-500 text-white">Subscribe</button>
-                </div>
-            </div>
-            <p className="text-center mt-8 text-sm">© 2025 Trackviso. All rights reserved.</p>
-        </section>
-      </div>
+          <div className="border-t border-gray-800 pt-8 text-center text-gray-400">
+            <p>&copy; 2025 Trackviso. All rights reserved. Built with ❤️ for students.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
 
-export default Landing; 
+export default Landing;
