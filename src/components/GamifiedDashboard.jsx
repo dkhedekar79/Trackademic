@@ -276,19 +276,19 @@ const GamifiedDashboard = () => {
         {/* Tab Content */}
 
 
-      <Suspense fallback={<div className="text-center py-10 text-gray-500">Loading...</div>}>
-          {activeTab === 'overview' && <OverviewTab userStats={userStats} />}
-          {activeTab === 'quests' && <QuestSystem />}
-          {activeTab === 'achievements' && <AchievementSystem />}
-          {activeTab === 'streaks' && <StreakTracker />}
-          {activeTab === 'leaderboards' && <LeaderboardSystem />}
-          {activeTab === 'premium' && <PremiumSystem />}
-        </Suspense>
+        <Suspense fallback={<div className="text-center py-10 text-gray-500">Loading...</div>}>
+            {activeTab === 'overview' && <OverviewTab userStats={userStats} />}
+            {activeTab === 'quests' && <QuestSystem />}
+            {activeTab === 'achievements' && <AchievementSystem />}
+            {activeTab === 'streaks' && <StreakTracker />}
+            {activeTab === 'leaderboards' && <LeaderboardSystem />}
+            {activeTab === 'premium' && <PremiumSystem />}
+          </Suspense>
+        </div>
+        </div>
       </div>
-      </div>
-    </div>
-  );
-};
+    );
+  };
 
 // Enhanced Overview Tab
 const OverviewTab = ({ userStats }) => {
