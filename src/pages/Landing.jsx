@@ -520,7 +520,7 @@ const Landing = () => {
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
-                name: "Sarah Chen",
+                name: "Sara_672",
                 role: "Computer Science Major",
                 text: "Trackviso saved my junior year, I used to journal all of my sessions but I became so burnt out, now this keeps me going!",
                 rating: 5
@@ -532,7 +532,7 @@ const Landing = () => {
                 rating: 5
               },
               {
-                name: "Emma Rodriguez",
+                name: "Emma_GOAT_",
                 role: "Engineering Student", 
                 text: "Finally, a tool that actually helps me stay organized. The gamification feature keeps me motivated every day.",
                 rating: 5
