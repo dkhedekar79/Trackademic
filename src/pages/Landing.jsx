@@ -224,9 +224,9 @@ const Landing = () => {
               viewport={{ once: true }}
             >
               <BarChart3 className="w-12 h-12 mb-6" />
-              <h3 className="text-2xl font-bold mb-4">Smart Analytics Dashboard</h3>
+              <h3 className="text-2xl font-bold mb-4">Track every session</h3>
               <p className="text-emerald-100 text-lg mb-6">
-                Visualize your study patterns, progress trends, and performance metrics with intuitive charts and insights.
+                Smart revision timer with inbuilt pomodoro mode, custom, and stopwatch features. Log every session you do.
               </p>
               <div className="bg-white/20 rounded-xl p-4">
                 <div className="flex items-center justify-between mb-2">
@@ -248,9 +248,9 @@ const Landing = () => {
               viewport={{ once: true }}
             >
               <Target className="w-12 h-12 mb-6" />
-              <h3 className="text-2xl font-bold mb-4">Intelligent Goal Setting</h3>
+              <h3 className="text-2xl font-bold mb-4">Gamified experience</h3>
               <p className="text-blue-100 text-lg mb-6">
-                Set SMART goals, track milestones, and get personalized recommendations to stay on track.
+                Become addicted to studying with streaks, xp, levels, achievements, quests, and more!
               </p>
               <div className="space-y-3">
                 <div className="flex items-center space-x-3">
