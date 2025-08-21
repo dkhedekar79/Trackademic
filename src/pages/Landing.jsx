@@ -462,40 +462,8 @@ const Landing = () => {
           </div>
 
           <div className="grid lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {/* Free Plan */}
-            <motion.div 
-              className="bg-white rounded-3xl p-8 shadow-lg border border-gray-200"
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-            >
-              <div className="text-center mb-8">
-                <h3 className="text-2xl font-bold mb-2">Free</h3>
-                <div className="text-4xl font-bold mb-4">$0<span className="text-lg text-gray-500">/month</span></div>
-                <p className="text-gray-600">Perfect for getting started</p>
-              </div>
-              <ul className="space-y-4 mb-8">
-                <li className="flex items-center space-x-3">
-                  <CheckCircle className="w-5 h-5 text-emerald-500" />
-                  <span>Basic progress tracking</span>
-                </li>
-                <li className="flex items-center space-x-3">
-                  <CheckCircle className="w-5 h-5 text-emerald-500" />
-                  <span>3 courses maximum</span>
-                </li>
-                <li className="flex items-center space-x-3">
-                  <CheckCircle className="w-5 h-5 text-emerald-500" />
-                  <span>Simple analytics</span>
-                </li>
-              </ul>
-              <Link 
-                to="/signup"
-                className="w-full bg-gray-100 text-gray-700 py-3 rounded-xl font-semibold text-center block hover:bg-gray-200 transition-colors"
-              >
-                Get Started Free
-              </Link>
-            </motion.div>
+            
+            
 
             {/* Pro Plan */}
             <motion.div 
