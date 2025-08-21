@@ -286,6 +286,8 @@ const GamifiedDashboard = () => {
           </Suspense>
         </div>
       </div>
+
+    );
  
 
 // Enhanced Overview Tab
