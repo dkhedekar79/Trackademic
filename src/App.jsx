@@ -38,9 +38,22 @@ function App() {
                 {/* Protected Routes */}
                 <Route path="/dashboard" element={
                   <ProtectedRoute>
-                    <Layout><GamifiedDashboard /></Layout>
+                    <Suspense fallback={<div className="text-center py-20">Loading Dashboard...</div>}>
+                      <div className="flex h-screen bg-gray-50">
+                        <Sidebar />
+                        <div className="flex-1 flex flex-col">
+                          <Navbar />
+                          <main className="flex-1 overflow-auto">
+                            <GamifiedDashboard />
+                          </main>
+                        </div>
+                      </div>
+                    </Suspense>
                   </ProtectedRoute>
                 } />
+                
+                
+               
                 <Route path="/classic-dashboard" element={
                   <ProtectedRoute>
                     <Layout><Dashboard /></Layout>
