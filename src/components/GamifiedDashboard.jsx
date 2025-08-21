@@ -29,6 +29,16 @@ const GamifiedDashboard = () => {
 
   const [activeTab, setActiveTab] = useState('overview');
   const [showQuickActions, setShowQuickActions] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+
+  useEffect(() => {
+    if (userStats) {
+      setLoading(false);
+    }
+  }, [userStats]);
+
+  if (loading) return <LoadingScreen />;
 
   // Generate daily quests on component mount
   useEffect(() => {
