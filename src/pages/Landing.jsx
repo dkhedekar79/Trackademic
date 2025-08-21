@@ -230,11 +230,11 @@ const Landing = () => {
               </p>
               <div className="bg-white/20 rounded-xl p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm">Math Progress</span>
-                  <span className="text-sm font-semibold">87%</span>
+                  <span className="text-sm">Time left</span>
+                  <span className="text-sm font-semibold">2 minutes</span>
                 </div>
                 <div className="w-full bg-white/30 rounded-full h-2">
-                  <div className="bg-white h-2 rounded-full" style={{ width: '87%' }}></div>
+                  <div className="bg-white h-2 rounded-full" style={{ width: '96%' }}></div>
                 </div>
               </div>
             </motion.div>
