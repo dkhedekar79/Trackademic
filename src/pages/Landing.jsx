@@ -457,7 +457,7 @@ const Landing = () => {
               </span>
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Start free, upgrade when you're ready. No hidden fees, cancel anytime.
+              Start free, Stay free. No hidden fees, No Paywalls.
             </p>
           </div>
 
@@ -468,7 +468,7 @@ const Landing = () => {
               </div>
             </div>
             <div className="text-center mb-8">
-              <h3 className="text-2xl font-bold mb-2">Pro</h3>
+              <h3 className="text-2xl font-bold mb-2">The Scholar</h3>
               <div className="text-4xl font-bold mb-4">$0<span className="text-lg text-emerald-100">/month</span></div>
               <p className="text-emerald-100">It's all free</p>
             </div>
