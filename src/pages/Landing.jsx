@@ -252,15 +252,15 @@ const Landing = () => {
               <p className="text-blue-100 text-lg mb-6">
                 Become addicted to studying with streaks, xp, levels, achievements, quests, and more!
               </p>
-              <div className="space-y-3">
-                <div className="flex items-center space-x-3">
-                  <CheckCircle className="w-5 h-5 text-green-300" />
-                  <span className="text-sm">Complete calculus homework</span>
+              <div className="bg-white/20 rounded-xl p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm">Level 3</span>
+                  <span className="text-sm font-semibold">87%</span>
                 </div>
-                <div className="flex items-center space-x-3">
-                  <Clock className="w-5 h-5 text-yellow-300" />
-                  <span className="text-sm">Review chemistry notes</span>
+                <div className="w-full bg-white/30 rounded-full h-2">
+                  <div className="bg-white h-2 rounded-full" style={{ width: '87%' }}></div>
                 </div>
+              </div>
               </div>
             </motion.div>
 
