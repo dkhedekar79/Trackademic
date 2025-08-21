@@ -254,7 +254,7 @@ const Landing = () => {
               </p>
               <div className="bg-white/20 rounded-xl p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm">Level 3</span>
+                  <span className="text-sm">Level 3 - 234 XP needed</span>
                   <span className="text-sm font-semibold">87%</span>
                 </div>
                 <div className="w-full bg-white/30 rounded-full h-2">
