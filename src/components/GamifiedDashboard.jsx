@@ -7,13 +7,16 @@ import {
 } from 'lucide-react';
 import { useGamification } from '../context/GamificationContext';
 import { AnimatedProgressBar } from './RewardAnimations';
-import StreakTracker from './StreakTracker';
-import QuestSystem from './QuestSystem';
-import AchievementSystem from './AchievementSystem';
-import LeaderboardSystem from './LeaderboardSystem';
-import PremiumSystem from './PremiumSystem';
 import RewardSystem from './RewardSystem';
 import MysteryBox from './MysteryBox';
+
+
+const StreakTracker = lazy(() => import('./StreakTracker'));
+const QuestSystem = lazy(() => import('./QuestSystem'));
+const AchievementSystem = lazy(() => import('./AchievementSystem'));
+const LeaderboardSystem = lazy(() => import('./LeaderboardSystem'));
+const PremiumSystem = lazy(() => import('./PremiumSystem'));
+const OverviewTab = lazy(() => import('./OverviewTab'));
 
 const GamifiedDashboard = () => {
   const { 
@@ -271,31 +274,17 @@ const GamifiedDashboard = () => {
         </div>
         
         {/* Tab Content */}
-        <div className="space-y-8">
-          {activeTab === 'overview' && (
-            <OverviewTab userStats={userStats} />
-          )}
-          
-          {activeTab === 'quests' && (
-            <QuestSystem />
-          )}
-          
-          {activeTab === 'achievements' && (
-            <AchievementSystem />
-          )}
-          
-          {activeTab === 'streaks' && (
-            <StreakTracker />
-          )}
-          
-          {activeTab === 'leaderboards' && (
-            <LeaderboardSystem />
-          )}
-          
-          {activeTab === 'premium' && (
-            <PremiumSystem />
-          )}
-        </div>
+
+
+      <Suspense fallback={<div className="text-center py-10 text-gray-500">Loading...</div>}>
+          {activeTab === 'overview' && <OverviewTab userStats={userStats} />}
+          {activeTab === 'quests' && <QuestSystem />}
+          {activeTab === 'achievements' && <AchievementSystem />}
+          {activeTab === 'streaks' && <StreakTracker />}
+          {activeTab === 'leaderboards' && <LeaderboardSystem />}
+          {activeTab === 'premium' && <PremiumSystem />}
+        </Suspense>
+      </div>
       </div>
     </div>
   );
