@@ -9,6 +9,8 @@ import { useGamification } from '../context/GamificationContext';
 import { AnimatedProgressBar } from './RewardAnimations';
 import RewardSystem from './RewardSystem';
 import MysteryBox from './MysteryBox';
+import LoadingScreen from './LoadingScreen';
+import LoadingSpinner from './LoadingSpinner';
 
 
 const StreakTracker = lazy(() => import('./StreakTracker'));
@@ -289,23 +291,33 @@ const GamifiedDashboard = () => {
           )}
           
           {activeTab === 'quests' && (
-            <QuestSystem />
+            <Suspense fallback={<LoadingSpinner text="Loading Quests..." />}>
+              <QuestSystem />
+            </Suspense>
           )}
           
           {activeTab === 'achievements' && (
-            <AchievementSystem />
+            <Suspense fallback={<LoadingSpinner text="Loading Achievements..." />}>
+              <AchievementSystem />
+            </Suspense>
           )}
           
           {activeTab === 'streaks' && (
-            <StreakTracker />
+            <Suspense fallback={<LoadingSpinner text="Loading Streaks..." />}>
+              <StreakTracker />
+            </Suspense>
           )}
           
           {activeTab === 'leaderboards' && (
-            <LeaderboardSystem />
+            <Suspense fallback={<LoadingSpinner text="Loading Leaderboards..." />}>
+              <LeaderboardSystem />
+            </Suspense>
           )}
           
           {activeTab === 'premium' && (
-            <PremiumSystem />
+            <Suspense fallback={<LoadingSpinner text="Loading Premium..." />}>
+              <PremiumSystem />
+            </Suspense>
           )}
         </div>
       </div>
