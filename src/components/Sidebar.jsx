@@ -31,27 +31,27 @@ export default function Sidebar() {
         </div>
       </div>
       <div className="flex flex-col gap-2 w-full pt-24 pb-4">
-        <Link to="/dashboard" className="flex items-center gap-3 px-6 py-3 focus:outline-none hover:bg-[#6C5DD3]/10 transition" title="Dashboard">
+        <Link to="/dashboard" className="flex items-center gap-3 px-6 py-3 focus:outline-none hover:bg-[#6C5DD3]/10 transition" title="Dashboard" onMouseEnter={() => preloadOnHover('gamified-dashboard')}>
           <LayoutDashboardIcon className="w-5 h-5 text-white opacity-1000" />
           <span className="text-white font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">Dashboard</span>
         </Link>
-        <Link to="/schedule" className="flex items-center gap-3 px-6 py-3 focus:outline-none hover:bg-[#6C5DD3]/10 transition" title="Study Planner">
+        <Link to="/schedule" className="flex items-center gap-3 px-6 py-3 focus:outline-none hover:bg-[#6C5DD3]/10 transition" title="Study Planner" onMouseEnter={() => preloadOnHover('schedule')}>
           <CalendarIcon className="w-5 h-5 text-white" />
           <span className="text-white font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">Schedule</span>
         </Link>
-        <Link to="/subjects" className="flex items-center gap-3 px-6 py-3 focus:outline-none hover:bg-[#6C5DD3]/10 transition" title="Subjects">
+        <Link to="/subjects" className="flex items-center gap-3 px-6 py-3 focus:outline-none hover:bg-[#6C5DD3]/10 transition" title="Subjects" onMouseEnter={() => preloadOnHover('subjects')}>
           <BookIcon className="w-5 h-5 text-white" />
           <span className="text-white font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">Subjects</span>
         </Link>
-        <Link to="/tasks" className="flex items-center gap-3 px-6 py-3 focus:outline-none hover:bg-[#6C5DD3]/10 transition" title="Tasks">
+        <Link to="/tasks" className="flex items-center gap-3 px-6 py-3 focus:outline-none hover:bg-[#6C5DD3]/10 transition" title="Tasks" onMouseEnter={() => preloadOnHover('tasks')}>
           <ListChecksIcon className="w-5 h-5 text-white" />
           <span className="text-white font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">Tasks</span>
         </Link>
-        <Link to="/study" className="flex items-center gap-3 px-6 py-3 focus:outline-none hover:bg-[#6C5DD3]/10 transition" title="Study">
+        <Link to="/study" className="flex items-center gap-3 px-6 py-3 focus:outline-none hover:bg-[#6C5DD3]/10 transition" title="Study" onMouseEnter={() => preloadOnHover('study')}>
           <BrainIcon className="w-5 h-5 text-white" />
           <span className="text-white font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">Study</span>
         </Link>
-        <Link to="/insights" className="flex items-center gap-3 px-6 py-3 focus:outline-none hover:bg-[#6C5DD3]/10 transition" title="Insights">
+        <Link to="/insights" className="flex items-center gap-3 px-6 py-3 focus:outline-none hover:bg-[#6C5DD3]/10 transition" title="Insights" onMouseEnter={() => preloadOnHover('insights')}>
           <BarChart3 className="w-5 h-5 text-white" />
           <span className="text-white font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">Insights</span>
         </Link>
