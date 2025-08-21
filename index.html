@@ -3,13 +3,100 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My App</title>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9570335781120627"
-     crossorigin="anonymous"></script>
+  <meta name="description" content="A gamified study application to boost your productivity" />
+  <meta name="theme-color" content="#8B5CF6" />
+
+  <!-- Preconnect to external domains -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="dns-prefetch" href="https://firebase.googleapis.com">
+  <link rel="preconnect" href="https://pagead2.googlesyndication.com">
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json">
+
+  <!-- Preload critical assets -->
+  <link rel="modulepreload" href="/src/main.jsx">
+  <link rel="modulepreload" href="/src/App.jsx">
+
+  <!-- Critical CSS for initial load -->
+  <style>
+    #root {
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .loading-screen {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: white;
+      z-index: 9999;
+    }
+
+    .loading-spinner {
+      width: 3rem;
+      height: 3rem;
+      border: 0.25rem solid #e5e7eb;
+      border-top: 0.25rem solid #8b5cf6;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background-color: #f9fafb;
+    }
+  </style>
+
+  <title>Study App - Gamified Learning Experience</title>
+
+  <!-- Load ads asynchronously and with lower priority -->
+  <script>
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        const script = document.createElement('script');
+        script.async = true;
+        script.crossOrigin = 'anonymous';
+        script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9570335781120627';
+        document.head.appendChild(script);
+      }, 2000);
+    });
+  </script>
 </head>
 <body>
+  <!-- Initial loading screen -->
+  <div id="initial-loader" class="loading-screen">
+    <div class="loading-spinner"></div>
+    <p style="margin-top: 1rem; color: #6b7280; font-weight: 500;">Loading Study App...</p>
+  </div>
+
   <div id="root"></div>
- 
+
+  <!-- Remove initial loader once React takes over -->
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        const loader = document.getElementById('initial-loader');
+        if (loader) {
+          loader.style.opacity = '0';
+          loader.style.transition = 'opacity 0.3s ease';
+          setTimeout(() => loader.remove(), 300);
+        }
+      }, 100);
+    });
+  </script>
+
   <script type="module" src="/src/main.jsx"></script>
 </body>
 </html>
