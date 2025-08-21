@@ -334,14 +334,14 @@ const Landing = () => {
               {
                 step: "01",
                 title: "Connect Your Courses",
-                desc: "Add your subjects, courses, and academic goals to create your personalized dashboard.",
+                desc: "Add your own subjects and tasks to create your own study experience.",
                 icon: BookOpen,
                 color: "emerald"
               },
               {
                 step: "02", 
                 title: "Track Your Progress",
-                desc: "Log study sessions, assignments, and achievements. Our AI learns your patterns.",
+                desc: "Log study sessions, assignments, and achievements. Earn XP and level up.",
                 icon: BarChart3,
                 color: "blue"
               },
