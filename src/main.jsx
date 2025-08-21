@@ -1,11 +1,11 @@
-import React from "react";
+import React, { Suspense } from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
-import { AuthProvider } from "./context/AuthContext";
+import LoadingScreen from "./components/LoadingScreen";
 import "./styles/index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <AuthProvider>
+  <Suspense fallback={<LoadingScreen />}>
     <App />
-  </AuthProvider>
+  </Suspense>
 );
