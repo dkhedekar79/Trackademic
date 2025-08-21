@@ -461,56 +461,43 @@ const Landing = () => {
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            
-            
-
-            {/* Pro Plan */}
-            <motion.div 
-              className="bg-gradient-to-br from-emerald-500 to-blue-600 rounded-3xl p-8 shadow-xl text-white relative"
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              viewport={{ once: true }}
+          <div className="bg-gradient-to-br from-emerald-500 to-blue-600 rounded-3xl shadow-xl text-white relative px-48 py-8">
+            <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+              <div className="bg-yellow-400 text-yellow-900 px-4 py-1 rounded-full text-sm font-semibold">
+                Most Popular
+              </div>
+            </div>
+            <div className="text-center mb-8">
+              <h3 className="text-2xl font-bold mb-2">Pro</h3>
+              <div className="text-4xl font-bold mb-4">$0<span className="text-lg text-emerald-100">/month</span></div>
+              <p className="text-emerald-100">It's all free</p>
+            </div>
+            <ul className="space-y-4 mb-8">
+              <li className="flex items-center space-x-3">
+                <CheckCircle className="w-5 h-5 text-emerald-200" />
+                <span>Unlimited subjects</span>
+              </li>
+              <li className="flex items-center space-x-3">
+                <CheckCircle className="w-5 h-5 text-emerald-200" />
+                <span>Unlimited logging</span>
+              </li>
+              <li className="flex items-center space-x-3">
+                <CheckCircle className="w-5 h-5 text-emerald-200" />
+                <span>Full insight access</span>
+              </li>
+              <li className="flex items-center space-x-3">
+                <CheckCircle className="w-5 h-5 text-emerald-200" />
+                <span>Full gamification access</span>
+              </li>
+            </ul>
+            <Link
+              to="/signup"
+              className="w-full bg-white text-emerald-600 py-3 rounded-xl font-semibold text-center block hover:bg-gray-50 transition-colors"
             >
-              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <div className="bg-yellow-400 text-yellow-900 px-4 py-1 rounded-full text-sm font-semibold">
-                  Most Popular
-                </div>
-              </div>
-              <div className="text-center mb-8">
-                <h3 className="text-2xl font-bold mb-2">Pro</h3>
-                <div className="text-4xl font-bold mb-4">$0<span className="text-lg text-emerald-100">/month</span></div>
-                <p className="text-emerald-100">It's all free</p>
-              </div>
-              <ul className="space-y-4 mb-8">
-                <li className="flex items-center space-x-3">
-                  <CheckCircle className="w-5 h-5 text-emerald-200" />
-                  <span>Unlimited subjects</span>
-                </li>
-                <li className="flex items-center space-x-3">
-                  <CheckCircle className="w-5 h-5 text-emerald-200" />
-                  <span>Unlimited logging</span>
-                </li>
-                <li className="flex items-center space-x-3">
-                  <CheckCircle className="w-5 h-5 text-emerald-200" />
-                  <span>Full insight access</span>
-                </li>
-                <li className="flex items-center space-x-3">
-                  <CheckCircle className="w-5 h-5 text-emerald-200" />
-                  <span>Full gamification access</span>
-                </li>
-              </ul>
-              <Link 
-                to="/signup"
-                className="w-full bg-white text-emerald-600 py-3 rounded-xl font-semibold text-center block hover:bg-gray-50 transition-colors"
-              >
-                Start for free
-              </Link>
-            </motion.div>
-
-            
-            
+              Start for free
+            </Link>
+          </div>
+          <div className="grid lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
           </div>
         </div>
       </section>
