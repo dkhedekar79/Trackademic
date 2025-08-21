@@ -582,7 +582,7 @@ const Landing = () => {
               to="/signup"
               className="bg-white text-emerald-600 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-50 transition-all duration-300 transform hover:scale-105 flex items-center justify-center"
             >
-              Start Free Trial
+              Start Now
               <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
             <button 
@@ -610,17 +610,7 @@ const Landing = () => {
               <p className="text-gray-400 mb-6">
                 Empowering students to achieve academic excellence through intelligent tracking and insights.
               </p>
-              <div className="flex space-x-4">
-                <div className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-gray-700 transition-colors cursor-pointer">
-                  <span className="text-sm">TW</span>
-                </div>
-                <div className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-gray-700 transition-colors cursor-pointer">
-                  <span className="text-sm">IG</span>
-                </div>
-                <div className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-gray-700 transition-colors cursor-pointer">
-                  <span className="text-sm">LI</span>
-                </div>
-              </div>
+              
             </div>
             
             <div>
