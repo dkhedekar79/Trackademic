@@ -16,7 +16,6 @@ const QuestSystem = lazy(() => import('./QuestSystem'));
 const AchievementSystem = lazy(() => import('./AchievementSystem'));
 const LeaderboardSystem = lazy(() => import('./LeaderboardSystem'));
 const PremiumSystem = lazy(() => import('./PremiumSystem'));
-const OverviewTab = lazy(() => import('./OverviewTab'));
 
 const GamifiedDashboard = () => {
   const { 
@@ -274,21 +273,35 @@ const GamifiedDashboard = () => {
         </div>
         
         {/* Tab Content */}
-
-
-        <Suspense fallback={<div className="text-center py-10 text-gray-500">Loading...</div>}>
-            {activeTab === 'overview' && <OverviewTab userStats={userStats} />}
-            {activeTab === 'quests' && <QuestSystem />}
-            {activeTab === 'achievements' && <AchievementSystem />}
-            {activeTab === 'streaks' && <StreakTracker />}
-            {activeTab === 'leaderboards' && <LeaderboardSystem />}
-            {activeTab === 'premium' && <PremiumSystem />}
-          </Suspense>
+        <div className="space-y-8">
+          {activeTab === 'overview' && (
+            <OverviewTab userStats={userStats} />
+          )}
+          
+          {activeTab === 'quests' && (
+            <QuestSystem />
+          )}
+          
+          {activeTab === 'achievements' && (
+            <AchievementSystem />
+          )}
+          
+          {activeTab === 'streaks' && (
+            <StreakTracker />
+          )}
+          
+          {activeTab === 'leaderboards' && (
+            <LeaderboardSystem />
+          )}
+          
+          {activeTab === 'premium' && (
+            <PremiumSystem />
+          )}
         </div>
       </div>
-
-    );
- 
+    </div>
+  );
+};
 
 // Enhanced Overview Tab
 const OverviewTab = ({ userStats }) => {
