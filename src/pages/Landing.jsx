@@ -13,7 +13,16 @@ import {
   CheckCircle,
   Smartphone,
   Laptop,
-  Tablet
+  Tablet,
+  Target,
+  Clock,
+  BarChart3,
+  GraduationCap,
+  Award,
+  Lightbulb,
+  TrendingUp,
+  Shield,
+  Sparkles
 } from "lucide-react";
 
 const Landing = () => {
@@ -40,6 +49,13 @@ const Landing = () => {
     }
   };
 
+  const scrollToSection = (sectionId) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-cyan-50">
       {/* Navigation */}
@@ -47,23 +63,44 @@ const Landing = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <BookOpen className="w-5 h-5 text-white" />
+              <div className="w-8 h-8 bg-gradient-to-r from-emerald-500 to-blue-600 rounded-lg flex items-center justify-center">
+                <Target className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                StudyFlow
+              <span className="text-xl font-bold bg-gradient-to-r from-emerald-600 to-blue-600 bg-clip-text text-transparent">
+                Trackademic
               </span>
             </div>
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#features" className="text-gray-600 hover:text-gray-900 transition-colors">Features</a>
-              <a href="#pricing" className="text-gray-600 hover:text-gray-900 transition-colors">Pricing</a>
-              <a href="#testimonials" className="text-gray-600 hover:text-gray-900 transition-colors">Reviews</a>
-              <Link to="/login" className="text-blue-600 hover:text-blue-700 font-medium">Login</Link>
+              <button 
+                onClick={() => scrollToSection('features')} 
+                className="text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
+              >
+                Features
+              </button>
+              <button 
+                onClick={() => scrollToSection('how-it-works')} 
+                className="text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
+              >
+                How It Works
+              </button>
+              <button 
+                onClick={() => scrollToSection('pricing')} 
+                className="text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
+              >
+                Pricing
+              </button>
+              <button 
+                onClick={() => scrollToSection('testimonials')} 
+                className="text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
+              >
+                Reviews
+              </button>
+              <Link to="/login" className="text-emerald-600 hover:text-emerald-700 font-medium">Login</Link>
               <Link 
                 to="/signup" 
-                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all duration-300 transform hover:scale-105"
+                className="bg-gradient-to-r from-emerald-600 to-blue-600 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all duration-300 transform hover:scale-105"
               >
-                Get Started Free
+                Start Free Trial
               </Link>
             </div>
           </div>
@@ -71,399 +108,631 @@ const Landing = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-24 pb-12 px-4">
+      <section className="pt-24 pb-16 px-4">
         <motion.div 
-          className="max-w-7xl mx-auto"
+          className="max-w-7xl mx-auto text-center"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
         >
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left Column - Main Content */}
-            <motion.div 
-              className="bg-gradient-to-br from-blue-600 to-purple-700 rounded-3xl p-8 lg:p-12 text-white relative overflow-hidden"
-              variants={itemVariants}
+          <motion.div variants={itemVariants} className="mb-8">
+            <div className="inline-flex items-center bg-emerald-100 text-emerald-800 px-4 py-2 rounded-full text-sm font-medium mb-6">
+              <Sparkles className="w-4 h-4 mr-2" />
+              Track your academic journey like never before
+            </div>
+          </motion.div>
+          
+          <motion.h1 
+            className="text-5xl lg:text-7xl font-bold leading-tight mb-8"
+            variants={itemVariants}
+          >
+            Transform Your{" "}
+            <span className="bg-gradient-to-r from-emerald-500 to-blue-600 bg-clip-text text-transparent">
+              Academic Success
+            </span>{" "}
+            with Smart Tracking
+          </motion.h1>
+          
+          <motion.p 
+            className="text-xl lg:text-2xl text-gray-600 mb-12 max-w-4xl mx-auto"
+            variants={itemVariants}
+          >
+            Monitor progress, optimize study habits, and achieve your academic goals with 
+            intelligent insights and personalized learning analytics.
+          </motion.p>
+          
+          <motion.div 
+            className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto"
+            variants={itemVariants}
+          >
+            <Link 
+              to="/signup"
+              className="bg-gradient-to-r from-emerald-600 to-blue-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center"
             >
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
-              <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-12 -translate-x-12"></div>
-              
-              <motion.h1 
-                className="text-4xl lg:text-6xl font-bold leading-tight mb-6"
-                variants={itemVariants}
-              >
-                A home designed to keep your{" "}
-                <span className="text-cyan-300">studies organised</span> and you{" "}
-                <span className="text-yellow-300">motivated</span>
-              </motion.h1>
-              
-              <motion.p 
-                className="text-xl mb-8 text-blue-100"
-                variants={itemVariants}
-              >
-                Transform your learning experience with AI-powered study tools that adapt to your needs.
-              </motion.p>
-              
-              <motion.div variants={itemVariants}>
-                <Link 
-                  to="/signup"
-                  className="inline-flex items-center bg-white text-blue-600 px-8 py-4 rounded-full font-semibold text-lg hover:bg-gray-50 transition-all duration-300 transform hover:scale-105 shadow-lg"
-                >
-                  Get started for free
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
-              </motion.div>
-            </motion.div>
+              Start Free Trial
+              <ArrowRight className="ml-2 w-5 h-5" />
+            </Link>
+            <button 
+              onClick={() => scrollToSection('demo')}
+              className="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-xl font-semibold text-lg hover:border-emerald-500 hover:text-emerald-600 transition-all duration-300 flex items-center justify-center"
+            >
+              <Play className="mr-2 w-5 h-5" />
+              Watch Demo
+            </button>
+          </motion.div>
 
-            {/* Right Column - Device Mockup */}
-            <motion.div 
-              className="relative"
-              variants={itemVariants}
-            >
-              <div className="bg-white rounded-3xl shadow-2xl p-8 transform rotate-3 hover:rotate-0 transition-transform duration-500">
-                <img 
-                  src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop&crop=center" 
-                  alt="StudyFlow Dashboard"
-                  className="w-full h-64 object-cover rounded-xl"
-                />
-                <div className="mt-4 space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <CheckCircle className="w-5 h-5 text-green-500" />
-                    <span className="text-gray-700">Study session completed</span>
+          {/* Hero Visual */}
+          <motion.div 
+            className="mt-16 relative"
+            variants={itemVariants}
+          >
+            <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-4xl mx-auto">
+              <div className="bg-gradient-to-br from-emerald-50 to-blue-50 rounded-2xl p-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="bg-white rounded-xl p-4 shadow-sm">
+                    <div className="flex items-center justify-between mb-3">
+                      <Clock className="w-6 h-6 text-emerald-500" />
+                      <span className="text-sm text-gray-500">This Week</span>
+                    </div>
+                    <div className="text-2xl font-bold text-gray-900">32.5h</div>
+                    <div className="text-sm text-emerald-600">+18% from last week</div>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Trophy className="w-5 h-5 text-yellow-500" />
-                    <span className="text-gray-700">Achievement unlocked!</span>
+                  <div className="bg-white rounded-xl p-4 shadow-sm">
+                    <div className="flex items-center justify-between mb-3">
+                      <Trophy className="w-6 h-6 text-blue-500" />
+                      <span className="text-sm text-gray-500">Goals</span>
+                    </div>
+                    <div className="text-2xl font-bold text-gray-900">8/10</div>
+                    <div className="text-sm text-blue-600">Completed</div>
+                  </div>
+                  <div className="bg-white rounded-xl p-4 shadow-sm">
+                    <div className="flex items-center justify-between mb-3">
+                      <TrendingUp className="w-6 h-6 text-purple-500" />
+                      <span className="text-sm text-gray-500">Progress</span>
+                    </div>
+                    <div className="text-2xl font-bold text-gray-900">94%</div>
+                    <div className="text-sm text-purple-600">On track</div>
                   </div>
                 </div>
               </div>
-            </motion.div>
-          </div>
+            </div>
+          </motion.div>
         </motion.div>
       </section>
 
-      {/* Feature Panels */}
-      <section className="py-16 px-4">
+      {/* Features Section */}
+      <section id="features" className="py-20 px-4 bg-white">
         <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Flashcards Panel */}
-            <motion.div 
-              className="bg-gradient-to-br from-purple-500 to-purple-700 rounded-3xl p-8 text-white flex items-center justify-between"
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-            >
-              <div className="flex-1">
-                <h3 className="text-3xl font-bold mb-4">
-                  Create flashcards and notes in record time.
-                </h3>
-                <p className="text-purple-100 text-lg">
-                  AI-powered content generation makes studying faster and more effective.
-                </p>
-              </div>
-              <div className="ml-8">
-                <div className="w-24 h-32 bg-white/20 rounded-xl flex items-center justify-center">
-                  <Brain className="w-12 h-12 text-white" />
-                </div>
-              </div>
-            </motion.div>
+          <div className="text-center mb-16">
+            <h2 className="text-4xl lg:text-5xl font-bold mb-6">
+              Powerful Features for{" "}
+              <span className="bg-gradient-to-r from-emerald-500 to-blue-600 bg-clip-text text-transparent">
+                Academic Excellence
+              </span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Everything you need to track, analyze, and improve your academic performance
+            </p>
+          </div>
 
-            {/* Testing Panel */}
+          <div className="grid lg:grid-cols-3 gap-8">
+            {/* Smart Analytics */}
             <motion.div 
-              className="bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-3xl p-8 text-white flex items-center justify-between"
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-            >
-              <div className="ml-8">
-                <div className="w-24 h-32 bg-white/20 rounded-xl flex items-center justify-center">
-                  <Zap className="w-12 h-12 text-white" />
-                </div>
-              </div>
-              <div className="flex-1 text-right">
-                <h3 className="text-3xl font-bold mb-4">
-                  Test your knowledge. Get instant feedback.
-                </h3>
-                <p className="text-cyan-100 text-lg">
-                  Smart quizzes adapt to your learning pace and identify weak areas.
-                </p>
-              </div>
-            </motion.div>
-
-            {/* Statistics Panel */}
-            <motion.div 
-              className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-3xl p-8 text-white"
+              className="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-3xl p-8 text-white"
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
               viewport={{ once: true }}
             >
-              <h3 className="text-3xl font-bold mb-6">
-                94% of users achieve better grades by using our smart learning platform.
-              </h3>
-              <Link 
-                to="/signup"
-                className="inline-flex items-center bg-white text-blue-600 px-6 py-3 rounded-full font-semibold hover:bg-gray-50 transition-colors"
-              >
-                Get started for free
-              </Link>
+              <BarChart3 className="w-12 h-12 mb-6" />
+              <h3 className="text-2xl font-bold mb-4">Smart Analytics Dashboard</h3>
+              <p className="text-emerald-100 text-lg mb-6">
+                Visualize your study patterns, progress trends, and performance metrics with intuitive charts and insights.
+              </p>
+              <div className="bg-white/20 rounded-xl p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm">Math Progress</span>
+                  <span className="text-sm font-semibold">87%</span>
+                </div>
+                <div className="w-full bg-white/30 rounded-full h-2">
+                  <div className="bg-white h-2 rounded-full" style={{ width: '87%' }}></div>
+                </div>
+              </div>
             </motion.div>
 
-            {/* AI Learning Panel */}
+            {/* Goal Tracking */}
             <motion.div 
-              className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-3xl p-8 text-white text-center"
+              className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-3xl p-8 text-white"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              viewport={{ once: true }}
+            >
+              <Target className="w-12 h-12 mb-6" />
+              <h3 className="text-2xl font-bold mb-4">Intelligent Goal Setting</h3>
+              <p className="text-blue-100 text-lg mb-6">
+                Set SMART goals, track milestones, and get personalized recommendations to stay on track.
+              </p>
+              <div className="space-y-3">
+                <div className="flex items-center space-x-3">
+                  <CheckCircle className="w-5 h-5 text-green-300" />
+                  <span className="text-sm">Complete calculus homework</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <Clock className="w-5 h-5 text-yellow-300" />
+                  <span className="text-sm">Review chemistry notes</span>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* AI Insights */}
+            <motion.div 
+              className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-3xl p-8 text-white"
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
               viewport={{ once: true }}
             >
-              <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Brain className="w-10 h-10 text-white" />
-              </div>
-              <h3 className="text-3xl font-bold mb-4">Learn with the help of AI</h3>
-              <a 
-                href="#features" 
-                className="inline-flex items-center text-white font-semibold hover:text-gray-200 transition-colors"
-              >
-                Learn more
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </a>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Video Section */}
-      <section className="py-16 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12">
-            {/* Video Panel */}
-            <motion.div 
-              className="relative bg-gray-900 rounded-3xl overflow-hidden group cursor-pointer"
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-              onClick={() => setIsVideoPlaying(!isVideoPlaying)}
-            >
-              <div className="aspect-video bg-gradient-to-br from-blue-600 to-purple-700 flex items-center justify-center">
-                {!isVideoPlaying ? (
-                  <div className="text-center">
-                    <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                      <Play className="w-8 h-8 text-white ml-1" />
-                    </div>
-                    <p className="text-white text-lg font-medium">Watch Demo</p>
-                  </div>
-                ) : (
-                  <div className="text-white text-center">
-                    <p className="text-lg">Video playing...</p>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-
-            {/* App Features */}
-            <div className="space-y-8">
-              <motion.div 
-                className="bg-gradient-to-r from-purple-500 to-purple-700 rounded-2xl p-6 text-white text-center"
-                initial={{ opacity: 0, x: 50 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6 }}
-                viewport={{ once: true }}
-              >
-                <Star className="w-12 h-12 mx-auto mb-4" />
-                <h4 className="text-2xl font-bold mb-4">
-                  Apple loved us so much that they made us App of the day!
-                </h4>
-              </motion.div>
-
-              <motion.div 
-                className="bg-gray-900 rounded-2xl p-6 text-white text-center"
-                initial={{ opacity: 0, x: 50 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                viewport={{ once: true }}
-              >
-                <h4 className="text-2xl font-bold mb-6">
-                  Take us anywhere with the free StudyFlow app on iOS and Android.
-                </h4>
-                <div className="flex justify-center space-x-4">
-                  <div className="bg-white/10 px-4 py-2 rounded-lg">
-                    <Smartphone className="w-6 h-6 mx-auto mb-1" />
-                    <span className="text-sm">iOS</span>
-                  </div>
-                  <div className="bg-white/10 px-4 py-2 rounded-lg">
-                    <Smartphone className="w-6 h-6 mx-auto mb-1" />
-                    <span className="text-sm">Android</span>
-                  </div>
+              <Brain className="w-12 h-12 mb-6" />
+              <h3 className="text-2xl font-bold mb-4">AI-Powered Insights</h3>
+              <p className="text-purple-100 text-lg mb-6">
+                Get personalized recommendations and insights to optimize your study schedule and improve performance.
+              </p>
+              <div className="bg-white/20 rounded-xl p-4">
+                <div className="flex items-center space-x-2 mb-2">
+                  <Lightbulb className="w-4 h-4" />
+                  <span className="text-sm font-medium">Smart Tip</span>
                 </div>
-              </motion.div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* AI Features */}
-      <section className="py-16 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12">
-            <motion.div 
-              className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-3xl p-8 text-white flex items-center justify-between"
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-            >
-              <div className="flex-1">
-                <h3 className="text-3xl font-bold mb-4">
-                  Generate explanations on any topic with AI.
-                </h3>
-                <p className="text-blue-100 text-lg">
-                  Get instant, personalized explanations that match your learning style.
-                </p>
-              </div>
-              <div className="ml-8">
-                <div className="w-24 h-32 bg-white/20 rounded-xl flex items-center justify-center">
-                  <Brain className="w-12 h-12 text-white" />
-                </div>
-              </div>
-            </motion.div>
-
-            <motion.div 
-              className="bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-3xl p-8 text-white flex items-center justify-between"
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-            >
-              <div className="ml-8">
-                <div className="w-24 h-32 bg-white/20 rounded-xl flex items-center justify-center">
-                  <Zap className="w-12 h-12 text-white" />
-                </div>
-              </div>
-              <div className="flex-1 text-right">
-                <h3 className="text-3xl font-bold mb-4">
-                  Scientifically-proven learning with Spaced Repetition.
-                </h3>
-                <p className="text-cyan-100 text-lg">
-                  Optimize retention with evidence-based learning techniques.
+                <p className="text-sm text-purple-100">
+                  Study math between 2-4 PM for 23% better retention
                 </p>
               </div>
             </motion.div>
           </div>
-        </div>
-      </section>
 
-      {/* Final CTA */}
-      <section className="py-16 px-4">
-        <motion.div 
-          className="max-w-7xl mx-auto bg-gradient-to-r from-gray-900 to-gray-800 rounded-3xl p-12 text-white text-center"
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-        >
-          <div className="grid lg:grid-cols-3 gap-8 items-center">
-            <div className="lg:col-span-2">
-              <h2 className="text-4xl font-bold mb-6">
-                Learn on your phone, tablet, and laptop.
-              </h2>
-              <Link 
-                to="/signup"
-                className="inline-flex items-center bg-white text-gray-900 px-8 py-4 rounded-full font-semibold text-lg hover:bg-gray-50 transition-all duration-300 transform hover:scale-105"
-              >
-                Get started for free
-              </Link>
-            </div>
-            <div className="flex justify-center space-x-4">
-              <div className="bg-white/10 p-4 rounded-2xl">
-                <Smartphone className="w-8 h-8" />
-              </div>
-              <div className="bg-white/10 p-4 rounded-2xl">
-                <Tablet className="w-8 h-8" />
-              </div>
-              <div className="bg-white/10 p-4 rounded-2xl">
-                <Laptop className="w-8 h-8" />
-              </div>
-            </div>
-          </div>
-        </motion.div>
-      </section>
-
-      {/* Testimonials */}
-      <section id="testimonials" className="py-16 px-4 bg-gradient-to-r from-purple-50 to-blue-50">
-        <div className="max-w-7xl mx-auto text-center">
-          <h2 className="text-4xl font-bold mb-12">What Students Say</h2>
-          <div className="grid md:grid-cols-3 gap-8">
+          {/* Feature Grid */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mt-16">
             {[
-              { name: "Sarah M.", role: "Medical Student", text: "StudyFlow helped me organize my MCAT prep and I scored in the 95th percentile!" },
-              { name: "James L.", role: "Engineering Student", text: "The AI explanations made complex calculus concepts finally click for me." },
-              { name: "Maya P.", role: "High School Student", text: "I went from C's to A's using the spaced repetition system. It actually works!" }
-            ].map((testimonial, index) => (
+              { icon: Clock, title: "Time Tracking", desc: "Automatic study session tracking" },
+              { icon: Award, title: "Achievement System", desc: "Gamified progress rewards" },
+              { icon: Shield, title: "Privacy First", desc: "Your data stays secure" },
+              { icon: Smartphone, title: "Cross-Platform", desc: "Works on all devices" }
+            ].map((feature, index) => (
               <motion.div 
                 key={index}
-                className="bg-white p-6 rounded-2xl shadow-lg"
+                className="bg-gray-50 rounded-2xl p-6 hover:bg-white hover:shadow-lg transition-all duration-300"
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 viewport={{ once: true }}
               >
-                <div className="flex justify-center mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
-                  ))}
-                </div>
-                <p className="text-gray-700 mb-4">"{testimonial.text}"</p>
-                <div className="font-semibold">{testimonial.name}</div>
-                <div className="text-gray-500 text-sm">{testimonial.role}</div>
+                <feature.icon className="w-8 h-8 text-emerald-500 mb-4" />
+                <h4 className="text-lg font-semibold mb-2">{feature.title}</h4>
+                <p className="text-gray-600 text-sm">{feature.desc}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12 px-4">
-        <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-8">
-          <div>
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <BookOpen className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-bold">StudyFlow</span>
-            </div>
-            <p className="text-gray-400">
-              Empowering students worldwide with AI-powered learning tools.
+      {/* How It Works Section */}
+      <section id="how-it-works" className="py-20 px-4 bg-gradient-to-br from-gray-50 to-blue-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl lg:text-5xl font-bold mb-6">
+              How Trackademic{" "}
+              <span className="bg-gradient-to-r from-emerald-500 to-blue-600 bg-clip-text text-transparent">
+                Works
+              </span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Get started in minutes and see immediate improvements in your academic tracking
             </p>
           </div>
-          <div>
-            <h4 className="font-semibold mb-4">Product</h4>
-            <div className="space-y-2 text-gray-400">
-              <div>Features</div>
-              <div>Pricing</div>
-              <div>Mobile App</div>
-            </div>
-          </div>
-          <div>
-            <h4 className="font-semibold mb-4">Company</h4>
-            <div className="space-y-2 text-gray-400">
-              <div>About</div>
-              <div>Careers</div>
-              <div>Contact</div>
-            </div>
-          </div>
-          <div>
-            <h4 className="font-semibold mb-4">Support</h4>
-            <div className="space-y-2 text-gray-400">
-              <div>Help Center</div>
-              <div>Privacy Policy</div>
-              <div>Terms of Service</div>
-            </div>
+
+          <div className="grid lg:grid-cols-3 gap-12">
+            {[
+              {
+                step: "01",
+                title: "Connect Your Courses",
+                desc: "Add your subjects, courses, and academic goals to create your personalized dashboard.",
+                icon: BookOpen,
+                color: "emerald"
+              },
+              {
+                step: "02", 
+                title: "Track Your Progress",
+                desc: "Log study sessions, assignments, and achievements. Our AI learns your patterns.",
+                icon: BarChart3,
+                color: "blue"
+              },
+              {
+                step: "03",
+                title: "Optimize & Improve",
+                desc: "Get personalized insights and recommendations to maximize your academic performance.",
+                icon: TrendingUp,
+                color: "purple"
+              }
+            ].map((item, index) => (
+              <motion.div 
+                key={index}
+                className="text-center"
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.2 }}
+                viewport={{ once: true }}
+              >
+                <div className={`w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-${item.color}-500 to-${item.color}-600 flex items-center justify-center text-white shadow-lg`}>
+                  <item.icon className="w-10 h-10" />
+                </div>
+                <div className={`text-4xl font-bold text-${item.color}-500 mb-4`}>{item.step}</div>
+                <h3 className="text-2xl font-bold mb-4">{item.title}</h3>
+                <p className="text-gray-600 text-lg leading-relaxed">{item.desc}</p>
+              </motion.div>
+            ))}
           </div>
         </div>
-        <div className="max-w-7xl mx-auto border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-          <p>&copy; 2024 StudyFlow. All rights reserved.</p>
+      </section>
+
+      {/* Demo Section */}
+      <section id="demo" className="py-20 px-4 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+            >
+              <h2 className="text-4xl lg:text-5xl font-bold mb-6">
+                See Trackademic in{" "}
+                <span className="bg-gradient-to-r from-emerald-500 to-blue-600 bg-clip-text text-transparent">
+                  Action
+                </span>
+              </h2>
+              <p className="text-xl text-gray-600 mb-8">
+                Watch how students are transforming their academic journey with intelligent tracking and insights.
+              </p>
+              <div className="space-y-4">
+                <div className="flex items-center space-x-3">
+                  <CheckCircle className="w-6 h-6 text-emerald-500" />
+                  <span className="text-lg">Real-time progress tracking</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <CheckCircle className="w-6 h-6 text-emerald-500" />
+                  <span className="text-lg">Personalized study insights</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <CheckCircle className="w-6 h-6 text-emerald-500" />
+                  <span className="text-lg">Goal achievement system</span>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div 
+              className="relative"
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+            >
+              <div 
+                className="relative bg-gradient-to-br from-emerald-600 to-blue-700 rounded-3xl overflow-hidden group cursor-pointer aspect-video flex items-center justify-center"
+                onClick={() => setIsVideoPlaying(!isVideoPlaying)}
+              >
+                {!isVideoPlaying ? (
+                  <div className="text-center">
+                    <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                      <Play className="w-10 h-10 text-white ml-1" />
+                    </div>
+                    <p className="text-white text-xl font-semibold">Watch 2-minute demo</p>
+                  </div>
+                ) : (
+                  <div className="text-white text-center">
+                    <p className="text-xl">Demo video playing...</p>
+                    <button 
+                      className="mt-4 bg-white/20 px-4 py-2 rounded-lg"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsVideoPlaying(false);
+                      }}
+                    >
+                      Close
+                    </button>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section id="pricing" className="py-20 px-4 bg-gradient-to-br from-gray-50 to-purple-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl lg:text-5xl font-bold mb-6">
+              Simple{" "}
+              <span className="bg-gradient-to-r from-emerald-500 to-blue-600 bg-clip-text text-transparent">
+                Pricing
+              </span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Start free, upgrade when you're ready. No hidden fees, cancel anytime.
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {/* Free Plan */}
+            <motion.div 
+              className="bg-white rounded-3xl p-8 shadow-lg border border-gray-200"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+            >
+              <div className="text-center mb-8">
+                <h3 className="text-2xl font-bold mb-2">Free</h3>
+                <div className="text-4xl font-bold mb-4">$0<span className="text-lg text-gray-500">/month</span></div>
+                <p className="text-gray-600">Perfect for getting started</p>
+              </div>
+              <ul className="space-y-4 mb-8">
+                <li className="flex items-center space-x-3">
+                  <CheckCircle className="w-5 h-5 text-emerald-500" />
+                  <span>Basic progress tracking</span>
+                </li>
+                <li className="flex items-center space-x-3">
+                  <CheckCircle className="w-5 h-5 text-emerald-500" />
+                  <span>3 courses maximum</span>
+                </li>
+                <li className="flex items-center space-x-3">
+                  <CheckCircle className="w-5 h-5 text-emerald-500" />
+                  <span>Simple analytics</span>
+                </li>
+              </ul>
+              <Link 
+                to="/signup"
+                className="w-full bg-gray-100 text-gray-700 py-3 rounded-xl font-semibold text-center block hover:bg-gray-200 transition-colors"
+              >
+                Get Started Free
+              </Link>
+            </motion.div>
+
+            {/* Pro Plan */}
+            <motion.div 
+              className="bg-gradient-to-br from-emerald-500 to-blue-600 rounded-3xl p-8 shadow-xl text-white relative"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              viewport={{ once: true }}
+            >
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                <div className="bg-yellow-400 text-yellow-900 px-4 py-1 rounded-full text-sm font-semibold">
+                  Most Popular
+                </div>
+              </div>
+              <div className="text-center mb-8">
+                <h3 className="text-2xl font-bold mb-2">Pro</h3>
+                <div className="text-4xl font-bold mb-4">$9<span className="text-lg text-emerald-100">/month</span></div>
+                <p className="text-emerald-100">For serious students</p>
+              </div>
+              <ul className="space-y-4 mb-8">
+                <li className="flex items-center space-x-3">
+                  <CheckCircle className="w-5 h-5 text-emerald-200" />
+                  <span>Unlimited courses</span>
+                </li>
+                <li className="flex items-center space-x-3">
+                  <CheckCircle className="w-5 h-5 text-emerald-200" />
+                  <span>Advanced analytics</span>
+                </li>
+                <li className="flex items-center space-x-3">
+                  <CheckCircle className="w-5 h-5 text-emerald-200" />
+                  <span>AI-powered insights</span>
+                </li>
+                <li className="flex items-center space-x-3">
+                  <CheckCircle className="w-5 h-5 text-emerald-200" />
+                  <span>Goal tracking & reminders</span>
+                </li>
+              </ul>
+              <Link 
+                to="/signup"
+                className="w-full bg-white text-emerald-600 py-3 rounded-xl font-semibold text-center block hover:bg-gray-50 transition-colors"
+              >
+                Start Pro Trial
+              </Link>
+            </motion.div>
+
+            {/* Enterprise Plan */}
+            <motion.div 
+              className="bg-white rounded-3xl p-8 shadow-lg border border-gray-200"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              viewport={{ once: true }}
+            >
+              <div className="text-center mb-8">
+                <h3 className="text-2xl font-bold mb-2">Enterprise</h3>
+                <div className="text-4xl font-bold mb-4">$29<span className="text-lg text-gray-500">/month</span></div>
+                <p className="text-gray-600">For institutions</p>
+              </div>
+              <ul className="space-y-4 mb-8">
+                <li className="flex items-center space-x-3">
+                  <CheckCircle className="w-5 h-5 text-emerald-500" />
+                  <span>Multi-user management</span>
+                </li>
+                <li className="flex items-center space-x-3">
+                  <CheckCircle className="w-5 h-5 text-emerald-500" />
+                  <span>Custom integrations</span>
+                </li>
+                <li className="flex items-center space-x-3">
+                  <CheckCircle className="w-5 h-5 text-emerald-500" />
+                  <span>Priority support</span>
+                </li>
+              </ul>
+              <button className="w-full bg-gray-100 text-gray-700 py-3 rounded-xl font-semibold text-center hover:bg-gray-200 transition-colors">
+                Contact Sales
+              </button>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section id="testimonials" className="py-20 px-4 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl lg:text-5xl font-bold mb-6">
+              What Students{" "}
+              <span className="bg-gradient-to-r from-emerald-500 to-blue-600 bg-clip-text text-transparent">
+                Say
+              </span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Join thousands of students who have transformed their academic journey
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                name: "Sarah Chen",
+                role: "Computer Science Major",
+                text: "Trackademic helped me identify my most productive study times. My GPA improved from 3.2 to 3.8 in one semester!",
+                rating: 5
+              },
+              {
+                name: "Marcus Johnson", 
+                role: "Pre-Med Student",
+                text: "The AI insights are incredible. It showed me I was spending too much time on topics I already knew. Game changer!",
+                rating: 5
+              },
+              {
+                name: "Emma Rodriguez",
+                role: "Engineering Student", 
+                text: "Finally, a tool that actually helps me stay organized. The goal tracking feature keeps me motivated every day.",
+                rating: 5
+              }
+            ].map((testimonial, index) => (
+              <motion.div 
+                key={index}
+                className="bg-gray-50 p-8 rounded-2xl hover:shadow-lg transition-all duration-300"
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                viewport={{ once: true }}
+              >
+                <div className="flex justify-center mb-4">
+                  {[...Array(testimonial.rating)].map((_, i) => (
+                    <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                  ))}
+                </div>
+                <p className="text-gray-700 mb-6 text-lg leading-relaxed">"{testimonial.text}"</p>
+                <div className="text-center">
+                  <div className="font-semibold text-lg">{testimonial.name}</div>
+                  <div className="text-gray-500">{testimonial.role}</div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="py-20 px-4 bg-gradient-to-r from-emerald-600 to-blue-700">
+        <motion.div 
+          className="max-w-4xl mx-auto text-center text-white"
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+        >
+          <h2 className="text-4xl lg:text-5xl font-bold mb-6">
+            Ready to Transform Your Academic Journey?
+          </h2>
+          <p className="text-xl text-emerald-100 mb-10">
+            Join thousands of students who are already achieving better results with Trackademic
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
+            <Link 
+              to="/signup"
+              className="bg-white text-emerald-600 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-50 transition-all duration-300 transform hover:scale-105 flex items-center justify-center"
+            >
+              Start Free Trial
+              <ArrowRight className="ml-2 w-5 h-5" />
+            </Link>
+            <button 
+              onClick={() => scrollToSection('demo')}
+              className="border-2 border-white text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-white hover:text-emerald-600 transition-all duration-300 flex items-center justify-center"
+            >
+              <Play className="mr-2 w-5 h-5" />
+              Watch Demo
+            </button>
+          </div>
+        </motion.div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-white py-16 px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-4 gap-8 mb-12">
+            <div>
+              <div className="flex items-center space-x-2 mb-4">
+                <div className="w-8 h-8 bg-gradient-to-r from-emerald-500 to-blue-600 rounded-lg flex items-center justify-center">
+                  <Target className="w-5 h-5 text-white" />
+                </div>
+                <span className="text-xl font-bold">Trackademic</span>
+              </div>
+              <p className="text-gray-400 mb-6">
+                Empowering students to achieve academic excellence through intelligent tracking and insights.
+              </p>
+              <div className="flex space-x-4">
+                <div className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-gray-700 transition-colors cursor-pointer">
+                  <span className="text-sm">TW</span>
+                </div>
+                <div className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-gray-700 transition-colors cursor-pointer">
+                  <span className="text-sm">IG</span>
+                </div>
+                <div className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-gray-700 transition-colors cursor-pointer">
+                  <span className="text-sm">LI</span>
+                </div>
+              </div>
+            </div>
+            
+            <div>
+              <h4 className="font-semibold mb-4">Product</h4>
+              <div className="space-y-3 text-gray-400">
+                <button onClick={() => scrollToSection('features')} className="block hover:text-white transition-colors">Features</button>
+                <button onClick={() => scrollToSection('pricing')} className="block hover:text-white transition-colors">Pricing</button>
+                <button onClick={() => scrollToSection('demo')} className="block hover:text-white transition-colors">Demo</button>
+                <div className="hover:text-white transition-colors cursor-pointer">Mobile App</div>
+              </div>
+            </div>
+            
+            <div>
+              <h4 className="font-semibold mb-4">Support</h4>
+              <div className="space-y-3 text-gray-400">
+                <div className="hover:text-white transition-colors cursor-pointer">Help Center</div>
+                <div className="hover:text-white transition-colors cursor-pointer">Contact Us</div>
+                <div className="hover:text-white transition-colors cursor-pointer">API Docs</div>
+                <div className="hover:text-white transition-colors cursor-pointer">Status</div>
+              </div>
+            </div>
+            
+            <div>
+              <h4 className="font-semibold mb-4">Company</h4>
+              <div className="space-y-3 text-gray-400">
+                <div className="hover:text-white transition-colors cursor-pointer">About</div>
+                <div className="hover:text-white transition-colors cursor-pointer">Blog</div>
+                <div className="hover:text-white transition-colors cursor-pointer">Careers</div>
+                <div className="hover:text-white transition-colors cursor-pointer">Privacy</div>
+                <div className="hover:text-white transition-colors cursor-pointer">Terms</div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="border-t border-gray-800 pt-8 text-center text-gray-400">
+            <p>&copy; 2024 Trackademic. All rights reserved. Built with ❤️ for students.</p>
+          </div>
         </div>
       </footer>
     </div>
