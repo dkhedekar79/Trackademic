@@ -3,13 +3,13 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
+  base: '/',   // ensures assets resolve correctly on deploy
   build: {
     rollupOptions: {
       output: {
         manualChunks(id) {
           // Vendor chunk for node_modules
           if (id.includes('node_modules')) {
-            // Separate chunks for large libraries
             if (id.includes('react') || id.includes('react-dom')) {
               return 'react';
             }
@@ -25,26 +25,18 @@ export default defineConfig({
             return 'vendor';
           }
 
-          // Separate chunks for different page groups
-          if (id.includes('/pages/')) {
-            return 'pages';
-          }
-          if (id.includes('/components/')) {
-            return 'components';
-          }
-          if (id.includes('/context/')) {
-            return 'context';
-          }
+          // Separate chunks for different groups
+          if (id.includes('/pages/')) return 'pages';
+          if (id.includes('/components/')) return 'components';
+          if (id.includes('/context/')) return 'context';
         },
       },
     },
     chunkSizeWarningLimit: 1000,
-    // Enable source maps for better debugging
-    sourcemap: true,
+    sourcemap: true, // source maps for debugging
   },
   publicDir: 'public',
-  // Enable build optimizations
   esbuild: {
-    drop: ['console', 'debugger'],
+    drop: ['console', 'debugger'], // strip console/debugger in prod
   },
 });
