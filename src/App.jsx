@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { TimerProvider } from './context/TimerContext';
@@ -7,6 +7,7 @@ import ProtectedRoute from './routes/ProtectedRoute';
 import AppLoadingScreen from './components/AppLoadingScreen';
 import PageLoadingScreen from './components/PageLoadingScreen';
 import ComponentLoadingScreen from './components/ComponentLoadingScreen';
+import { preloadCriticalRoutes } from './utils/preloadRoutes';
 import './styles/index.css';
 
 // Lazy-loaded components for better code splitting
