@@ -148,7 +148,7 @@ const Landing = () => {
               to="/signup"
               className="bg-gradient-to-r from-emerald-600 to-blue-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center"
             >
-              Get Started for Free
+              It's 100% Free
               <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
             <button 
