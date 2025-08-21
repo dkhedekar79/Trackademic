@@ -5,9 +5,7 @@ export default defineConfig({
   plugins: [
     react({
       // Enable Fast Refresh
-      fastRefresh: true,
-      // Include JSX runtime automatically
-      jsxImportSource: 'react'
+      fastRefresh: true
     })
   ],
   
@@ -22,42 +20,38 @@ export default defineConfig({
     rollupOptions: {
       output: {
         // Enhanced manual chunking strategy
-        manualChunks: {
-          // Vendor chunk for external dependencies
-          vendor: ['react', 'react-dom', 'react-router-dom'],
-          
-          // Firebase chunk
-          firebase: ['firebase'],
-          
-          // UI libraries chunk
-          ui: ['lucide-react', 'react-icons', 'framer-motion'],
-          
-          // Swiper chunk (if used heavily)
-          swiper: ['swiper'],
-          
-          // Context chunk
-          context: [
-            './src/context/AuthContext',
-            './src/context/TimerContext', 
-            './src/context/GamificationContext'
-          ],
+        manualChunks: (id) => {
+          // Vendor chunk for main React dependencies
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
+              return 'vendor-react';
+            }
+            
+            // Firebase chunk
+            if (id.includes('firebase')) {
+              return 'vendor-firebase';
+            }
+            
+            // UI libraries chunk
+            if (id.includes('lucide-react') || id.includes('react-icons') || id.includes('framer-motion')) {
+              return 'vendor-ui';
+            }
+            
+            // Other vendor libraries
+            return 'vendor';
+          }
           
           // Gamification components chunk
-          gamification: [
-            './src/components/AchievementSystem',
-            './src/components/LeaderboardSystem',
-            './src/components/RewardSystem',
-            './src/components/QuestSystem',
-            './src/components/MysteryBox',
-            './src/components/PremiumSystem'
-          ]
+          if (id.includes('/components/') && 
+              (id.includes('Achievement') || id.includes('Leaderboard') || 
+               id.includes('Reward') || id.includes('Quest') || 
+               id.includes('Mystery') || id.includes('Premium'))) {
+            return 'gamification';
+          }
         },
         
         // Optimize chunk naming
-        chunkFileNames: (chunkInfo) => {
-          const facadeModuleId = chunkInfo.facadeModuleId ? chunkInfo.facadeModuleId.split('/').pop().replace('.jsx', '').replace('.js', '') : 'chunk';
-          return `assets/[name]-[hash].js`;
-        },
+        chunkFileNames: 'assets/[name]-[hash].js',
         
         // Optimize asset naming
         assetFileNames: 'assets/[name]-[hash].[ext]'
@@ -77,18 +71,17 @@ export default defineConfig({
       'react',
       'react-dom',
       'react-router-dom',
-      'firebase',
       'lucide-react',
       'framer-motion'
     ],
     exclude: [
-      // Exclude any problematic dependencies
+      'firebase'
     ]
   },
   
   // Server configuration for development
   server: {
-    port: 3000,
+    port: 5173,
     strictPort: false,
     host: true,
     
@@ -100,18 +93,11 @@ export default defineConfig({
   
   // Preview configuration
   preview: {
-    port: 3000,
+    port: 5173,
     strictPort: false,
     host: true
   },
   
   // Define public directory
-  publicDir: 'public',
-  
-  // Enable experimental features for better performance
-  experimental: {
-    renderBuiltUrl: (filename) => {
-      return `/${filename}`;
-    }
-  }
+  publicDir: 'public'
 });
