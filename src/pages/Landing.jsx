@@ -480,25 +480,25 @@ const Landing = () => {
               </div>
               <div className="text-center mb-8">
                 <h3 className="text-2xl font-bold mb-2">Pro</h3>
-                <div className="text-4xl font-bold mb-4">$9<span className="text-lg text-emerald-100">/month</span></div>
-                <p className="text-emerald-100">For serious students</p>
+                <div className="text-4xl font-bold mb-4">$0<span className="text-lg text-emerald-100">/month</span></div>
+                <p className="text-emerald-100">It's all free</p>
               </div>
               <ul className="space-y-4 mb-8">
                 <li className="flex items-center space-x-3">
                   <CheckCircle className="w-5 h-5 text-emerald-200" />
-                  <span>Unlimited courses</span>
+                  <span>Unlimited subjects</span>
                 </li>
                 <li className="flex items-center space-x-3">
                   <CheckCircle className="w-5 h-5 text-emerald-200" />
-                  <span>Advanced analytics</span>
+                  <span>Unlimited logging</span>
                 </li>
                 <li className="flex items-center space-x-3">
                   <CheckCircle className="w-5 h-5 text-emerald-200" />
-                  <span>AI-powered insights</span>
+                  <span>Full insight access</span>
                 </li>
                 <li className="flex items-center space-x-3">
                   <CheckCircle className="w-5 h-5 text-emerald-200" />
-                  <span>Goal tracking & reminders</span>
+                  <span>Full gamification access</span>
                 </li>
               </ul>
               <Link 
