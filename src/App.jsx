@@ -42,7 +42,8 @@ function App() {
   }, []);
 
   return (
-    <AuthProvider>
+    <LazyLoadErrorBoundary>
+      <AuthProvider>
       <GamificationProvider>
         <TimerProvider>
           <Router>
@@ -181,7 +182,8 @@ function App() {
           </Router>
         </TimerProvider>
       </GamificationProvider>
-    </AuthProvider>
+      </AuthProvider>
+    </LazyLoadErrorBoundary>
   );
 }
 
