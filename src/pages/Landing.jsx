@@ -100,7 +100,7 @@ const Landing = () => {
                 to="/signup" 
                 className="bg-gradient-to-r from-emerald-600 to-blue-600 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all duration-300 transform hover:scale-105"
               >
-                Start Free Trial
+                Let's go!
               </Link>
             </div>
           </div>
