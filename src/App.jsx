@@ -7,6 +7,7 @@ import ProtectedRoute from './routes/ProtectedRoute';
 import AppLoadingScreen from './components/AppLoadingScreen';
 import PageLoadingScreen from './components/PageLoadingScreen';
 import ComponentLoadingScreen from './components/ComponentLoadingScreen';
+import LazyLoadErrorBoundary from './components/LazyLoadErrorBoundary';
 import { preloadCriticalRoutes } from './utils/preloadRoutes';
 import './styles/index.css';
 
